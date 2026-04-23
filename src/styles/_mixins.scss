@@ -1,0 +1,152 @@
+@use 'variables' as v;
+
+@mixin respond-to($bp) {
+  @if $bp == sm {
+    @media (min-width: v.$bp-sm) {
+      @content;
+    }
+  }
+  @if $bp == md {
+    @media (min-width: v.$bp-md) {
+      @content;
+    }
+  }
+  @if $bp == lg {
+    @media (min-width: v.$bp-lg) {
+      @content;
+    }
+  }
+  @if $bp == xl {
+    @media (min-width: v.$bp-xl) {
+      @content;
+    }
+  }
+  @if $bp == 2xl {
+    @media (min-width: v.$bp-2xl) {
+      @content;
+    }
+  }
+}
+
+@mixin flex($dir: row, $align: center, $justify: flex-start, $gap: 0) {
+  display: flex;
+  flex-direction: $dir;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+@mixin grid($cols: 1, $gap: v.$space-lg) {
+  display: grid;
+  grid-template-columns: repeat($cols, 1fr);
+  gap: $gap;
+}
+
+@mixin card {
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-sm;
+  border: 1px solid v.$border;
+  transition:
+    box-shadow v.$transition-normal,
+    transform v.$transition-normal;
+  &:hover {
+    box-shadow: v.$shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-sm;
+  font-family: v.$font-body;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  border-radius: v.$radius-full;
+  transition: all v.$transition-fast;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 10px 22px;
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: v.$primary;
+  color: v.$white;
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+    box-shadow: 0 4px 14px rgba(217, 79, 61, 0.35);
+  }
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+@mixin btn-outline {
+  @include btn-base;
+  background: transparent;
+  color: v.$primary;
+  border: 2px solid v.$primary;
+  &:hover:not(:disabled) {
+    background: v.$primary-light;
+  }
+}
+
+@mixin btn-ghost {
+  @include btn-base;
+  background: transparent;
+  color: v.$text-mid;
+  &:hover:not(:disabled) {
+    background: v.$ivory-dark;
+    color: v.$text-dark;
+  }
+}
+
+@mixin input-base {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-md;
+  font-family: v.$font-body;
+  font-size: 0.95rem;
+  color: v.$text-dark;
+  background: v.$white;
+  transition:
+    border-color v.$transition-fast,
+    box-shadow v.$transition-fast;
+  outline: none;
+  &:focus {
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(217, 79, 61, 0.12);
+  }
+  &::placeholder {
+    color: v.$text-light;
+  }
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 v.$space-md;
+  @include respond-to(md) {
+    padding: 0 v.$space-xl;
+  }
+  @include respond-to(xl) {
+    padding: 0 v.$space-2xl;
+  }
+}

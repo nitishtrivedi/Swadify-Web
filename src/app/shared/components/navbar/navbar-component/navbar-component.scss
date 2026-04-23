@@ -1,0 +1,219 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 253, 245, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: all 0.25s ease;
+
+  &.scrolled {
+    border-bottom-color: v.$border;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  &__inner {
+    @include m.flex(row, center, space-between, v.$space-md);
+    height: 68px;
+  }
+
+  &__logo {
+    @include m.flex(row, center, flex-start, 10px);
+    text-decoration: none;
+  }
+
+  &__brand {
+    font-family: v.$font-display;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: v.$primary;
+    letter-spacing: -0.5px;
+  }
+
+  &__links {
+    list-style: none;
+    @include m.flex(row, center, flex-start, v.$space-lg);
+    display: none;
+    @include m.respond-to(md) {
+      display: flex;
+    }
+
+    a {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: v.$text-mid;
+      transition: color v.$transition-fast;
+      &:hover,
+      &.active {
+        color: v.$primary;
+      }
+      &.active {
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__actions {
+    @include m.flex(row, center, flex-end, v.$space-sm);
+  }
+
+  &__cart-btn {
+    position: relative;
+    @include m.flex(row, center, center);
+    color: v.$text-mid;
+    padding: 8px;
+    border-radius: v.$radius-md;
+    transition: all v.$transition-fast;
+    &:hover {
+      color: v.$primary;
+      background: v.$primary-light;
+    }
+  }
+
+  .cart-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 18px;
+    height: 18px;
+    background: v.$primary;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 50%;
+    @include m.flex(row, center, center);
+  }
+
+  .btn-sm {
+    padding: 8px 18px;
+    font-size: 0.85rem;
+  }
+
+  @include m.respond-to(md) {
+    .btn-outline,
+    .btn-primary {
+      display: inline-flex;
+    }
+  }
+
+  &__profile {
+    position: relative;
+    cursor: pointer;
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: v.$primary-light;
+      color: v.$primary;
+      font-weight: 700;
+      font-size: 0.9rem;
+      @include m.flex(row, center, center);
+      border: 2px solid v.$primary;
+    }
+  }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 200px;
+    background: v.$white;
+    border-radius: v.$radius-lg;
+    box-shadow: v.$shadow-lg;
+    border: 1px solid v.$border;
+    padding: v.$space-md;
+    animation: fadeInUp 0.2s ease;
+
+    &__name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: v.$text-dark;
+      margin-bottom: v.$space-sm;
+    }
+
+    a,
+    button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: v.$radius-md;
+      font-size: 0.875rem;
+      color: v.$text-mid;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: v.$font-body;
+      transition: all v.$transition-fast;
+      &:hover {
+        background: v.$ivory-dark;
+        color: v.$text-dark;
+      }
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid v.$border;
+      margin: v.$space-sm 0;
+    }
+
+    &__logout {
+      color: v.$primary !important;
+      font-weight: 600 !important;
+    }
+  }
+
+  &__hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    @include m.respond-to(md) {
+      display: none;
+    }
+
+    span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: v.$text-dark;
+      border-radius: 2px;
+      transition: all v.$transition-fast;
+    }
+  }
+
+  &__mobile {
+    background: v.$white;
+    border-top: 1px solid v.$border;
+    padding: v.$space-md;
+    @include m.flex(column, stretch, flex-start, v.$space-sm);
+    @include m.respond-to(md) {
+      display: none;
+    }
+
+    a,
+    button {
+      display: block;
+      padding: 12px v.$space-md;
+      font-size: 1rem;
+      color: v.$text-mid;
+      border-radius: v.$radius-md;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: v.$font-body;
+      font-size: 0.95rem;
+      text-align: left;
+      &:hover {
+        background: v.$ivory-dark;
+        color: v.$text-dark;
+      }
+    }
+  }
+}

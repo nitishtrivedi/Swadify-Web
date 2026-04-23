@@ -1,0 +1,171 @@
+// ── Auth ──────────────────────────────────────────────────
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface LoginRequest {
+  usernameOrEmail: string;
+  password: string;
+}
+export interface RegisterRequest {
+  firstName: string;
+  lastName?: string;
+  username: string;
+  email: string;
+  password: string;
+  phone?: string;
+}
+
+// ── User ──────────────────────────────────────────────────
+export type UserRole = 'Customer' | 'Admin' | 'SuperAdmin' | 'DeliveryPartner';
+
+export interface User {
+  id: string;
+  firstName: string;
+  lastName?: string;
+  username: string;
+  email: string;
+  phone?: string;
+  role: UserRole;
+  isEmailVerified: boolean;
+  profilePicUrl?: string;
+  createdAt: string;
+}
+
+// ── Restaurant ────────────────────────────────────────────
+export interface Restaurant {
+  id: string;
+  name: string;
+  description?: string;
+  cuisineType: string;
+  logoUrl?: string;
+  coverUrl?: string;
+  rating: number;
+  reviewCount: number;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+  deliveryTimeMin: number;
+  deliveryTimeMax: number;
+  minOrderAmount: number;
+  deliveryFee: number;
+  address: Address;
+}
+
+export interface Address {
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  lat?: number;
+  lng?: number;
+}
+
+// ── Menu ──────────────────────────────────────────────────
+export interface MenuCategory {
+  id: string;
+  name: string;
+  restaurantId: string;
+  sortOrder: number;
+  items: MenuItem[];
+}
+
+export interface MenuItem {
+  id: string;
+  categoryId: string;
+  restaurantId: string;
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  isVeg: boolean;
+  isAvailable: boolean;
+  preparationTimeMin: number;
+  tags?: string[];
+}
+
+// ── Cart ──────────────────────────────────────────────────
+export interface CartItem {
+  menuItem: MenuItem;
+  quantity: number;
+}
+
+export interface Cart {
+  restaurantId: string;
+  restaurantName: string;
+  items: CartItem[];
+}
+
+// ── Order ─────────────────────────────────────────────────
+export type OrderStatus =
+  | 'Placed'
+  | 'Confirmed'
+  | 'Preparing'
+  | 'PartnerAssigned'
+  | 'OutForDelivery'
+  | 'Delivered'
+  | 'Cancelled';
+
+export type PaymentMethod = 'COD' | 'Online';
+export type PaymentStatus = 'Pending' | 'Paid' | 'Refunded' | 'Failed';
+
+export interface Order {
+  id: string;
+  customerId: string;
+  restaurant: Pick<Restaurant, 'id' | 'name' | 'logoUrl'>;
+  items: CartItem[];
+  status: OrderStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  subtotal: number;
+  deliveryFee: number;
+  discount: number;
+  total: number;
+  deliveryAddress: Address;
+  deliveryPartnerId?: string;
+  deliveryPartnerName?: string;
+  otp?: string;
+  cancelReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Reviews ───────────────────────────────────────────────
+export interface Review {
+  id: string;
+  customerId: string;
+  customerName: string;
+  restaurantId: string;
+  orderId: string;
+  rating: number;
+  comment?: string;
+  adminReply?: string;
+  createdAt: string;
+}
+
+// ── Delivery Partner ──────────────────────────────────────
+export interface DeliveryPartner {
+  id: string;
+  name: string;
+  phone: string;
+  isAvailable: boolean;
+  rating: number;
+  totalDeliveries: number;
+  vehicleType: string;
+  currentLocation?: { lat: number; lng: number };
+}
+
+// ── API Wrappers ──────────────────────────────────────────
+export interface ApiResponse<T> {
+  data: T;
+  message: string;
+  success: boolean;
+}
+export interface PagedResponse<T> extends ApiResponse<T[]> {
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}

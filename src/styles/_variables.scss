@@ -1,0 +1,53 @@
+// ── Brand Colors ──────────────────────────────────────────
+$white: #ffffff;
+$ivory: #fffdf5;
+$ivory-dark: #fff8e7;
+$primary: #d94f3d; // warm red (tandoor red)
+$primary-dark: #b53c2c;
+$primary-light: #fdecea;
+$saffron: #ff9933; // Indian saffron accent
+$saffron-light: #fff3e0;
+$green: #2e7d52; // Indian flag green for success
+$green-light: #e8f5ee;
+
+// ── Neutrals ──────────────────────────────────────────────
+$text-dark: #1a1a2e;
+$text-mid: #4a4a6a;
+$text-light: #8888aa;
+$border: #ede8df;
+$border-focus: #d94f3d;
+$shadow-sm: 0 2px 8px rgba(217, 79, 61, 0.08);
+$shadow-md: 0 4px 20px rgba(217, 79, 61, 0.12);
+$shadow-lg: 0 8px 40px rgba(217, 79, 61, 0.16);
+
+// ── Typography ────────────────────────────────────────────
+$font-body: 'Poppins', sans-serif;
+$font-display: 'Playfair Display', serif;
+
+// ── Spacing scale ─────────────────────────────────────────
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+$space-2xl: 48px;
+$space-3xl: 64px;
+
+// ── Border radius ─────────────────────────────────────────
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 20px;
+$radius-xl: 32px;
+$radius-full: 9999px;
+
+// ── Transitions ───────────────────────────────────────────
+$transition-fast: 0.15s ease;
+$transition-normal: 0.25s ease;
+$transition-slow: 0.4s ease;
+
+// ── Breakpoints ───────────────────────────────────────────
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+$bp-2xl: 1536px;

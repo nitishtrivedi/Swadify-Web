@@ -1,0 +1,102 @@
+<nav class="navbar" [class.scrolled]="scrolled()">
+  <div class="container navbar__inner">
+    <!-- Logo -->
+    <a routerLink="/" class="navbar__logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#D94F3D" />
+        <path
+          d="M10 22 Q14 10 18 14 Q22 18 26 10"
+          stroke="#FFFDF5"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          fill="none"
+        />
+        <circle cx="18" cy="25" r="3" fill="#FF9933" />
+        <path
+          d="M12 28 Q18 24 24 28"
+          stroke="#FFFDF5"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          fill="none"
+        />
+      </svg>
+      <span class="navbar__brand">Swadify</span>
+    </a>
+
+    <!-- Desktop Nav Links -->
+    <ul class="navbar__links">
+      <li>
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          >Home</a
+        >
+      </li>
+      <li><a routerLink="/restaurants" routerLinkActive="active">Restaurants</a></li>
+    </ul>
+
+    <!-- Right Actions -->
+    <div class="navbar__actions">
+      @if (isLoggedIn()) {
+        <!-- Cart -->
+        <a routerLink="/cart" class="navbar__cart-btn">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+          </svg>
+          @if (cartCount() > 0) {
+            <span class="cart-badge">{{ cartCount() }}</span>
+          }
+        </a>
+
+        <!-- Profile dropdown -->
+        <div class="navbar__profile" (click)="toggleDropdown()">
+          <div class="avatar">{{ userInitial() }}</div>
+          @if (dropdownOpen()) {
+            <div class="dropdown" (click)="$event.stopPropagation()">
+              <p class="dropdown__name">{{ userName() }}</p>
+              <hr />
+              <a routerLink="/profile" (click)="dropdownOpen.set(false)">My Profile</a>
+              <a routerLink="/orders" (click)="dropdownOpen.set(false)">My Orders</a>
+              <hr />
+              <button class="dropdown__logout" (click)="logout()">Sign Out</button>
+            </div>
+          }
+        </div>
+      } @else {
+        <button class="btn-outline btn-sm" (click)="openLogin()">Log In</button>
+        <button class="btn-primary btn-sm" (click)="openRegister()">Sign Up</button>
+      }
+
+      <!-- Hamburger -->
+      <button class="navbar__hamburger" (click)="mobileOpen.set(!mobileOpen())" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  @if (mobileOpen()) {
+    <div class="navbar__mobile">
+      <a routerLink="/" (click)="mobileOpen.set(false)">Home</a>
+      <a routerLink="/restaurants" (click)="mobileOpen.set(false)">Restaurants</a>
+      @if (isLoggedIn()) {
+        <a routerLink="/cart" (click)="mobileOpen.set(false)">Cart ({{ cartCount() }})</a>
+        <a routerLink="/orders" (click)="mobileOpen.set(false)">My Orders</a>
+        <a routerLink="/profile" (click)="mobileOpen.set(false)">Profile</a>
+        <button (click)="logout()">Sign Out</button>
+      } @else {
+        <button class="btn-outline" (click)="openLogin(); mobileOpen.set(false)">Log In</button>
+        <button class="btn-primary" (click)="openRegister(); mobileOpen.set(false)">Sign Up</button>
+      }
+    </div>
+  }
+</nav>
+<p>navbar-component works!</p>

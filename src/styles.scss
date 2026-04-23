@@ -1,1 +1,139 @@
 /* You can add global styles to this file, and also import other style files */
+@use 'styles/variables' as v;
+@use 'styles/mixins' as m;
+@use 'styles/animations';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: v.$font-body;
+  background: v.$ivory;
+  color: v.$text-dark;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+// ── Typography ─────────────────────────────────────────────
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.25;
+}
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+h2 {
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+h3 {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+}
+p {
+  color: v.$text-mid;
+}
+a {
+  color: v.$primary;
+  text-decoration: none;
+}
+
+// ── Utility classes ────────────────────────────────────────
+.container {
+  @include m.container;
+}
+.btn-primary {
+  @include m.btn-primary;
+}
+.btn-outline {
+  @include m.btn-outline;
+}
+.btn-ghost {
+  @include m.btn-ghost;
+}
+.card {
+  @include m.card;
+}
+.input {
+  @include m.input-base;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.75rem;
+  font-weight: 600;
+  &--primary {
+    background: v.$primary-light;
+    color: v.$primary;
+  }
+  &--success {
+    background: v.$green-light;
+    color: v.$green;
+  }
+  &--warning {
+    background: v.$saffron-light;
+    color: darken(v.$saffron, 20%);
+  }
+  &--gray {
+    background: #f0eef8;
+    color: v.$text-mid;
+  }
+}
+
+.divider {
+  height: 1px;
+  background: v.$border;
+  margin: v.$space-lg 0;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0ede8 25%, #faf8f4 50%, #f0ede8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: v.$radius-md;
+}
+
+// ── Scrollbar ─────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: v.$ivory;
+}
+::-webkit-scrollbar-thumb {
+  background: v.$border;
+  border-radius: 3px;
+}
+
+// ── Form helpers ──────────────────────────────────────────
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-xs;
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: v.$text-dark;
+  }
+  .error-msg {
+    font-size: 0.8rem;
+    color: v.$primary;
+  }
+}
