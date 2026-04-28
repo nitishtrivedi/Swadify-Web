@@ -1,0 +1,19 @@
+<app-navbar-component (openAuth)="authModal.set($event)" />
+
+<main class="layout-main">
+  <router-outlet />
+</main>
+
+<app-footer-component />
+
+<!-- Auth modal (login/register) -->
+@if (authModal()) {
+  <app-auth-modal [mode]="authModal()!" (close)="authModal.set(null)" />
+}
+
+<!-- Cart mini-popup (shown when not on /cart) -->
+@if (cartVisible()) {
+  <app-cart-mini />
+}
+
+<app-toast-component />

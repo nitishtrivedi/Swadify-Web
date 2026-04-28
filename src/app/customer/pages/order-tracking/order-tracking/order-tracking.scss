@@ -1,0 +1,594 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+.page-header {
+  background: linear-gradient(135deg, v.$ivory-dark, v.$primary-light);
+  padding: v.$space-xl 0;
+  .back-link {
+    @include m.flex(row, center, flex-start, 6px);
+    font-size: 0.85rem;
+    color: v.$text-light;
+    margin-bottom: v.$space-sm;
+    display: inline-flex;
+    transition: color v.$transition-fast;
+    &:hover {
+      color: v.$primary;
+    }
+  }
+  h1 {
+    font-family: v.$font-display;
+  }
+  .order-id {
+    color: v.$text-light;
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+}
+
+.track-layout {
+  display: grid;
+  gap: v.$space-xl;
+  grid-template-columns: 1fr;
+  padding-top: v.$space-xl;
+  padding-bottom: v.$space-3xl;
+  align-items: start;
+  @include m.respond-to(lg) {
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+.track-skeleton {
+  display: grid;
+  gap: v.$space-lg;
+  @include m.respond-to(lg) {
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+/* ── Status Hero ───────────────────────────── */
+.status-hero {
+  @include m.flex(row, center, flex-start, v.$space-lg);
+  border-radius: v.$radius-xl;
+  padding: v.$space-xl;
+  margin-bottom: v.$space-lg;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    opacity: 0.05;
+    border-radius: inherit;
+  }
+
+  &--placed {
+    background: linear-gradient(135deg, #fff3e0, #fff8e7);
+    border: 1px solid #ffe0b2;
+  }
+  &--confirmed {
+    background: linear-gradient(135deg, v.$saffron-light, #fff3e0);
+    border: 1px solid #ffe0b2;
+  }
+  &--preparing {
+    background: linear-gradient(135deg, #fff3e0, v.$saffron-light);
+    border: 1px solid #ffb300;
+  }
+  &--partnerassigned {
+    background: linear-gradient(135deg, #ede7f6, #ebf4ff);
+    border: 1px solid #b39ddb;
+  }
+  &--outfordelivery {
+    background: linear-gradient(135deg, #ebf4ff, #e3f2fd);
+    border: 1px solid #90caf9;
+  }
+  &--delivered {
+    background: linear-gradient(135deg, v.$green-light, #e0f2f1);
+    border: 1px solid #a5d6a7;
+  }
+  &--cancelled {
+    background: linear-gradient(135deg, v.$primary-light, #fff3e0);
+    border: 1px solid #ffcdd2;
+  }
+
+  &__icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    h2 {
+      font-size: 1.2rem;
+      color: v.$text-dark;
+    }
+    p {
+      font-size: 0.85rem;
+      color: v.$text-mid;
+      margin-top: 4px;
+    }
+  }
+}
+
+.live-badge {
+  @include m.flex(row, center, center, 6px);
+  margin-left: auto;
+  flex-shrink: 0;
+  background: rgba(217, 79, 61, 0.1);
+  border: 1px solid rgba(217, 79, 61, 0.3);
+  border-radius: v.$radius-full;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: v.$primary;
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: v.$primary;
+    animation: pulse 1.2s infinite;
+  }
+}
+
+/* ── Cancel alert ──────────────────────────── */
+.cancel-alert {
+  @include m.flex(row, flex-start, flex-start, v.$space-md);
+  background: v.$primary-light;
+  border: 1px solid rgba(217, 79, 61, 0.25);
+  border-radius: v.$radius-lg;
+  padding: v.$space-lg;
+  margin-bottom: v.$space-lg;
+
+  svg {
+    flex-shrink: 0;
+    color: v.$primary;
+    margin-top: 2px;
+  }
+
+  &__title {
+    font-weight: 700;
+    color: v.$primary;
+    margin-bottom: 4px;
+  }
+  &__reason {
+    font-size: 0.85rem;
+    color: v.$text-mid;
+    margin-bottom: 6px;
+  }
+  &__refund {
+    font-size: 0.85rem;
+    color: v.$text-mid;
+    strong {
+      color: v.$green;
+      font-weight: 700;
+    }
+  }
+}
+
+/* ── Timeline ──────────────────────────────── */
+.timeline-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+  margin-bottom: v.$space-lg;
+
+  &__title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: v.$space-xl;
+  }
+}
+
+.timeline {
+  @include m.flex(column, stretch, flex-start, 0);
+}
+
+.timeline-step {
+  @include m.flex(row, flex-start, flex-start, v.$space-md);
+
+  &.cancelled .tl-circle {
+    opacity: 0.3;
+  }
+  &.cancelled .tl-label {
+    color: v.$text-light;
+  }
+}
+
+.tl-left {
+  @include m.flex(column, center, flex-start, 0);
+  flex-shrink: 0;
+  width: 36px;
+}
+
+.tl-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid v.$border;
+  background: v.$white;
+  @include m.flex(row, center, center);
+  font-size: 1rem;
+  transition: all v.$transition-normal;
+  flex-shrink: 0;
+
+  .timeline-step.done & {
+    border-color: v.$green;
+    background: v.$green-light;
+    color: v.$green;
+  }
+  .timeline-step.active & {
+    border-color: v.$primary;
+    background: v.$primary;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(217, 79, 61, 0.15);
+  }
+}
+
+.tl-line {
+  width: 2px;
+  flex: 1;
+  min-height: 40px;
+  background: v.$border;
+  margin: 4px auto;
+  .timeline-step.done & {
+    background: v.$green;
+  }
+}
+
+.tl-content {
+  flex: 1;
+  padding: 8px 0 v.$space-lg;
+}
+
+.tl-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: v.$text-dark;
+}
+.tl-sub {
+  font-size: 0.8rem;
+  color: v.$text-light;
+  margin-top: 3px;
+}
+
+.tl-dots {
+  @include m.flex(row, center, flex-start, 4px);
+  margin-top: 8px;
+  span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: v.$primary;
+    opacity: 0.4;
+    &:nth-child(1) {
+      animation: pulse 1s 0s infinite;
+    }
+    &:nth-child(2) {
+      animation: pulse 1s 0.2s infinite;
+    }
+    &:nth-child(3) {
+      animation: pulse 1s 0.4s infinite;
+    }
+  }
+}
+
+/* ── Delivery Partner card ─────────────────── */
+.dp-card {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$border;
+  padding: v.$space-md v.$space-lg;
+  margin-bottom: v.$space-lg;
+
+  &__avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: v.$primary-light;
+    color: v.$primary;
+    @include m.flex(row, center, center);
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: v.$text-dark;
+  }
+  &__sub {
+    font-size: 0.75rem;
+    color: v.$text-light;
+    margin-top: 2px;
+  }
+
+  &__actions {
+    margin-left: auto;
+  }
+}
+
+.dp-stars {
+  @include m.flex(row, center, flex-start, 2px);
+  margin-top: 4px;
+  span {
+    font-size: 0.75rem;
+    color: v.$text-light;
+    margin-left: 4px;
+  }
+}
+
+.dp-action-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: v.$green-light;
+  color: v.$green;
+  @include m.flex(row, center, center);
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$green;
+    color: v.$white;
+  }
+}
+
+/* ── OTP card ──────────────────────────────── */
+.otp-card {
+  @include m.flex(row, center, space-between, v.$space-md);
+  background: #ebf4ff;
+  border: 1px solid #90caf9;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md v.$space-lg;
+  margin-bottom: v.$space-lg;
+
+  &__left {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+  }
+  &__label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1565c0;
+  }
+  &__hint {
+    font-size: 0.75rem;
+    color: #5b8def;
+    margin-top: 2px;
+  }
+}
+
+.otp-code {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  span {
+    width: 38px;
+    height: 44px;
+    background: v.$white;
+    border: 2px solid #90caf9;
+    border-radius: v.$radius-md;
+    @include m.flex(row, center, center);
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #1565c0;
+    box-shadow: 0 2px 8px rgba(91, 141, 239, 0.15);
+  }
+}
+
+/* ── Summary card ──────────────────────────── */
+.summary-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+  margin-bottom: v.$space-lg;
+
+  &__title {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: v.$space-md;
+  }
+}
+
+.summary-restaurant {
+  p {
+    font-weight: 700;
+    color: v.$primary;
+    font-size: 0.875rem;
+  }
+  margin-bottom: v.$space-md;
+  padding-bottom: v.$space-md;
+  border-bottom: 1px solid v.$border;
+}
+
+.summary-items {
+  @include m.flex(column, stretch, flex-start, v.$space-sm);
+  margin-bottom: v.$space-md;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.sum-item {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  font-size: 0.83rem;
+  .si-name {
+    flex: 1;
+    color: v.$text-dark;
+    font-weight: 500;
+  }
+  .si-qty {
+    color: v.$text-light;
+  }
+  .si-price {
+    font-weight: 700;
+  }
+}
+
+.bill-breakdown {
+  @include m.flex(column, stretch, flex-start, v.$space-xs);
+  border-top: 1px solid v.$border;
+  padding-top: v.$space-sm;
+  margin-bottom: v.$space-sm;
+}
+
+.bb-row {
+  @include m.flex(row, center, space-between);
+  font-size: 0.82rem;
+  color: v.$text-mid;
+  &--discount {
+    color: v.$green;
+    font-weight: 600;
+  }
+}
+
+.bill-total-row {
+  @include m.flex(row, center, space-between);
+  font-weight: 800;
+  color: v.$text-dark;
+  font-size: 1rem;
+  border-top: 2px dashed v.$border;
+  padding-top: v.$space-sm;
+  margin-bottom: v.$space-md;
+}
+
+.payment-tag {
+  @include m.flex(row, center, space-between);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  &.cod {
+    background: v.$green-light;
+    color: v.$green;
+  }
+}
+
+.payment-status {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  &.paid {
+    color: v.$green;
+  }
+}
+
+/* ── Addr card ─────────────────────────────── */
+.addr-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+  margin-bottom: v.$space-lg;
+
+  h3 {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: v.$space-md;
+  }
+  p {
+    font-size: 0.875rem;
+    color: v.$text-mid;
+    line-height: 1.6;
+  }
+}
+
+/* ── Help card ─────────────────────────────── */
+.help-card {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  background: #ebf4ff;
+  border: 1px solid #bbdefb;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md v.$space-lg;
+  margin-bottom: v.$space-lg;
+
+  svg {
+    flex-shrink: 0;
+  }
+  &__title {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: v.$text-dark;
+  }
+  &__sub {
+    font-size: 0.78rem;
+    color: v.$text-light;
+    margin-top: 2px;
+  }
+}
+
+.help-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid #5b8def;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #5b8def;
+  white-space: nowrap;
+  transition: all v.$transition-fast;
+  &:hover {
+    background: #5b8def;
+    color: v.$white;
+  }
+}
+
+/* ── Review prompt ─────────────────────────── */
+.review-prompt {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+  @include m.flex(column, center, center, v.$space-md);
+  text-align: center;
+  p {
+    color: v.$text-mid;
+    font-size: 0.875rem;
+  }
+  &__stars {
+    @include m.flex(row, center, center, v.$space-xs);
+  }
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform v.$transition-fast;
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+/* Shared */
+.veg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1.5px solid v.$green;
+  flex-shrink: 0;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: v.$green;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.non-veg {
+    border-color: v.$primary;
+    &::after {
+      background: v.$primary;
+    }
+  }
+}

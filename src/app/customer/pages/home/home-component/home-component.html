@@ -1,0 +1,319 @@
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container hero__inner">
+    <div class="hero__text animate-fade-up">
+      <div class="hero__badge">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="#FF9933">
+          <circle cx="7" cy="7" r="7" />
+        </svg>
+        <span>Fresh &amp; Authentic Indian Food</span>
+      </div>
+      <h1 class="hero__headline">
+        Taste India<br />
+        <span class="hero__accent">Delivered</span> to You
+      </h1>
+      <p class="hero__sub">
+        From spicy street chaat to royal biryanis — order from the best restaurants near you, in
+        minutes.
+      </p>
+
+      <!-- Search bar -->
+      <div class="hero__search">
+        <div class="search-bar">
+          <svg
+            class="search-bar__icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            [(ngModel)]="searchQuery"
+            placeholder="Search restaurants or dishes…"
+            (keyup.enter)="goSearch()"
+          />
+          <button class="btn-primary" (click)="goSearch()">Search</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="hero__stats">
+        <div class="stat"><strong>200+</strong><span>Restaurants</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>30 min</strong><span>Avg Delivery</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>50k+</strong><span>Happy Customers</span></div>
+      </div>
+    </div>
+
+    <!-- Hero Illustration -->
+    <div class="hero__illustration">
+      <svg viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
+        <!-- Background circle -->
+        <circle cx="240" cy="240" r="220" fill="#FFF3E0" opacity="0.6" />
+        <circle cx="240" cy="240" r="170" fill="#FDECEA" opacity="0.5" />
+
+        <!-- Thali plate -->
+        <ellipse cx="240" cy="290" rx="160" ry="22" fill="rgba(0,0,0,0.06)" />
+        <circle cx="240" cy="270" r="150" fill="#FFFDF5" stroke="#EDE8DF" stroke-width="3" />
+        <circle cx="240" cy="270" r="135" fill="#FFF8E7" stroke="#EDE8DF" stroke-width="1.5" />
+
+        <!-- Rice mound -->
+        <ellipse cx="240" cy="270" rx="55" ry="32" fill="#FFF3C4" />
+        <ellipse cx="240" cy="258" rx="45" ry="20" fill="#FFFAE0" />
+
+        <!-- Dal bowl -->
+        <ellipse cx="155" cy="260" rx="38" ry="28" fill="#FFB74D" opacity="0.85" />
+        <ellipse cx="155" cy="252" rx="32" ry="20" fill="#FFA726" opacity="0.7" />
+
+        <!-- Curry bowl -->
+        <ellipse cx="325" cy="260" rx="38" ry="28" fill="#EF6C00" opacity="0.75" />
+        <ellipse cx="325" cy="252" rx="32" ry="20" fill="#E65100" opacity="0.6" />
+
+        <!-- Roti -->
+        <ellipse cx="185" cy="308" rx="30" ry="8" fill="#D7A96A" transform="rotate(-15 185 308)" />
+        <ellipse
+          cx="185"
+          cy="305"
+          rx="28"
+          ry="6"
+          fill="#C8955C"
+          opacity="0.7"
+          transform="rotate(-15 185 305)"
+        />
+
+        <!-- Papad -->
+        <ellipse cx="295" cy="308" rx="28" ry="7" fill="#FFF176" transform="rotate(12 295 308)" />
+        <ellipse
+          cx="295"
+          cy="305"
+          rx="26"
+          ry="5"
+          fill="#F9E44A"
+          opacity="0.8"
+          transform="rotate(12 295 305)"
+        />
+
+        <!-- Small katori - chutney -->
+        <circle cx="218" cy="308" r="16" fill="#4CAF50" opacity="0.75" />
+        <circle cx="218" cy="306" r="12" fill="#66BB6A" opacity="0.6" />
+
+        <!-- Garnish dots - saffron -->
+        <circle cx="240" cy="255" r="3" fill="#FF9933" />
+        <circle cx="252" cy="261" r="2" fill="#FF9933" />
+        <circle cx="228" cy="261" r="2" fill="#FF9933" />
+
+        <!-- Steam wavy lines -->
+        <path
+          d="M200 130 Q204 118 200 106 Q196 94 200 82"
+          stroke="#D94F3D"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.4"
+        />
+        <path
+          d="M240 120 Q244 108 240 96 Q236 84 240 72"
+          stroke="#FF9933"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.4"
+        />
+        <path
+          d="M280 130 Q284 118 280 106 Q276 94 280 82"
+          stroke="#D94F3D"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.4"
+        />
+
+        <!-- Decorative rangoli dots -->
+        <circle cx="100" cy="150" r="5" fill="#FF9933" opacity="0.4" />
+        <circle cx="380" cy="150" r="5" fill="#D94F3D" opacity="0.4" />
+        <circle cx="90" cy="380" r="4" fill="#FF9933" opacity="0.3" />
+        <circle cx="390" cy="380" r="4" fill="#D94F3D" opacity="0.3" />
+
+        <!-- Delivery bike -->
+        <g transform="translate(60, 80) scale(0.7)" opacity="0.9">
+          <circle cx="20" cy="40" r="14" fill="none" stroke="#D94F3D" stroke-width="3" />
+          <circle cx="20" cy="40" r="4" fill="#D94F3D" />
+          <circle cx="70" cy="40" r="14" fill="none" stroke="#D94F3D" stroke-width="3" />
+          <circle cx="70" cy="40" r="4" fill="#D94F3D" />
+          <path
+            d="M20 40 L35 20 L60 20 L70 40"
+            stroke="#D94F3D"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+          <path d="M35 20 L40 10 L58 10 L60 20" fill="#FF9933" opacity="0.8" />
+          <circle cx="45" cy="18" r="5" fill="#FFFDF5" stroke="#FF9933" stroke-width="2" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Wave divider -->
+  <div class="hero__wave">
+    <svg viewBox="0 0 1440 60" fill="none" preserveAspectRatio="none">
+      <path d="M0 60 Q360 0 720 30 Q1080 60 1440 10 L1440 60 Z" fill="#FFFDF5" />
+    </svg>
+  </div>
+</section>
+
+<!-- ── CUISINE FILTERS ────────────────────────────────── -->
+<section class="section cuisines">
+  <div class="container">
+    <h2 class="section__title">What are you craving?</h2>
+    <div class="cuisine-scroll">
+      @for (c of cuisineList; track c.label) {
+        <button
+          class="cuisine-chip"
+          [class.active]="activeCuisine() === c.label"
+          (click)="filterByCuisine(c.label)"
+        >
+          <span class="cuisine-chip__emoji">{{ c.emoji }}</span>
+          <span>{{ c.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURED RESTAURANTS ──────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section__header">
+      <h2 class="section__title">🔥 Top Rated Near You</h2>
+      <a routerLink="/restaurants" class="section__link">View all →</a>
+    </div>
+
+    @if (loadingFeatured()) {
+      <div class="restaurant-grid">
+        @for (n of [1, 2, 3, 4]; track n) {
+          <div class="skeleton" style="height: 300px; border-radius: 20px"></div>
+        }
+      </div>
+    } @else if (featuredRestaurants().length === 0) {
+      <!-- <app-empty-state
+        icon="🍽️"
+        title="No restaurants yet"
+        message="We're adding more restaurants soon!"
+      /> -->
+      <app-empty-state
+        icon="🍽️"
+        title="No restaurants yet"
+        message="We're adding more restaurants soon!"
+      />
+    } @else {
+      <div class="restaurant-grid">
+        @for (r of featuredRestaurants(); track r.id) {
+          <app-restaurant-card-component [restaurant]="r" />
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ───────────────────────────────────── -->
+<section class="section how-it-works">
+  <div class="container">
+    <h2 class="section__title center">How Swadify Works</h2>
+    <p class="section__desc center">Order your favourite food in just 3 simple steps</p>
+    <div class="steps-grid">
+      @for (step of howItWorks; track step.no) {
+        <div class="step-card">
+          <div class="step-card__no">{{ step.no }}</div>
+          <div class="step-card__icon">
+            <svg [attr.viewBox]="step.vb" width="56" height="56" fill="none">
+              <path
+                [attr.d]="step.path"
+                [attr.stroke]="'#D94F3D'"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.desc }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── APP PROMO BANNER ───────────────────────────────── -->
+<section class="section promo-banner">
+  <div class="container">
+    <div class="promo-card">
+      <div class="promo-card__text">
+        <span class="badge badge--warning">Limited Time</span>
+        <h2>Get ₹100 off on your first order!</h2>
+        <p>Use code <strong>SWADIFY100</strong> at checkout. Valid for new users only.</p>
+        <a routerLink="/restaurants" class="btn-primary">Order Now</a>
+      </div>
+      <div class="promo-card__art">
+        <svg viewBox="0 0 220 200" fill="none" width="220" height="200">
+          <circle cx="110" cy="100" r="90" fill="#FF9933" opacity="0.12" />
+          <!-- Discount tag -->
+          <rect
+            x="55"
+            y="45"
+            width="110"
+            height="110"
+            rx="16"
+            fill="#FFFDF5"
+            stroke="#FF9933"
+            stroke-width="2.5"
+          />
+          <path d="M55 78 L165 78" stroke="#FF9933" stroke-width="1.5" opacity="0.4" />
+          <text
+            x="110"
+            y="70"
+            text-anchor="middle"
+            font-family="Poppins"
+            font-weight="800"
+            font-size="13"
+            fill="#FF9933"
+          >
+            USE CODE
+          </text>
+          <text
+            x="110"
+            y="105"
+            text-anchor="middle"
+            font-family="Poppins"
+            font-weight="800"
+            font-size="18"
+            fill="#D94F3D"
+          >
+            SWADIFY100
+          </text>
+          <text
+            x="110"
+            y="132"
+            text-anchor="middle"
+            font-family="Poppins"
+            font-weight="700"
+            font-size="24"
+            fill="#2E7D52"
+          >
+            ₹100 OFF
+          </text>
+          <circle cx="55" cy="110" r="14" fill="#FFF8E7" stroke="#FF9933" stroke-width="2" />
+          <circle cx="165" cy="110" r="14" fill="#FFF8E7" stroke="#FF9933" stroke-width="2" />
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>

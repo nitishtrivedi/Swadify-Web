@@ -1,0 +1,273 @@
+@if (loading()) {
+  <div class="detail-skeleton container">
+    <div class="skeleton" style="height: 280px; border-radius: 20px; margin-bottom: 24px"></div>
+    <div class="skeleton" style="height: 48px; width: 60%; margin-bottom: 16px"></div>
+    <div class="skeleton" style="height: 24px; width: 40%; margin-bottom: 40px"></div>
+  </div>
+} @else if (restaurant()) {
+  <!-- ── COVER ──────────────────────────────────────────── -->
+  <div class="cover">
+    @if (restaurant()!.coverUrl) {
+      <img [src]="restaurant()!.coverUrl" [alt]="restaurant()!.name" class="cover__img" />
+    } @else {
+      <div class="cover__placeholder">
+        <svg viewBox="0 0 800 280" fill="none" width="100%">
+          <rect width="800" height="280" fill="#FFF3E0" />
+          <circle cx="400" cy="140" r="80" fill="#D94F3D" opacity="0.12" />
+          <!-- Decorative rangoli -->
+          <circle
+            cx="400"
+            cy="140"
+            r="50"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="1.5"
+            opacity="0.2"
+            stroke-dasharray="8 6"
+          />
+          <circle cx="400" cy="140" r="30" fill="#FF9933" opacity="0.15" />
+          <text x="400" y="152" text-anchor="middle" font-size="40">🍽️</text>
+          <!-- Side decorations -->
+          <circle cx="120" cy="60" r="24" fill="#FF9933" opacity="0.1" />
+          <circle cx="680" cy="60" r="24" fill="#D94F3D" opacity="0.1" />
+          <circle cx="120" cy="220" r="16" fill="#D94F3D" opacity="0.08" />
+          <circle cx="680" cy="220" r="16" fill="#FF9933" opacity="0.08" />
+        </svg>
+      </div>
+    }
+    <div class="cover__overlay"></div>
+
+    <!-- Status pill -->
+    <div class="cover__status" [class.open]="restaurant()!.isOpen">
+      <span class="status-dot"></span>
+      {{ restaurant()!.isOpen ? 'Open Now' : 'Closed' }}
+      · {{ restaurant()!.openTime }} – {{ restaurant()!.closeTime }}
+    </div>
+  </div>
+
+  <!-- ── HEADER INFO ─────────────────────────────────────── -->
+  <div class="container">
+    <div class="r-header">
+      <div class="r-header__info">
+        <h1 class="r-header__name">{{ restaurant()!.name }}</h1>
+        <p class="r-header__cuisine">{{ restaurant()!.cuisineType }}</p>
+
+        <div class="r-header__meta">
+          <!-- Rating -->
+          <div class="meta-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF9933">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            {{ restaurant()!.rating | number: '1.1-1' }}
+            <span>({{ restaurant()!.reviewCount }} reviews)</span>
+          </div>
+          <!-- Time -->
+          <div class="meta-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            {{ restaurant()!.deliveryTimeMin }}–{{ restaurant()!.deliveryTimeMax }} min
+          </div>
+          <!-- Delivery -->
+          <div class="meta-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3" />
+              <path d="M9 17h6M13 17h3a2 2 0 002-2v-4M16 5h3l2 5-1 7" />
+              <circle cx="5" cy="17" r="2" />
+              <circle cx="18" cy="17" r="2" />
+            </svg>
+            {{
+              restaurant()!.deliveryFee === 0
+                ? 'Free delivery'
+                : '₹' + restaurant()!.deliveryFee + ' delivery'
+            }}
+          </div>
+          <!-- Min order -->
+          <div class="meta-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+            </svg>
+            ₹{{ restaurant()!.minOrderAmount }} min order
+          </div>
+        </div>
+
+        @if (restaurant()!.description) {
+          <p class="r-header__desc">{{ restaurant()!.description }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- ── MENU LAYOUT ────────────────────────────────────── -->
+    <div class="menu-layout">
+      <!-- Category sidebar (sticky) -->
+      <aside class="category-nav">
+        <p class="category-nav__label">Menu</p>
+        @for (cat of menu(); track cat.id) {
+          <button
+            class="cat-btn"
+            [class.active]="activeCategory() === cat.id"
+            (click)="scrollToCategory(cat.id)"
+          >
+            {{ cat.name }}
+            <span class="cat-count">{{ cat.items.length }}</span>
+          </button>
+        }
+      </aside>
+
+      <!-- Menu items -->
+      <div class="menu-content">
+        <!-- Search within menu -->
+        <div class="menu-search">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input [(ngModel)]="menuSearch" placeholder="Search in menu…" />
+        </div>
+
+        <!-- Veg toggle -->
+        <div class="veg-toggle">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="vegFilter" (ngModelChange)="applyFilter()" />
+            <span class="toggle-switch"></span>
+            <span class="toggle-text">
+              <div class="veg-dot"></div>
+              Veg Only
+            </span>
+          </label>
+        </div>
+
+        @if (loadingMenu()) {
+          @for (n of [1, 2, 3]; track n) {
+            <div
+              class="skeleton"
+              style="height: 100px; margin-bottom: 16px; border-radius: 12px"
+            ></div>
+          }
+        } @else {
+          @for (cat of filteredMenu(); track cat.id) {
+            <div class="menu-section" [id]="'cat-' + cat.id">
+              <h2 class="menu-section__title">{{ cat.name }}</h2>
+              @for (item of cat.items; track item.id) {
+                <div class="menu-item" [class.unavailable]="!item.isAvailable">
+                  <div class="menu-item__info">
+                    <div class="menu-item__top">
+                      <div class="veg-dot" [class.non-veg]="!item.isVeg"></div>
+                      @if (item.tags?.includes('bestseller')) {
+                        <span class="badge badge--warning" style="font-size: 0.68rem"
+                          >Bestseller</span
+                        >
+                      }
+                    </div>
+                    <h3 class="menu-item__name">{{ item.name }}</h3>
+                    @if (item.description) {
+                      <p class="menu-item__desc">{{ item.description }}</p>
+                    }
+                    <div class="menu-item__footer">
+                      <span class="menu-item__price">₹{{ item.price }}</span>
+                      <span class="menu-item__time">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        {{ item.preparationTimeMin }} min
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="menu-item__actions">
+                    @if (item.imageUrl) {
+                      <img [src]="item.imageUrl" [alt]="item.name" class="menu-item__img" />
+                    }
+                    @if (!item.isAvailable) {
+                      <span class="unavail-label">Not available</span>
+                    } @else {
+                      @if (getQty(item.id) === 0) {
+                        <button class="add-btn" (click)="addToCart(item)">+ Add</button>
+                      } @else {
+                        <div class="qty-ctrl">
+                          <button (click)="decreaseQty(item)">−</button>
+                          <span>{{ getQty(item.id) }}</span>
+                          <button (click)="addToCart(item)">+</button>
+                        </div>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (filteredMenu().length === 0) {
+            <div class="empty-menu">
+              <span>😕</span>
+              <p>No items match your search.</p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Conflict modal -->
+@if (showConflict()) {
+  <div class="modal-backdrop" (click)="showConflict.set(false)">
+    <div class="conflict-modal" (click)="$event.stopPropagation()">
+      <div class="conflict-modal__icon">🛒</div>
+      <h3>Start a new cart?</h3>
+      <p>
+        Your cart has items from <strong>{{ cart.cart()?.restaurantName }}</strong
+        >. Adding items from a different restaurant will clear it.
+      </p>
+      <div class="conflict-modal__btns">
+        <button class="btn-outline" (click)="showConflict.set(false)">Keep existing</button>
+        <button class="btn-primary" (click)="forceAddToCart()">Start new cart</button>
+      </div>
+    </div>
+  </div>
+}

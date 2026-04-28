@@ -1,0 +1,492 @@
+<div class="page-header">
+  <div class="container">
+    <a routerLink="/cart" class="back-link">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      Back to cart
+    </a>
+    <h1>Checkout</h1>
+  </div>
+</div>
+
+<!-- Progress steps -->
+<div class="checkout-progress">
+  <div class="container">
+    <div class="progress-steps">
+      @for (step of steps; track step.no; let i = $index) {
+        <div
+          class="progress-step"
+          [class.active]="currentStep() >= step.no"
+          [class.done]="currentStep() > step.no"
+        >
+          <div class="step-circle">
+            @if (currentStep() > step.no) {
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            } @else {
+              {{ step.no }}
+            }
+          </div>
+          <span class="step-label">{{ step.label }}</span>
+          @if (i < steps.length - 1) {
+            <div class="step-line"></div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="container checkout-layout">
+  <div class="checkout-main">
+    <!-- ── STEP 1: DELIVERY ADDRESS ──────────────────── -->
+    @if (currentStep() === 1) {
+      <div class="checkout-section animate-fade-up">
+        <div class="section-head">
+          <div class="section-no">1</div>
+          <h2>Delivery Address</h2>
+        </div>
+
+        <form [formGroup]="addressForm" class="addr-form">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <input class="input" formControlName="name" placeholder="Arjun Sharma" />
+              @if (af['name'].touched && af['name'].invalid) {
+                <span class="error-msg">Name is required</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>Phone <span class="req">*</span></label>
+              <input class="input" formControlName="phone" placeholder="+91 98765 43210" />
+              @if (af['phone'].touched && af['phone'].invalid) {
+                <span class="error-msg">Valid phone required</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Address Line 1 <span class="req">*</span></label>
+            <input
+              class="input"
+              formControlName="line1"
+              placeholder="Flat no, Building name, Street"
+            />
+            @if (af['line1'].touched && af['line1'].invalid) {
+              <span class="error-msg">Address is required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Address Line 2</label>
+            <input class="input" formControlName="line2" placeholder="Area, Landmark (optional)" />
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>City <span class="req">*</span></label>
+              <input class="input" formControlName="city" placeholder="Mumbai" />
+              @if (af['city'].touched && af['city'].invalid) {
+                <span class="error-msg">Required</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>State <span class="req">*</span></label>
+              <input class="input" formControlName="state" placeholder="Maharashtra" />
+              @if (af['state'].touched && af['state'].invalid) {
+                <span class="error-msg">Required</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>Pincode <span class="req">*</span></label>
+              <input class="input" formControlName="pincode" placeholder="400001" maxlength="6" />
+              @if (af['pincode'].touched && af['pincode'].invalid) {
+                <span class="error-msg">6-digit pincode</span>
+              }
+            </div>
+          </div>
+
+          <!-- Address type tabs -->
+          <div class="addr-types">
+            <p class="addr-types__label">Save as</p>
+            <div class="addr-type-chips">
+              @for (type of addressTypes; track type.value) {
+                <button
+                  type="button"
+                  class="addr-chip"
+                  [class.active]="addrType() === type.value"
+                  (click)="addrType.set(type.value)"
+                >
+                  {{ type.icon }} {{ type.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <button type="button" class="btn-primary step-next-btn" (click)="nextStep()">
+            Continue to Payment
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- ── STEP 2: PAYMENT ────────────────────────────── -->
+    @if (currentStep() === 2) {
+      <div class="checkout-section animate-fade-up">
+        <div class="section-head">
+          <div class="section-no">2</div>
+          <h2>Payment Method</h2>
+        </div>
+
+        <!-- Address summary -->
+        <div class="addr-summary">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <div>
+            <p class="addr-summary__name">{{ addressForm.value.name }}</p>
+            <p class="addr-summary__text">
+              {{ addressForm.value.line1 }}
+              @if (addressForm.value.line2) {
+                , {{ addressForm.value.line2 }}
+              }
+              , {{ addressForm.value.city }}, {{ addressForm.value.state }} –
+              {{ addressForm.value.pincode }}
+            </p>
+          </div>
+          <button class="edit-addr-btn" (click)="currentStep.set(1)">Edit</button>
+        </div>
+
+        <!-- Payment options -->
+        <div class="payment-options">
+          <!-- Online -->
+          <label class="payment-option" [class.selected]="paymentMethod() === 'Online'">
+            <input
+              type="radio"
+              name="payment"
+              value="Online"
+              [checked]="paymentMethod() === 'Online'"
+              (change)="paymentMethod.set('Online')"
+            />
+            <div class="payment-option__content">
+              <div class="payment-option__header">
+                <div class="payment-option__icon online-icon">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <rect x="1" y="4" width="22" height="16" rx="2" />
+                    <line x1="1" y1="10" x2="23" y2="10" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="payment-option__title">Pay Online</p>
+                  <p class="payment-option__sub">UPI, Cards, Net Banking via Razorpay</p>
+                </div>
+                <div class="payment-option__radio"></div>
+              </div>
+              @if (paymentMethod() === 'Online') {
+                <div class="payment-methods-grid animate-fade-in">
+                  @for (pm of onlinePayMethods; track pm.label) {
+                    <div class="pay-method-chip">
+                      <span>{{ pm.icon }}</span>
+                      <span>{{ pm.label }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="razorpay-badge">
+                  <svg viewBox="0 0 80 20" fill="none" width="80" height="20">
+                    <rect width="80" height="20" rx="4" fill="#072654" />
+                    <text
+                      x="8"
+                      y="14"
+                      font-family="Poppins"
+                      font-size="8"
+                      font-weight="700"
+                      fill="white"
+                    >
+                      Secured by
+                    </text>
+                    <text
+                      x="46"
+                      y="14"
+                      font-family="Poppins"
+                      font-size="8"
+                      font-weight="800"
+                      fill="#3395FF"
+                    >
+                      Razorpay
+                    </text>
+                  </svg>
+                  <span>256-bit SSL encryption</span>
+                </div>
+              }
+            </div>
+          </label>
+
+          <!-- COD -->
+          <label class="payment-option" [class.selected]="paymentMethod() === 'COD'">
+            <input
+              type="radio"
+              name="payment"
+              value="COD"
+              [checked]="paymentMethod() === 'COD'"
+              (change)="paymentMethod.set('COD')"
+            />
+            <div class="payment-option__content">
+              <div class="payment-option__header">
+                <div class="payment-option__icon cod-icon">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="payment-option__title">Cash on Delivery</p>
+                  <p class="payment-option__sub">Pay when your order arrives</p>
+                </div>
+                <div class="payment-option__radio"></div>
+              </div>
+              @if (paymentMethod() === 'COD') {
+                <div class="cod-note animate-fade-in">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#FF9933"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <path
+                      d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                    />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  Please keep exact change of ₹{{ state.grandTotal || cart.subtotal() }} ready.
+                </div>
+              }
+            </div>
+          </label>
+        </div>
+
+        <!-- Place Order CTA -->
+        <button class="btn-primary place-order-btn" (click)="placeOrder()" [disabled]="placing()">
+          @if (placing()) {
+            <span class="spinner"></span> Processing…
+          } @else {
+            @if (paymentMethod() === 'Online') {
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <rect x="1" y="4" width="22" height="16" rx="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg>
+              Pay ₹{{ state.grandTotal || cart.subtotal() }}
+            } @else {
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              Place Order · ₹{{ state.grandTotal || cart.subtotal() }}
+            }
+          }
+        </button>
+
+        <p class="order-note">
+          By placing the order, you agree to our
+          <a href="#">Terms of Service</a>
+        </p>
+      </div>
+    }
+
+    <!-- ── STEP 3: CONFIRMATION ───────────────────────── -->
+    @if (currentStep() === 3) {
+      <div class="order-success animate-fade-up">
+        <div class="success-graphic">
+          <svg viewBox="0 0 200 200" fill="none" width="200" height="200">
+            <circle cx="100" cy="100" r="100" fill="#E8F5EE" />
+            <circle cx="100" cy="100" r="75" fill="#C8E6C9" opacity="0.5" />
+
+            <!-- Checkmark -->
+            <circle cx="100" cy="100" r="52" fill="#2E7D52" />
+            <path
+              d="M74 100 L90 116 L126 82"
+              stroke="white"
+              stroke-width="5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+            />
+
+            <!-- Rangoli dots -->
+            <circle cx="30" cy="60" r="6" fill="#FF9933" opacity="0.4" />
+            <circle cx="170" cy="60" r="6" fill="#D94F3D" opacity="0.4" />
+            <circle cx="30" cy="140" r="4" fill="#D94F3D" opacity="0.3" />
+            <circle cx="170" cy="140" r="4" fill="#FF9933" opacity="0.3" />
+
+            <!-- Star sparkles -->
+            <path d="M22 100 L26 94 L30 100 L26 106 Z" fill="#FF9933" opacity="0.5" />
+            <path d="M170 100 L174 94 L178 100 L174 106 Z" fill="#D94F3D" opacity="0.5" />
+          </svg>
+        </div>
+
+        <div class="success-text">
+          <h2>Order Placed! 🎉</h2>
+          <p class="success-sub">
+            Your food is being prepared. You'll receive updates as your order progresses.
+          </p>
+
+          <div class="order-id-pill">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+              <rect x="9" y="3" width="6" height="4" rx="1" />
+            </svg>
+            Order ID: <strong>#{{ placedOrderId() }}</strong>
+          </div>
+
+          @if (paymentMethod() === 'COD') {
+            <div class="cod-confirm-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#2E7D52">
+                <circle cx="12" cy="12" r="10" />
+                <path
+                  d="M12 6v6l4 2"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  fill="none"
+                />
+              </svg>
+              Keep ₹{{ state.grandTotal }} ready for the delivery partner
+            </div>
+          }
+        </div>
+
+        <div class="success-actions">
+          <a [routerLink]="['/orders', placedOrderId()]" class="btn-primary"> Track Your Order </a>
+          <a routerLink="/restaurants" class="btn-outline"> Order More Food </a>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ── ORDER SUMMARY (sidebar) ─────────────────────── -->
+  @if (currentStep() < 3) {
+    <div class="order-summary">
+      <div class="summary-card">
+        <h3 class="summary-card__title">Order Summary</h3>
+        <p class="summary-card__restaurant">{{ cart.cart()?.restaurantName }}</p>
+
+        <div class="summary-items">
+          @for (item of cart.items(); track item.menuItem.id) {
+            <div class="summary-item">
+              <div class="veg-dot" [class.non-veg]="!item.menuItem.isVeg"></div>
+              <span class="si-name">{{ item.menuItem.name }}</span>
+              <span class="si-qty">× {{ item.quantity }}</span>
+              <span class="si-price">₹{{ item.menuItem.price * item.quantity }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="summary-bill">
+          <div class="sb-row">
+            <span>Subtotal</span>
+            <span>₹{{ cart.subtotal() }}</span>
+          </div>
+          <div class="sb-row">
+            <span>Delivery</span>
+            <span>{{ (state.deliveryFee ?? 40) === 0 ? 'Free' : '₹' + state.deliveryFee }}</span>
+          </div>
+          <div class="sb-row">
+            <span>Platform fee</span>
+            <span>₹5</span>
+          </div>
+          @if (state.discount > 0) {
+            <div class="sb-row sb-discount">
+              <span>Discount</span>
+              <span>− ₹{{ state.discount }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="summary-total">
+          <span>Total</span>
+          <span>₹{{ state.grandTotal }}</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

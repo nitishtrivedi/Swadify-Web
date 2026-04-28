@@ -1,0 +1,123 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+.cart-mini {
+  position: fixed;
+  bottom: v.$space-xl;
+  left: v.$space-xl;
+  z-index: 900;
+
+  &__trigger {
+    @include m.flex(row, center, center, v.$space-sm);
+    background: v.$primary;
+    color: v.$white;
+    border: none;
+    cursor: pointer;
+    border-radius: v.$radius-full;
+    padding: 12px 20px;
+    font-family: v.$font-body;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(217, 79, 61, 0.4);
+    transition: all v.$transition-fast;
+    &:hover {
+      background: v.$primary-dark;
+      transform: scale(1.03);
+    }
+  }
+
+  &__count {
+    background: v.$white;
+    color: v.$primary;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    @include m.flex(row, center, center);
+  }
+
+  &__panel {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    background: v.$white;
+    border-radius: v.$radius-lg;
+    box-shadow: v.$shadow-lg;
+    border: 1px solid v.$border;
+    padding: v.$space-md;
+    min-width: 280px;
+    animation: fadeInUp 0.2s ease;
+  }
+
+  &__restaurant {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: v.$text-dark;
+    margin-bottom: v.$space-sm;
+  }
+
+  &__items {
+    @include m.flex(column, stretch, flex-start, v.$space-xs);
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: v.$space-md;
+  }
+
+  &__item {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    font-size: 0.85rem;
+    .item-name {
+      flex: 1;
+      color: v.$text-dark;
+    }
+    .item-qty {
+      color: v.$text-light;
+    }
+    .item-price {
+      font-weight: 600;
+      color: v.$primary;
+    }
+  }
+
+  &__footer {
+    @include m.flex(row, center, space-between);
+    border-top: 1px solid v.$border;
+    padding-top: v.$space-sm;
+    .subtotal {
+      font-size: 0.9rem;
+      color: v.$text-mid;
+    }
+  }
+}
+
+.veg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1.5px solid v.$green;
+  flex-shrink: 0;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: v.$green;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.non-veg {
+    border-color: v.$primary;
+    &::after {
+      background: v.$primary;
+    }
+  }
+}
+
+.btn-sm {
+  padding: 7px 16px;
+  font-size: 0.82rem;
+}

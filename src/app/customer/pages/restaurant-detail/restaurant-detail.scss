@@ -1,0 +1,440 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+/* ── Cover ─────────────────────────────────── */
+.cover {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  @include m.respond-to(md) {
+    height: 340px;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  &__placeholder {
+    width: 100%;
+    height: 100%;
+  }
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(26, 26, 46, 0.5));
+  }
+  &__status {
+    position: absolute;
+    bottom: v.$space-lg;
+    left: v.$space-lg;
+    @include m.flex(row, center, flex-start, v.$space-xs);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: v.$radius-full;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: v.$primary;
+    &.open {
+      color: v.$green;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: v.$primary;
+      animation: pulse 1.5s infinite;
+    }
+    &.open .status-dot {
+      background: v.$green;
+    }
+  }
+}
+
+/* ── Restaurant header ─────────────────────── */
+.r-header {
+  padding: v.$space-xl 0;
+  &__name {
+    font-family: v.$font-display;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+  }
+  &__cuisine {
+    color: v.$text-light;
+    margin-top: 4px;
+    margin-bottom: v.$space-md;
+  }
+  &__meta {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    flex-wrap: wrap;
+    margin-bottom: v.$space-md;
+  }
+  &__desc {
+    color: v.$text-mid;
+    max-width: 600px;
+  }
+}
+
+.meta-pill {
+  @include m.flex(row, center, flex-start, 5px);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  border: 1px solid v.$border;
+  span {
+    color: v.$text-light;
+    font-weight: 400;
+  }
+}
+
+/* ── Menu layout ───────────────────────────── */
+.menu-layout {
+  display: grid;
+  gap: v.$space-xl;
+  grid-template-columns: 1fr;
+  padding-bottom: v.$space-3xl;
+  @include m.respond-to(lg) {
+    grid-template-columns: 220px 1fr;
+  }
+}
+
+/* ── Category nav ──────────────────────────── */
+.category-nav {
+  display: none;
+  @include m.respond-to(lg) {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-xs;
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+  }
+
+  &__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: v.$text-light;
+    padding: 0 v.$space-md;
+    margin-bottom: v.$space-xs;
+  }
+}
+
+.cat-btn {
+  @include m.flex(row, center, space-between);
+  width: 100%;
+  text-align: left;
+  padding: 10px v.$space-md;
+  border-radius: v.$radius-md;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.875rem;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &:hover,
+  &.active {
+    background: v.$primary-light;
+    color: v.$primary;
+    font-weight: 600;
+  }
+}
+
+.cat-count {
+  background: v.$border;
+  border-radius: v.$radius-full;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  color: v.$text-light;
+}
+
+/* ── Menu content ──────────────────────────── */
+.menu-search {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 10px 16px;
+  margin-bottom: v.$space-md;
+  &:focus-within {
+    border-color: v.$primary;
+  }
+  svg {
+    color: v.$text-light;
+    flex-shrink: 0;
+  }
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: v.$font-body;
+    font-size: 0.9rem;
+    background: none;
+    &::placeholder {
+      color: v.$text-light;
+    }
+  }
+}
+
+.veg-toggle {
+  margin-bottom: v.$space-lg;
+  .toggle-label {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    cursor: pointer;
+    input {
+      display: none;
+    }
+  }
+  .toggle-text {
+    @include m.flex(row, center, flex-start, v.$space-xs);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: v.$text-mid;
+  }
+  .toggle-switch {
+    width: 42px;
+    height: 24px;
+    border-radius: v.$radius-full;
+    background: v.$border;
+    position: relative;
+    transition: background v.$transition-fast;
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: v.$white;
+      transition: transform v.$transition-fast;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+  input:checked + .toggle-switch {
+    background: v.$green;
+    &::after {
+      transform: translateX(18px);
+    }
+  }
+}
+
+/* ── Menu section ──────────────────────────── */
+.menu-section {
+  margin-bottom: v.$space-2xl;
+  &__title {
+    font-family: v.$font-display;
+    font-size: 1.3rem;
+    padding-bottom: v.$space-sm;
+    margin-bottom: v.$space-md;
+    border-bottom: 2px solid v.$border;
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: v.$primary;
+    }
+  }
+}
+
+/* ── Menu item ─────────────────────────────── */
+.menu-item {
+  @include m.flex(row, flex-start, space-between, v.$space-md);
+  padding: v.$space-md 0;
+  border-bottom: 1px solid v.$border;
+  transition: background v.$transition-fast;
+  border-radius: v.$radius-md;
+  padding: v.$space-md;
+  &:hover {
+    background: v.$ivory;
+  }
+  &.unavailable {
+    opacity: 0.55;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+  &__top {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    margin-bottom: 6px;
+  }
+  &__name {
+    font-weight: 700;
+    color: v.$text-dark;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  &__desc {
+    font-size: 0.82rem;
+    color: v.$text-light;
+    margin-bottom: v.$space-sm;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  &__footer {
+    @include m.flex(row, center, flex-start, v.$space-md);
+  }
+  &__price {
+    font-weight: 800;
+    font-size: 1rem;
+    color: v.$text-dark;
+  }
+  &__time {
+    @include m.flex(row, center, flex-start, 3px);
+    font-size: 0.75rem;
+    color: v.$text-light;
+  }
+
+  &__actions {
+    @include m.flex(column, flex-end, center, v.$space-sm);
+    flex-shrink: 0;
+  }
+  &__img {
+    width: 88px;
+    height: 88px;
+    border-radius: v.$radius-md;
+    object-fit: cover;
+    flex-shrink: 0;
+    @include m.respond-to(md) {
+      width: 100px;
+      height: 100px;
+    }
+  }
+}
+
+.veg-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  border: 1.5px solid v.$green;
+  flex-shrink: 0;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: v.$green;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.non-veg {
+    border-color: v.$primary;
+    &::after {
+      background: v.$primary;
+    }
+  }
+}
+
+.add-btn {
+  background: v.$white;
+  color: v.$primary;
+  border: 1.5px solid v.$primary;
+  border-radius: v.$radius-full;
+  padding: 7px 20px;
+  font-family: v.$font-body;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$primary;
+    color: v.$white;
+  }
+}
+
+.qty-ctrl {
+  @include m.flex(row, center, center, 0);
+  background: v.$primary;
+  border-radius: v.$radius-full;
+  overflow: hidden;
+  button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    cursor: pointer;
+    background: none;
+    color: v.$white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: background v.$transition-fast;
+    &:hover {
+      background: v.$primary-dark;
+    }
+  }
+  span {
+    width: 28px;
+    text-align: center;
+    color: v.$white;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+}
+
+.unavail-label {
+  font-size: 0.75rem;
+  color: v.$text-light;
+}
+
+.empty-menu {
+  @include m.flex(column, center, center, v.$space-sm);
+  padding: v.$space-2xl;
+  text-align: center;
+  span {
+    font-size: 2rem;
+  }
+  p {
+    color: v.$text-light;
+  }
+}
+
+/* ── Conflict modal ─────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(4px);
+  @include m.flex(row, center, center);
+}
+
+.conflict-modal {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  padding: v.$space-2xl;
+  max-width: 400px;
+  width: 90%;
+  @include m.flex(column, center, center, v.$space-md);
+  text-align: center;
+  animation: fadeInUp 0.3s ease;
+
+  &__icon {
+    font-size: 3rem;
+  }
+  h3 {
+    font-size: 1.2rem;
+  }
+  p {
+    color: v.$text-mid;
+    font-size: 0.9rem;
+  }
+  &__btns {
+    @include m.flex(row, center, center, v.$space-md);
+    width: 100%;
+  }
+}

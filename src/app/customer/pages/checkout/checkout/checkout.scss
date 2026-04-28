@@ -1,0 +1,545 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+.page-header {
+  background: linear-gradient(135deg, v.$ivory-dark, v.$primary-light);
+  padding: v.$space-xl 0;
+  .back-link {
+    @include m.flex(row, center, flex-start, 6px);
+    font-size: 0.85rem;
+    color: v.$text-light;
+    margin-bottom: v.$space-sm;
+    display: inline-flex;
+    transition: color v.$transition-fast;
+    &:hover {
+      color: v.$primary;
+    }
+  }
+  h1 {
+    font-family: v.$font-display;
+  }
+}
+
+/* ── Progress steps ────────────────────────── */
+.checkout-progress {
+  background: v.$white;
+  border-bottom: 1px solid v.$border;
+  padding: v.$space-md 0;
+}
+
+.progress-steps {
+  @include m.flex(row, center, center, 0);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.progress-step {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  position: relative;
+
+  .step-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid v.$border;
+    background: v.$white;
+    color: v.$text-light;
+    font-weight: 700;
+    font-size: 0.85rem;
+    @include m.flex(row, center, center);
+    flex-shrink: 0;
+    transition: all v.$transition-normal;
+    z-index: 1;
+  }
+
+  .step-label {
+    font-size: 0.8rem;
+    color: v.$text-light;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .step-line {
+    flex: 1;
+    min-width: 40px;
+    height: 2px;
+    background: v.$border;
+    margin: 0 v.$space-sm;
+    transition: background v.$transition-normal;
+  }
+
+  &.active .step-circle {
+    border-color: v.$primary;
+    background: v.$primary;
+    color: v.$white;
+  }
+  &.active .step-label {
+    color: v.$primary;
+  }
+
+  &.done .step-circle {
+    border-color: v.$green;
+    background: v.$green-light;
+    color: v.$green;
+  }
+  &.done + .progress-step .step-line {
+    background: v.$green;
+  }
+}
+
+/* ── Checkout layout ───────────────────────── */
+.checkout-layout {
+  display: grid;
+  gap: v.$space-xl;
+  grid-template-columns: 1fr;
+  padding-top: v.$space-xl;
+  padding-bottom: v.$space-3xl;
+  align-items: start;
+  @include m.respond-to(lg) {
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+/* ── Checkout section ──────────────────────── */
+.checkout-section {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+}
+
+.section-head {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  margin-bottom: v.$space-xl;
+
+  h2 {
+    font-size: 1.15rem;
+  }
+}
+
+.section-no {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: v.$primary;
+  color: v.$white;
+  font-weight: 800;
+  font-size: 0.9rem;
+  @include m.flex(row, center, center);
+  flex-shrink: 0;
+}
+
+/* ── Address form ──────────────────────────── */
+.addr-form {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: v.$space-md;
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: v.$space-md;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.req {
+  color: v.$primary;
+}
+
+.addr-types {
+  &__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: v.$text-mid;
+    margin-bottom: v.$space-sm;
+  }
+}
+
+.addr-type-chips {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+}
+
+.addr-chip {
+  padding: 8px 16px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid v.$border;
+  background: v.$white;
+  font-family: v.$font-body;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  cursor: pointer;
+  transition: all v.$transition-fast;
+  &.active {
+    border-color: v.$primary;
+    background: v.$primary-light;
+    color: v.$primary;
+  }
+  &:hover {
+    border-color: v.$primary;
+  }
+}
+
+.step-next-btn {
+  margin-top: v.$space-md;
+  padding: 14px 28px;
+  @include m.flex(row, center, center, v.$space-sm);
+}
+
+/* ── Address summary ───────────────────────── */
+.addr-summary {
+  @include m.flex(row, flex-start, flex-start, v.$space-md);
+  background: v.$primary-light;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md v.$space-lg;
+  margin-bottom: v.$space-xl;
+  border: 1px solid rgba(217, 79, 61, 0.2);
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  &__name {
+    font-weight: 700;
+    color: v.$text-dark;
+    font-size: 0.9rem;
+  }
+  &__text {
+    font-size: 0.82rem;
+    color: v.$text-mid;
+    margin-top: 3px;
+  }
+}
+
+.edit-addr-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.82rem;
+  color: v.$primary;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: v.$radius-full;
+  border: 1px solid v.$primary;
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$primary;
+    color: v.$white;
+  }
+}
+
+/* ── Payment options ───────────────────────── */
+.payment-options {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+  margin-bottom: v.$space-xl;
+}
+
+.payment-option {
+  border: 2px solid v.$border;
+  border-radius: v.$radius-lg;
+  cursor: pointer;
+  transition: all v.$transition-fast;
+  overflow: hidden;
+  input[type='radio'] {
+    display: none;
+  }
+
+  &.selected {
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(217, 79, 61, 0.1);
+  }
+
+  &__content {
+    padding: v.$space-lg;
+  }
+
+  &__header {
+    @include m.flex(row, center, flex-start, v.$space-md);
+  }
+
+  &__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: v.$radius-md;
+    @include m.flex(row, center, center);
+    flex-shrink: 0;
+    &.online-icon {
+      background: #ebf4ff;
+      color: #5b8def;
+    }
+    &.cod-icon {
+      background: v.$green-light;
+      color: v.$green;
+    }
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: v.$text-dark;
+  }
+  &__sub {
+    font-size: 0.8rem;
+    color: v.$text-light;
+    margin-top: 2px;
+  }
+
+  &__radio {
+    margin-left: auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid v.$border;
+    flex-shrink: 0;
+    position: relative;
+    transition: all v.$transition-fast;
+  }
+
+  &.selected &__radio {
+    border-color: v.$primary;
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: v.$primary;
+    }
+  }
+}
+
+.payment-methods-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-sm;
+  margin-top: v.$space-md;
+  padding-top: v.$space-md;
+  border-top: 1px solid v.$border;
+}
+
+.pay-method-chip {
+  @include m.flex(row, center, flex-start, 6px);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  border: 1px solid v.$border;
+}
+
+.razorpay-badge {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  margin-top: v.$space-sm;
+  span {
+    font-size: 0.72rem;
+    color: v.$text-light;
+  }
+}
+
+.cod-note {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$saffron-light;
+  border-radius: v.$radius-md;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: darken(#ff9933, 25%);
+  margin-top: v.$space-md;
+  border-top: 1px solid v.$border;
+}
+
+.place-order-btn {
+  width: 100%;
+  justify-content: center;
+  gap: v.$space-sm;
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: v.$radius-full;
+  margin-bottom: v.$space-sm;
+}
+
+.order-note {
+  text-align: center;
+  font-size: 0.78rem;
+  color: v.$text-light;
+  a {
+    color: v.$primary;
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* ── Success state ─────────────────────────── */
+.order-success {
+  @include m.flex(column, center, center, v.$space-xl);
+  padding: v.$space-3xl v.$space-lg;
+  text-align: center;
+}
+
+.success-graphic svg {
+  filter: drop-shadow(0 8px 24px rgba(46, 125, 82, 0.2));
+}
+
+.success-text {
+  @include m.flex(column, center, center, v.$space-md);
+  h2 {
+    font-family: v.$font-display;
+    font-size: 2rem;
+    color: v.$text-dark;
+  }
+}
+
+.success-sub {
+  color: v.$text-mid;
+  max-width: 380px;
+  font-size: 0.95rem;
+}
+
+.order-id-pill {
+  @include m.flex(row, center, center, v.$space-sm);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  color: v.$text-mid;
+  strong {
+    color: v.$text-dark;
+  }
+}
+
+.cod-confirm-note {
+  @include m.flex(row, center, center, v.$space-sm);
+  background: v.$green-light;
+  border-radius: v.$radius-full;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: v.$green;
+}
+
+.success-actions {
+  @include m.flex(row, center, center, v.$space-md);
+  flex-wrap: wrap;
+}
+
+/* ── Order Summary card ─────────────────────── */
+.summary-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+  position: sticky;
+  top: 90px;
+
+  &__title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: v.$space-xs;
+  }
+  &__restaurant {
+    font-size: 0.82rem;
+    color: v.$primary;
+    font-weight: 600;
+    margin-bottom: v.$space-md;
+  }
+}
+
+.summary-items {
+  @include m.flex(column, stretch, flex-start, v.$space-sm);
+  margin-bottom: v.$space-md;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.summary-item {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  font-size: 0.83rem;
+  .si-name {
+    flex: 1;
+    color: v.$text-dark;
+    font-weight: 500;
+  }
+  .si-qty {
+    color: v.$text-light;
+  }
+  .si-price {
+    font-weight: 700;
+    color: v.$text-dark;
+  }
+}
+
+.summary-bill {
+  @include m.flex(column, stretch, flex-start, v.$space-xs);
+  border-top: 1px solid v.$border;
+  padding-top: v.$space-md;
+  margin-bottom: v.$space-md;
+}
+
+.sb-row {
+  @include m.flex(row, center, space-between);
+  font-size: 0.83rem;
+  color: v.$text-mid;
+}
+.sb-discount {
+  color: v.$green;
+  font-weight: 600;
+}
+
+.summary-total {
+  @include m.flex(row, center, space-between);
+  font-weight: 800;
+  font-size: 1rem;
+  color: v.$text-dark;
+  border-top: 2px dashed v.$border;
+  padding-top: v.$space-md;
+}
+
+.veg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1.5px solid v.$green;
+  flex-shrink: 0;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: v.$green;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.non-veg {
+    border-color: v.$primary;
+    &::after {
+      background: v.$primary;
+    }
+  }
+}

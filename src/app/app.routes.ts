@@ -3,21 +3,64 @@ import { authGuard, adminGuard, dpGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   //   // ── Customer routes ───────────────────────────────────────
-  //   {
-  //     path: '',
-  //     loadComponent: () => import('./customer/layout/customer-layout.component')
-  //                          .then(m => m.CustomerLayoutComponent),
-  //     children: [
-  //       { path: '', loadComponent: () => import('./customer/pages/home/home.component').then(m => m.HomeComponent) },
-  //       { path: 'restaurants', loadComponent: () => import('./customer/pages/restaurants/restaurants.component').then(m => m.RestaurantsComponent) },
-  //       { path: 'restaurants/:id', loadComponent: () => import('./customer/pages/restaurant-detail/restaurant-detail.component').then(m => m.RestaurantDetailComponent) },
-  //       { path: 'cart',      canActivate: [authGuard], loadComponent: () => import('./customer/pages/cart/cart.component').then(m => m.CartComponent) },
-  //       { path: 'checkout',  canActivate: [authGuard], loadComponent: () => import('./customer/pages/checkout/checkout.component').then(m => m.CheckoutComponent) },
-  //       { path: 'orders',    canActivate: [authGuard], loadComponent: () => import('./customer/pages/orders/orders.component').then(m => m.OrdersComponent) },
-  //       { path: 'orders/:id',canActivate: [authGuard], loadComponent: () => import('./customer/pages/order-tracking/order-tracking.component').then(m => m.OrderTrackingComponent) },
-  //       { path: 'profile',   canActivate: [authGuard], loadComponent: () => import('./customer/pages/profile/profile.component').then(m => m.ProfileComponent) },
-  //     ]
-  //   },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./customer/layout/customer-layout/customer-layout').then((m) => m.CustomerLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./customer/pages/home/home-component/home-component').then(
+            (m) => m.HomeComponent,
+          ),
+      },
+      {
+        path: 'restaurants',
+        loadComponent: () =>
+          import('./customer/pages/restaurants/restaurants/restaurants').then((m) => m.Restaurants),
+      },
+      {
+        path: 'restaurants/:id',
+        loadComponent: () =>
+          import('./customer/pages/restaurant-detail/restaurant-detail').then(
+            (m) => m.RestaurantDetail,
+          ),
+      },
+      // {
+      //   path: 'cart',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./customer/pages/car').then((m) => m.CartComponent),
+      // },
+      // {
+      //   path: 'checkout',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./customer/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
+      // },
+      // {
+      //   path: 'orders',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./customer/pages/orders/orders.component').then((m) => m.OrdersComponent),
+      // },
+      // {
+      //   path: 'orders/:id',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./customer/pages/order-tracking/order-tracking.component').then(
+      //       (m) => m.OrderTrackingComponent,
+      //     ),
+      // },
+      // {
+      //   path: 'profile',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./customer/pages/profile/profile.component').then((m) => m.ProfileComponent),
+      // },
+    ],
+  },
 
   //   // ── Admin routes ──────────────────────────────────────────
   //   {

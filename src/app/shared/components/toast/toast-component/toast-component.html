@@ -1,0 +1,9 @@
+<div class="toast-container">
+  @for (t of toastSvc.toasts(); track t.id) {
+    <div class="toast toast--{{ t.type }}" (click)="toastSvc.dismiss(t.id)">
+      <span class="toast__icon">{{ iconFor(t.type) }}</span>
+      <span class="toast__msg">{{ t.message }}</span>
+      <button class="toast__close">✕</button>
+    </div>
+  }
+</div>

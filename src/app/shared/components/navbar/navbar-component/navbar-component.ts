@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth-service';
 import { CartService } from '../../../../core/services/cart-service';
@@ -14,6 +14,8 @@ export class NavbarComponent {
   private auth = inject(AuthService);
   private cart = inject(CartService);
   private router = inject(Router);
+
+  openAuth = output<'login' | 'register'>();
 
   scrolled = signal(false);
   dropdownOpen = signal(false);
@@ -35,9 +37,11 @@ export class NavbarComponent {
     this.dropdownOpen.update((v) => !v);
   }
   openLogin() {
+    this.openAuth.emit('login');
     this.router.navigate([], { queryParams: { action: 'login' } });
   }
   openRegister() {
+    this.openAuth.emit('register');
     this.router.navigate([], { queryParams: { action: 'register' } });
   }
   logout() {

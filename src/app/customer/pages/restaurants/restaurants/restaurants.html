@@ -1,0 +1,105 @@
+<div class="page-header">
+  <div class="container">
+    <h1>All Restaurants</h1>
+    <p>{{ totalCount() }} restaurants available</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <!-- Search + Filters bar -->
+  <div class="filters-bar">
+    <div class="search-inline">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <input
+        [(ngModel)]="search"
+        (ngModelChange)="onSearch()"
+        placeholder="Search restaurants or cuisines…"
+      />
+      @if (search()) {
+        <button class="clear-btn" (click)="search.set(''); onSearch()">✕</button>
+      }
+    </div>
+
+    <div class="filter-chips">
+      <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="loadRestaurants()">
+        <option value="rating">Top Rated</option>
+        <option value="deliveryTime">Fastest Delivery</option>
+        <option value="minOrder">Min Order</option>
+      </select>
+
+      <button
+        class="filter-chip"
+        [class.active]="vegOnly()"
+        (click)="vegOnly.set(!vegOnly()); loadRestaurants()"
+      >
+        <div class="veg-dot"></div>
+        Pure Veg
+      </button>
+
+      <button
+        class="filter-chip"
+        [class.active]="openNow()"
+        (click)="openNow.set(!openNow()); loadRestaurants()"
+      >
+        🟢 Open Now
+      </button>
+    </div>
+  </div>
+
+  <!-- Active cuisine pill -->
+  @if (activeCuisine()) {
+    <div class="active-filter">
+      <span
+        >Cuisine: <strong>{{ activeCuisine() }}</strong></span
+      >
+      <button (click)="activeCuisine.set(''); loadRestaurants()">✕</button>
+    </div>
+  }
+
+  <!-- Grid -->
+  @if (loading()) {
+    <div class="r-grid">
+      @for (n of [1, 2, 3, 4, 5, 6]; track n) {
+        <div class="skeleton" style="height: 290px; border-radius: 20px"></div>
+      }
+    </div>
+  } @else if (restaurants().length === 0) {
+    <div class="empty-state">
+      <svg viewBox="0 0 160 140" fill="none" width="180">
+        <circle cx="80" cy="70" r="60" fill="#FDECEA" opacity="0.6" />
+        <text x="80" y="85" text-anchor="middle" font-size="52">🔍</text>
+      </svg>
+      <h3>No restaurants found</h3>
+      <p>Try adjusting your search or filters.</p>
+      <button class="btn-outline" (click)="resetFilters()">Reset Filters</button>
+    </div>
+  } @else {
+    <div class="r-grid">
+      @for (r of restaurants(); track r.id) {
+        <app-restaurant-card-component [restaurant]="r" />
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button [disabled]="page() === 1" (click)="setPage(page() - 1)">‹</button>
+        @for (p of pageRange(); track p) {
+          <button [class.active]="p === page()" (click)="setPage(p)">{{ p }}</button>
+        }
+        <button [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">›</button>
+      </div>
+    }
+  }
+</div>

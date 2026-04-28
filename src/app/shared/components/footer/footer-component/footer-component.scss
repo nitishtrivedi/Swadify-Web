@@ -1,0 +1,92 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.footer {
+  background: v.$text-dark;
+  color: rgba(255, 255, 255, 0.7);
+  padding-top: v.$space-3xl;
+  font-size: 0.875rem;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$space-2xl;
+    padding-bottom: v.$space-2xl;
+
+    @include m.respond-to(md) {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+  }
+
+  &__brand {
+    p {
+      margin-top: v.$space-md;
+      line-height: 1.7;
+      max-width: 260px;
+    }
+  }
+
+  &__logo {
+    @include m.flex(row, center, flex-start, 10px);
+    span {
+      font-family: v.$font-display;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: v.$white;
+    }
+  }
+
+  &__social {
+    @include m.flex(row, center, flex-start, v.$space-md);
+    margin-top: v.$space-lg;
+    a {
+      color: rgba(255, 255, 255, 0.5);
+      transition: color v.$transition-fast;
+      &:hover {
+        color: v.$saffron;
+      }
+    }
+  }
+
+  &__col {
+    @include m.flex(column, flex-start, flex-start, v.$space-sm);
+    h4 {
+      color: v.$white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: v.$space-xs;
+    }
+    a {
+      color: rgba(255, 255, 255, 0.6);
+      transition: color v.$transition-fast;
+      &:hover {
+        color: v.$saffron;
+      }
+    }
+  }
+
+  &__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: v.$space-lg;
+    padding-bottom: v.$space-lg;
+    @include m.flex(column, center, center, v.$space-sm);
+    text-align: center;
+    @include m.respond-to(md) {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+
+  &__legal {
+    @include m.flex(row, center, flex-start, v.$space-lg);
+    a {
+      color: rgba(255, 255, 255, 0.5);
+      &:hover {
+        color: v.$white;
+      }
+    }
+  }
+}

@@ -1,0 +1,175 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-box__header">
+      <div class="modal-box__logo">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="18" fill="#D94F3D" />
+          <path
+            d="M10 22 Q14 10 18 14 Q22 18 26 10"
+            stroke="#FFFDF5"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <circle cx="18" cy="25" r="3" fill="#FF9933" />
+        </svg>
+        <span>Swadify</span>
+      </div>
+      <button class="modal-box__close" (click)="close.emit()">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="modal-box__tabs">
+      <button [class.active]="currentMode() === 'login'" (click)="currentMode.set('login')">
+        Log In
+      </button>
+      <button [class.active]="currentMode() === 'register'" (click)="currentMode.set('register')">
+        Sign Up
+      </button>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
+    @if (currentMode() === 'login') {
+      <form [formGroup]="loginForm" (ngSubmit)="doLogin()" class="modal-box__form">
+        <p class="modal-box__subtitle">Welcome back! Log in to continue.</p>
+
+        <div class="form-group">
+          <label>Username or Email</label>
+          <input
+            class="input"
+            formControlName="usernameOrEmail"
+            placeholder="you@example.com"
+            autocomplete="username"
+          />
+          @if (
+            loginForm.get('usernameOrEmail')?.touched && loginForm.get('usernameOrEmail')?.invalid
+          ) {
+            <span class="error-msg">This field is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input
+              class="input"
+              [type]="showPwd() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <button type="button" class="eye-btn" (click)="showPwd.set(!showPwd())">
+              {{ showPwd() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+            <span class="error-msg">Password is required</span>
+          }
+        </div>
+
+        <a href="#" class="forgot-link">Forgot password?</a>
+
+        <button type="submit" class="btn-primary w-full" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+          }
+          Log In
+        </button>
+      </form>
+    }
+
+    <!-- ── REGISTER FORM ── -->
+    @if (currentMode() === 'register') {
+      <form [formGroup]="registerForm" (ngSubmit)="doRegister()" class="modal-box__form">
+        <p class="modal-box__subtitle">Create your free account.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name <span class="req">*</span></label>
+            <input class="input" formControlName="firstName" placeholder="Arjun" />
+            @if (rf['firstName'].touched && rf['firstName'].invalid) {
+              <span class="error-msg">Required</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input class="input" formControlName="lastName" placeholder="Sharma" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Username <span class="req">*</span></label>
+          <input class="input" formControlName="username" placeholder="arjun_sharma" />
+          @if (rf['username'].touched && rf['username'].invalid) {
+            <span class="error-msg">
+              {{ rf['username'].hasError('required') ? 'Required' : 'Min 3 characters' }}
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Email <span class="req">*</span></label>
+          <input class="input" formControlName="email" type="email" placeholder="arjun@email.com" />
+          @if (rf['email'].touched && rf['email'].invalid) {
+            <span class="error-msg">Enter a valid email</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Password <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input
+              class="input"
+              [type]="showPwd() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Min 8 characters"
+            />
+            <button type="button" class="eye-btn" (click)="showPwd.set(!showPwd())">
+              {{ showPwd() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (rf['password'].touched && rf['password'].invalid) {
+            <span class="error-msg">Min 8 characters required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Phone <span class="optional">(optional)</span></label>
+          <input class="input" formControlName="phone" placeholder="+91 98765 43210" />
+        </div>
+
+        <p class="terms">
+          By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+        </p>
+
+        <button type="submit" class="btn-primary w-full" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+          }
+          Create Account
+        </button>
+      </form>
+    }
+
+    <!-- success state -->
+    @if (registered()) {
+      <div class="modal-box__success">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="32" fill="#E8F5EE" />
+          <path
+            d="M20 32 l9 9 l16-16"
+            stroke="#2E7D52"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </svg>
+        <h3>Check your inbox!</h3>
+        <p>We've sent a verification link to your email. Verify to start ordering.</p>
+        <button class="btn-outline" (click)="close.emit()">Got it</button>
+      </div>
+    }
+  </div>
+</div>

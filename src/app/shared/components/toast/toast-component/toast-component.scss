@@ -1,0 +1,59 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.toast-container {
+  position: fixed;
+  bottom: v.$space-xl;
+  right: v.$space-xl;
+  z-index: 9999;
+  @include m.flex(column, flex-end, flex-end, v.$space-sm);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: all;
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  padding: 14px 18px;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-lg;
+  min-width: 280px;
+  max-width: 380px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  animation: slideInRight 0.3s ease;
+  border-left: 4px solid transparent;
+
+  &--success {
+    background: v.$white;
+    border-left-color: v.$green;
+    color: v.$green;
+  }
+  &--error {
+    background: v.$white;
+    border-left-color: v.$primary;
+    color: v.$primary;
+  }
+  &--info {
+    background: v.$white;
+    border-left-color: #5b8def;
+    color: #5b8def;
+  }
+  &--warning {
+    background: v.$white;
+    border-left-color: v.$saffron;
+    color: darken(v.$saffron, 20%);
+  }
+
+  &__msg {
+    flex: 1;
+    color: v.$text-dark;
+  }
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: v.$text-light;
+    font-size: 0.75rem;
+  }
+}

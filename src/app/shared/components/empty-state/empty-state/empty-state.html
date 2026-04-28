@@ -1,0 +1,166 @@
+<div class="empty-state">
+  <div class="empty-state__graphic">
+    @switch (icon) {
+      @case ('cart') {
+        <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="90" r="80" fill="#FDECEA" opacity="0.5" />
+          <rect
+            x="55"
+            y="48"
+            width="90"
+            height="70"
+            rx="10"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="2.5"
+            stroke-dasharray="6 4"
+            opacity="0.4"
+          />
+          <path
+            d="M30 38 L45 38 L58 95 L142 95 L155 58 L58 58"
+            stroke="#D94F3D"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+          <circle cx="72" cy="112" r="9" fill="none" stroke="#D94F3D" stroke-width="2.5" />
+          <circle cx="128" cy="112" r="9" fill="none" stroke="#D94F3D" stroke-width="2.5" />
+          <path
+            d="M85 72 L115 72 M100 58 L100 86"
+            stroke="#FF9933"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      }
+      @case ('orders') {
+        <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="90" r="80" fill="#FFF3E0" opacity="0.5" />
+          <rect
+            x="48"
+            y="40"
+            width="104"
+            height="110"
+            rx="10"
+            fill="#FFFDF5"
+            stroke="#EDE8DF"
+            stroke-width="2"
+          />
+          <rect x="48" y="40" width="104" height="28" rx="10" fill="#FDECEA" />
+          <path d="M65 56 L135 56" stroke="#D94F3D" stroke-width="2" stroke-linecap="round" />
+          <path d="M65 82 L110 82" stroke="#EDE8DF" stroke-width="2" stroke-linecap="round" />
+          <path d="M65 98 L125 98" stroke="#EDE8DF" stroke-width="2" stroke-linecap="round" />
+          <path d="M65 114 L100 114" stroke="#EDE8DF" stroke-width="2" stroke-linecap="round" />
+          <circle cx="148" cy="138" r="22" fill="#FFF3E0" stroke="#FF9933" stroke-width="2" />
+          <path
+            d="M140 138 L145 143 L156 132"
+            stroke="#FF9933"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      }
+      @case ('search') {
+        <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="90" r="80" fill="#FFF3E0" opacity="0.4" />
+          <circle
+            cx="88"
+            cy="80"
+            r="38"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="3"
+            opacity="0.5"
+          />
+          <circle cx="88" cy="80" r="24" fill="#FDECEA" opacity="0.6" />
+          <path
+            d="M115 107 L140 132"
+            stroke="#D94F3D"
+            stroke-width="3"
+            stroke-linecap="round"
+            opacity="0.7"
+          />
+          <path
+            d="M80 68 Q88 62 96 68"
+            stroke="#D94F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+            fill="none"
+            opacity="0.5"
+          />
+          <path
+            d="M80 84 Q88 90 96 84"
+            stroke="#D94F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+            fill="none"
+            opacity="0.5"
+          />
+        </svg>
+      }
+      @case ('restaurant') {
+        <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="90" r="80" fill="#FFF3E0" opacity="0.5" />
+          <rect
+            x="50"
+            y="70"
+            width="100"
+            height="75"
+            rx="8"
+            fill="#FFFDF5"
+            stroke="#EDE8DF"
+            stroke-width="2"
+          />
+          <path d="M50 84 L150 84" stroke="#EDE8DF" stroke-width="1.5" />
+          <rect x="80" y="95" width="40" height="50" rx="4" fill="#FDECEA" />
+          <rect
+            x="60"
+            y="95"
+            width="16"
+            height="20"
+            rx="3"
+            fill="#FFF3E0"
+            stroke="#EDE8DF"
+            stroke-width="1.5"
+          />
+          <rect
+            x="124"
+            y="95"
+            width="16"
+            height="20"
+            rx="3"
+            fill="#FFF3E0"
+            stroke="#EDE8DF"
+            stroke-width="1.5"
+          />
+          <path
+            d="M60 70 L75 50 L100 45 L125 50 L140 70"
+            fill="#FDECEA"
+            stroke="#D94F3D"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+          <circle cx="100" cy="58" r="7" fill="#FF9933" opacity="0.7" />
+        </svg>
+      }
+      @default {
+        <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="90" r="80" fill="#FDECEA" opacity="0.4" />
+          <text x="100" y="108" text-anchor="middle" font-size="64">{{ icon }}</text>
+        </svg>
+      }
+    }
+  </div>
+
+  <h3 class="empty-state__title">{{ title }}</h3>
+  <p class="empty-state__message">{{ message }}</p>
+
+  @if (actionLabel && actionRoute) {
+    <a [routerLink]="actionRoute" class="btn-primary">{{ actionLabel }}</a>
+  }
+  @if (actionLabel && !actionRoute && actionClick) {
+    <button class="btn-primary" (click)="actionClick()">{{ actionLabel }}</button>
+  }
+</div>
