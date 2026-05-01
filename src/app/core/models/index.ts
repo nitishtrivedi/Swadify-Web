@@ -6,16 +6,24 @@ export interface AuthTokens {
 }
 
 export interface LoginRequest {
-  usernameOrEmail: string;
+  identifier: string;
   password: string;
 }
 export interface RegisterRequest {
   firstName: string;
-  lastName?: string;
+  lastName: string; // ✅ required
   username: string;
   email: string;
   password: string;
-  phone?: string;
+  phoneNumber: string; // ✅ correct name
+  role?: number; // optional (backend defaults anyway)
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
+  user: User;
 }
 
 // ── User ──────────────────────────────────────────────────
@@ -160,9 +168,9 @@ export interface DeliveryPartner {
 
 // ── API Wrappers ──────────────────────────────────────────
 export interface ApiResponse<T> {
-  data: T;
-  message: string;
   success: boolean;
+  message: string;
+  data: T;
 }
 export interface PagedResponse<T> extends ApiResponse<T[]> {
   totalCount: number;

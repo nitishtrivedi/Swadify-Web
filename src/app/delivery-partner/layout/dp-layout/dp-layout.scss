@@ -1,0 +1,141 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+.dp-shell {
+  min-height: 100vh;
+  background: #f4f2ef;
+  @include m.flex(column, stretch, flex-start, 0);
+  padding-bottom: 70px; // space for bottom nav
+}
+
+/* Top bar */
+.dp-topbar {
+  @include m.flex(row, center, space-between, v.$space-md);
+  background: v.$white;
+  border-bottom: 1px solid v.$border;
+  padding: 0 v.$space-lg;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 700;
+  flex-shrink: 0;
+
+  &__brand {
+    @include m.flex(row, center, flex-start, v.$space-xs);
+    font-size: 1rem;
+    color: v.$text-dark;
+    svg {
+      flex-shrink: 0;
+    }
+    strong {
+      color: v.$primary;
+    }
+  }
+
+  &__logout {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: v.$text-light;
+    padding: 8px;
+    border-radius: v.$radius-sm;
+    transition: color v.$transition-fast;
+    &:hover {
+      color: v.$primary;
+    }
+  }
+}
+
+/* Online toggle */
+.online-toggle {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  cursor: pointer;
+  input {
+    display: none;
+  }
+
+  &__track {
+    width: 44px;
+    height: 24px;
+    border-radius: v.$radius-full;
+    background: v.$border;
+    position: relative;
+    flex-shrink: 0;
+    transition: background v.$transition-fast;
+    .online-toggle input:checked + & {
+      background: v.$green;
+    }
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: v.$white;
+    transition: transform v.$transition-fast;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    .online-toggle input:checked ~ .online-toggle__track & {
+      transform: translateX(20px);
+    }
+  }
+
+  &__label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: v.$text-light;
+    &.online {
+      color: v.$green;
+    }
+  }
+}
+
+/* Main */
+.dp-main {
+  flex: 1;
+  padding: v.$space-lg;
+  @include m.respond-to(md) {
+    padding: v.$space-xl;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+/* Bottom nav */
+.dp-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: v.$white;
+  border-top: 1px solid v.$border;
+  @include m.flex(row, stretch, stretch, 0);
+  z-index: 700;
+}
+
+.dp-nav-item {
+  flex: 1;
+  @include m.flex(column, center, center, 3px);
+  text-decoration: none;
+  color: v.$text-light;
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: color v.$transition-fast;
+  border-top: 2px solid transparent;
+
+  &__icon {
+    font-size: 1.3rem;
+  }
+  &__label {
+    text-align: center;
+  }
+
+  &.active {
+    color: v.$primary;
+    border-top-color: v.$primary;
+  }
+}

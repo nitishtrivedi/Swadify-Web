@@ -1,0 +1,442 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.dp-dash {
+  @include m.flex(column, stretch, flex-start, v.$space-lg);
+}
+
+/* Stats */
+.dp-stats {
+  display: grid;
+  gap: v.$space-sm;
+  grid-template-columns: repeat(2, 1fr);
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.dp-stat-card {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$border;
+  padding: v.$space-md;
+  border-left: 4px solid var(--col);
+
+  &__icon {
+    font-size: 1.4rem;
+  }
+  &__value {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: v.$text-dark;
+  }
+  &__label {
+    font-size: 0.7rem;
+    color: v.$text-light;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Active order */
+.active-order-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 2px solid v.$primary;
+  padding: v.$space-lg;
+  box-shadow: 0 4px 20px rgba(217, 79, 61, 0.12);
+
+  &__header {
+    @include m.flex(row, center, space-between);
+    margin-bottom: v.$space-lg;
+  }
+
+  &__id {
+    font-family: monospace;
+    font-weight: 700;
+    color: v.$text-light;
+  }
+  &__actions {
+    @include m.flex(column, stretch, flex-start, v.$space-sm);
+    margin-top: v.$space-lg;
+  }
+}
+
+.live-label {
+  @include m.flex(row, center, flex-start, 6px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: v.$primary;
+  background: v.$primary-light;
+  border-radius: v.$radius-full;
+  padding: 4px 10px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: v.$primary;
+  animation: pulse 1.2s infinite;
+}
+
+.active-order-card__info {
+  @include m.flex(column, stretch, flex-start, 0);
+  background: v.$ivory;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md;
+}
+
+.active-order-info-row {
+  @include m.flex(row, flex-start, flex-start, v.$space-sm);
+  padding: v.$space-sm 0;
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+.aoi-label {
+  font-size: 0.72rem;
+  color: v.$text-light;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.aoi-value {
+  font-weight: 700;
+  color: v.$text-dark;
+  font-size: 0.9rem;
+}
+.aoi-sub {
+  font-size: 0.78rem;
+  color: v.$text-light;
+}
+
+.route-line {
+  width: 2px;
+  height: 20px;
+  background: v.$border;
+  margin-left: 7px;
+}
+
+/* OTP */
+.active-otp {
+  @include m.flex(row, center, space-between, v.$space-md);
+  background: #ebf4ff;
+  border-radius: v.$radius-md;
+  padding: v.$space-sm v.$space-md;
+  margin-top: v.$space-md;
+  span:first-child {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1565c0;
+  }
+}
+
+.otp-digits {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  span {
+    width: 34px;
+    height: 40px;
+    border-radius: v.$radius-sm;
+    background: v.$white;
+    border: 2px solid #90caf9;
+    @include m.flex(row, center, center);
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #1565c0;
+  }
+}
+
+/* DP action buttons */
+.dp-action-btn {
+  @include m.flex(row, center, center, v.$space-sm);
+  width: 100%;
+  padding: 13px;
+  border-radius: v.$radius-full;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: all v.$transition-fast;
+
+  &--primary {
+    background: v.$saffron;
+    color: #1a1a2e;
+    &:hover:not(:disabled) {
+      background: darken(#ff9933, 10%);
+    }
+  }
+  &--success {
+    background: v.$green;
+    color: v.$white;
+    &:hover:not(:disabled) {
+      background: darken(#2e7d52, 8%);
+    }
+  }
+  &--danger {
+    background: v.$white;
+    color: v.$primary;
+    border: 1.5px solid v.$primary;
+    &:hover:not(:disabled) {
+      background: v.$primary-light;
+    }
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.active-order-bill {
+  @include m.flex(row, center, center, v.$space-sm);
+  margin-top: v.$space-md;
+  padding-top: v.$space-md;
+  border-top: 1px solid v.$border;
+  font-size: 0.82rem;
+  color: v.$text-light;
+  flex-wrap: wrap;
+}
+
+.pay-method {
+  font-weight: 700;
+  color: v.$text-dark;
+  &.cod {
+    color: v.$green;
+  }
+}
+
+/* Section */
+.dp-section {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+
+  &__header {
+    @include m.flex(row, center, space-between);
+    h3 {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
+}
+
+.refresh-btn {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 6px 12px;
+  border-radius: v.$radius-full;
+  border: 1px solid v.$border;
+  background: v.$white;
+  font-family: v.$font-body;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  cursor: pointer;
+  transition: all v.$transition-fast;
+  &:hover {
+    border-color: v.$primary;
+    color: v.$primary;
+  }
+}
+
+/* Available orders */
+.avail-order-card {
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$border;
+  padding: v.$space-md;
+  transition: all v.$transition-fast;
+  &:hover {
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__header {
+    @include m.flex(row, center, space-between, v.$space-md);
+    margin-bottom: v.$space-sm;
+  }
+
+  &__restaurant {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+  }
+
+  &__distance {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  &__addr {
+    @include m.flex(row, center, flex-start, v.$space-xs);
+    font-size: 0.78rem;
+    color: v.$text-light;
+    margin-bottom: v.$space-md;
+    svg {
+      color: v.$primary;
+      flex-shrink: 0;
+    }
+  }
+
+  &__footer {
+    @include m.flex(row, center, space-between);
+    border-top: 1px solid v.$border;
+    padding-top: v.$space-sm;
+  }
+
+  &__actions {
+    @include m.flex(row, center, flex-end, v.$space-sm);
+  }
+}
+
+.rest-icon {
+  font-size: 1.3rem;
+}
+.avail-order-restaurant {
+  font-weight: 700;
+  color: v.$text-dark;
+  font-size: 0.9rem;
+}
+.avail-order-meta {
+  font-size: 0.75rem;
+  color: v.$text-light;
+  margin-top: 2px;
+}
+.distance-val {
+  font-weight: 800;
+  font-size: 1rem;
+  color: v.$text-dark;
+}
+.distance-label {
+  font-size: 0.68rem;
+  color: v.$text-light;
+}
+
+.pay-tag {
+  padding: 3px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: v.$ivory-dark;
+  color: v.$text-mid;
+  &.cod {
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+  }
+}
+
+.dp-accept-btn {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 9px 20px;
+  border-radius: v.$radius-full;
+  background: v.$primary;
+  color: v.$white;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all v.$transition-fast;
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.dp-empty {
+  @include m.flex(column, center, center, v.$space-sm);
+  padding: v.$space-2xl;
+  text-align: center;
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px dashed v.$border;
+  span {
+    font-size: 2.5rem;
+  }
+  p {
+    font-size: 0.875rem;
+    color: v.$text-light;
+  }
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(4px);
+  @include m.flex(row, flex-end, center);
+}
+
+.dp-modal {
+  background: v.$white;
+  border-radius: v.$radius-xl v.$radius-xl 0 0;
+  width: 100%;
+  padding: v.$space-xl;
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+  animation: fadeInUp 0.25s ease;
+  h3 {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  p {
+    font-size: 0.875rem;
+    color: v.$text-mid;
+  }
+}
+
+.cancel-textarea {
+  width: 100%;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-md;
+  padding: 10px;
+  font-family: v.$font-body;
+  font-size: 0.875rem;
+  color: v.$text-dark;
+  resize: none;
+  outline: none;
+  background: v.$ivory;
+  &:focus {
+    border-color: v.$primary;
+  }
+  &::placeholder {
+    color: v.$text-light;
+  }
+}
+
+.dp-modal-actions {
+  @include m.flex(row, center, flex-end, v.$space-sm);
+}
+
+.btn-danger-dp {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 10px 20px;
+  border-radius: v.$radius-full;
+  background: v.$primary;
+  color: v.$white;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: background v.$transition-fast;
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}

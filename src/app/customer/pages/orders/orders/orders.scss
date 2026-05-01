@@ -1,0 +1,344 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.page-header {
+  background: linear-gradient(135deg, v.$ivory-dark, v.$primary-light);
+  padding: v.$space-2xl 0 v.$space-xl;
+  h1 {
+    font-family: v.$font-display;
+  }
+  p {
+    color: v.$text-light;
+    margin-top: 4px;
+  }
+}
+
+.orders-layout {
+  padding-top: v.$space-xl;
+  padding-bottom: v.$space-3xl;
+}
+
+/* ── Tabs ──────────────────────────────────── */
+.filter-tabs {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 4px;
+  display: inline-flex;
+  margin-bottom: v.$space-lg;
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filter-tab {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 9px 18px;
+  border-radius: v.$radius-full;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: v.$text-mid;
+  white-space: nowrap;
+  transition: all v.$transition-fast;
+  &.active {
+    background: v.$white;
+    color: v.$primary;
+    box-shadow: v.$shadow-sm;
+  }
+}
+
+.tab-count {
+  background: v.$primary-light;
+  color: v.$primary;
+  border-radius: v.$radius-full;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  .active & {
+    background: v.$primary;
+    color: v.$white;
+  }
+}
+
+/* ── Search ────────────────────────────────── */
+.orders-search {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 10px 18px;
+  max-width: 420px;
+  margin-bottom: v.$space-xl;
+  transition: border-color v.$transition-fast;
+  &:focus-within {
+    border-color: v.$primary;
+  }
+  svg {
+    color: v.$text-light;
+    flex-shrink: 0;
+  }
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: v.$font-body;
+    font-size: 0.9rem;
+    background: none;
+    color: v.$text-dark;
+    &::placeholder {
+      color: v.$text-light;
+    }
+  }
+}
+
+/* ── Orders list ───────────────────────────── */
+.orders-list {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+}
+
+/* ── Order card ────────────────────────────── */
+.order-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  transition:
+    box-shadow v.$transition-normal,
+    transform v.$transition-normal;
+  overflow: hidden;
+  &:hover {
+    box-shadow: v.$shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &__header {
+    @include m.flex(row, center, space-between, v.$space-md);
+    padding: v.$space-lg v.$space-lg v.$space-md;
+    flex-wrap: wrap;
+    gap: v.$space-sm;
+  }
+
+  &__restaurant {
+    @include m.flex(row, center, flex-start, v.$space-md);
+    h3 {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: v.$text-dark;
+    }
+  }
+
+  &__items {
+    @include m.flex(row, center, flex-start, v.$space-xs);
+    padding: 0 v.$space-lg v.$space-md;
+    flex-wrap: wrap;
+  }
+
+  &__footer {
+    @include m.flex(row, center, space-between, v.$space-md);
+    padding: v.$space-md v.$space-lg;
+    background: v.$ivory;
+    border-top: 1px solid v.$border;
+    flex-wrap: wrap;
+    gap: v.$space-sm;
+  }
+
+  &__bill {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    flex-wrap: wrap;
+  }
+
+  &__actions {
+    @include m.flex(row, center, flex-end, v.$space-sm);
+    flex-wrap: wrap;
+  }
+}
+
+.restaurant-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: v.$radius-md;
+  background: v.$ivory-dark;
+  @include m.flex(row, center, center);
+  flex-shrink: 0;
+  border: 1px solid v.$border;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.order-meta {
+  font-size: 0.78rem;
+  color: v.$text-light;
+  margin-top: 3px;
+}
+
+/* Status pills */
+.status-pill {
+  @include m.flex(row, center, flex-start, 6px);
+  padding: 5px 12px;
+  border-radius: v.$radius-full;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &--placed {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  &--confirmed {
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+  }
+  &--preparing {
+    background: #fff9c4;
+    color: #f57f17;
+  }
+  &--active {
+    background: #ebf4ff;
+    color: #1565c0;
+  }
+  &--delivered {
+    background: v.$green-light;
+    color: v.$green;
+  }
+  &--cancelled {
+    background: v.$primary-light;
+    color: v.$primary;
+  }
+}
+
+/* Item chips */
+.item-chip {
+  @include m.flex(row, center, flex-start, 5px);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: v.$text-mid;
+  border: 1px solid v.$border;
+  &--more {
+    color: v.$primary;
+    background: v.$primary-light;
+    border-color: rgba(217, 79, 61, 0.2);
+  }
+}
+
+.veg-dot-sm {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  border: 1.5px solid v.$green;
+  flex-shrink: 0;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: v.$green;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &.non-veg {
+    border-color: v.$primary;
+    &::after {
+      background: v.$primary;
+    }
+  }
+}
+
+/* Bill */
+.bill-total {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: v.$text-dark;
+}
+.payment-badge {
+  padding: 3px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: v.$ivory-dark;
+  color: v.$text-mid;
+  &.cod {
+    background: v.$green-light;
+    color: v.$green;
+  }
+}
+.refund-badge {
+  padding: 3px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: v.$green-light;
+  color: v.$green;
+}
+
+/* Action buttons */
+.btn-sm {
+  padding: 7px 16px;
+  font-size: 0.82rem;
+}
+
+/* Refund note */
+.refund-note {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  padding: 10px v.$space-lg;
+  background: v.$green-light;
+  border-top: 1px solid rgba(46, 125, 82, 0.2);
+  font-size: 0.82rem;
+  color: v.$green;
+  strong {
+    font-weight: 700;
+  }
+}
+
+/* Pagination */
+.pagination {
+  @include m.flex(row, center, center, v.$space-sm);
+  margin-top: v.$space-2xl;
+  button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid v.$border;
+    background: v.$white;
+    cursor: pointer;
+    font-family: v.$font-body;
+    font-weight: 600;
+    color: v.$text-mid;
+    transition: all v.$transition-fast;
+    &.active {
+      background: v.$primary;
+      border-color: v.$primary;
+      color: v.$white;
+    }
+    &:hover:not(.active):not(:disabled) {
+      border-color: v.$primary;
+      color: v.$primary;
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}

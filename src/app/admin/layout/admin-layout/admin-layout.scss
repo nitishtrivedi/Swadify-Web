@@ -1,0 +1,361 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+$sidebar-w: 240px;
+$sidebar-collapsed: 68px;
+$topbar-h: 60px;
+
+/* ── Shell ─────────────────────────────────── */
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f2ef;
+
+  &.sidebar-collapsed {
+    .sidebar {
+      width: $sidebar-collapsed;
+    }
+    .admin-main {
+      margin-left: $sidebar-collapsed;
+    }
+    .sidebar__section-label {
+      visibility: hidden;
+      height: 0;
+      margin: 0;
+    }
+  }
+}
+
+/* ── Sidebar ───────────────────────────────── */
+.sidebar {
+  width: $sidebar-w;
+  flex-shrink: 0;
+  background: #1a1a2e;
+  @include m.flex(column, stretch, flex-start, 0);
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 800;
+  transition: width v.$transition-normal;
+  overflow: hidden;
+
+  @media (max-width: 1023px) {
+    transform: translateX(-100%);
+    transition: transform v.$transition-normal;
+    width: $sidebar-w !important;
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+
+  &__logo {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    padding: v.$space-lg v.$space-md;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    min-height: 68px;
+    flex-shrink: 0;
+  }
+
+  &__brand {
+    @include m.flex(column, flex-start, flex-start, 2px);
+  }
+  &__brand-name {
+    font-family: v.$font-display;
+    font-size: 1.2rem;
+    color: v.$white;
+    font-weight: 700;
+  }
+  &__brand-tag {
+    font-size: 0.65rem;
+    color: v.$saffron;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  &__nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: v.$space-md v.$space-sm;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 0 v.$space-sm;
+    margin-bottom: v.$space-xs;
+    transition: all v.$transition-fast;
+  }
+
+  &__bottom {
+    @include m.flex(column, stretch, flex-start, 0);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: v.$space-sm;
+  }
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 799;
+  background: rgba(0, 0, 0, 0.5);
+  @include m.respond-to(lg) {
+    display: none;
+  }
+}
+
+/* Nav items */
+.nav-item {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  padding: 11px v.$space-sm;
+  border-radius: v.$radius-md;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all v.$transition-fast;
+  position: relative;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+
+  &__icon {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  &__label {
+    flex: 1;
+  }
+  &__badge {
+    background: v.$primary;
+    color: v.$white;
+    border-radius: v.$radius-full;
+    padding: 1px 7px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+    &--dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      padding: 0;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: v.$white;
+  }
+  &.active {
+    background: v.$primary;
+    color: v.$white;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      background: v.$saffron;
+      border-radius: 0 2px 2px 0;
+    }
+  }
+}
+
+/* Sidebar user */
+.sidebar-user {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  padding: v.$space-sm;
+  border-radius: v.$radius-md;
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: v.$primary;
+    color: v.$white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    @include m.flex(row, center, center);
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+  &__name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: v.$white;
+    @include m.truncate;
+  }
+  &__role {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 6px;
+  border-radius: v.$radius-sm;
+  transition: all v.$transition-fast;
+  &:hover {
+    color: v.$primary;
+    background: rgba(217, 79, 61, 0.1);
+  }
+}
+
+.collapse-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  padding: v.$space-sm;
+  border-radius: v.$radius-md;
+  margin-top: 4px;
+  @include m.flex(row, center, center);
+  transition: all v.$transition-fast;
+  &:hover {
+    color: v.$white;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  @media (max-width: 1023px) {
+    display: none;
+  }
+}
+
+/* ── Main ──────────────────────────────────── */
+.admin-main {
+  flex: 1;
+  margin-left: $sidebar-w;
+  min-width: 0;
+  @include m.flex(column, stretch, flex-start, 0);
+  transition: margin-left v.$transition-normal;
+
+  @media (max-width: 1023px) {
+    margin-left: 0 !important;
+  }
+}
+
+/* Top bar */
+.admin-topbar {
+  height: $topbar-h;
+  background: v.$white;
+  border-bottom: 1px solid v.$border;
+  @include m.flex(row, center, flex-start, v.$space-md);
+  padding: 0 v.$space-xl;
+  position: sticky;
+  top: 0;
+  z-index: 700;
+  flex-shrink: 0;
+}
+
+.topbar-hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-mid;
+  padding: 6px;
+  border-radius: v.$radius-sm;
+  @include m.flex(row, center, center);
+  @include m.respond-to(lg) {
+    display: none;
+  }
+  &:hover {
+    background: v.$ivory-dark;
+  }
+}
+
+.topbar-breadcrumb {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  &__root {
+    font-size: 0.85rem;
+    color: v.$text-light;
+  }
+  &__current {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: v.$text-dark;
+  }
+  svg {
+    color: v.$text-light;
+  }
+}
+
+.topbar-actions {
+  @include m.flex(row, center, flex-end, v.$space-sm);
+  margin-left: auto;
+}
+
+.topbar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: v.$ivory-dark;
+  border: none;
+  cursor: pointer;
+  color: v.$text-mid;
+  @include m.flex(row, center, center);
+  position: relative;
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$border;
+    color: v.$text-dark;
+  }
+}
+
+.notif-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: v.$primary;
+  border: 2px solid v.$white;
+}
+
+.topbar-user {
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: v.$primary-light;
+    color: v.$primary;
+    font-weight: 700;
+    font-size: 0.85rem;
+    @include m.flex(row, center, center);
+    border: 2px solid v.$primary;
+    cursor: pointer;
+  }
+}
+
+/* Content area */
+.admin-content {
+  flex: 1;
+  padding: v.$space-xl;
+  @include m.respond-to(md) {
+    padding: v.$space-xl v.$space-2xl;
+  }
+}

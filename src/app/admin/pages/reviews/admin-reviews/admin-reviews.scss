@@ -1,0 +1,440 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.page-wrap {
+  @include m.flex(column, stretch, flex-start, v.$space-xl);
+}
+.page-top {
+  @include m.flex(row, center, space-between, v.$space-md);
+  flex-wrap: wrap;
+}
+.page-title {
+  font-family: v.$font-display;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.page-sub {
+  color: v.$text-light;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.filter-bar {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  flex-wrap: wrap;
+}
+
+.search-inline {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 9px 16px;
+  flex: 1;
+  max-width: 340px;
+  &:focus-within {
+    border-color: v.$primary;
+  }
+  svg {
+    color: v.$text-light;
+    flex-shrink: 0;
+  }
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: v.$font-body;
+    font-size: 0.875rem;
+    background: none;
+    &::placeholder {
+      color: v.$text-light;
+    }
+  }
+}
+
+.rating-filter {
+  @include m.flex(row, center, flex-start, 0);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 3px;
+}
+
+.rf-btn {
+  padding: 7px 12px;
+  border-radius: v.$radius-full;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &.active {
+    background: v.$white;
+    color: v.$primary;
+    box-shadow: v.$shadow-sm;
+  }
+}
+
+.filter-select {
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 9px 14px;
+  font-family: v.$font-body;
+  font-size: 0.85rem;
+  color: v.$text-mid;
+  background: v.$white;
+  cursor: pointer;
+  outline: none;
+  &:focus {
+    border-color: v.$primary;
+  }
+}
+
+/* Rating summary */
+.rating-summary {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-lg v.$space-xl;
+  @include m.flex(column, stretch, flex-start, v.$space-sm);
+  position: relative;
+}
+
+.rating-row {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  &__label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: v.$text-mid;
+    width: 24px;
+  }
+  &__bar {
+    flex: 1;
+    height: 8px;
+    background: v.$ivory-dark;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  &__fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  &__count {
+    font-size: 0.78rem;
+    color: v.$text-light;
+    width: 32px;
+    text-align: right;
+  }
+}
+
+.fill-5 {
+  background: v.$green;
+}
+.fill-4 {
+  background: #8bc34a;
+}
+.fill-3 {
+  background: v.$saffron;
+}
+.fill-2 {
+  background: #ff7043;
+}
+.fill-1 {
+  background: v.$primary;
+}
+
+.avg-rating-pill {
+  position: absolute;
+  right: v.$space-xl;
+  top: 50%;
+  transform: translateY(-50%);
+  @include m.flex(column, center, center, 4px);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md v.$space-lg;
+
+  &__value {
+    font-weight: 900;
+    font-size: 2.2rem;
+    color: v.$text-dark;
+    line-height: 1;
+  }
+  &__label {
+    font-size: 0.72rem;
+    color: v.$text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+}
+
+.avg-stars {
+  @include m.flex(row, center, center, 2px);
+}
+
+/* Review cards */
+.reviews-list {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+}
+
+.review-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-lg v.$space-xl;
+  transition: box-shadow v.$transition-normal;
+  &:hover {
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__header {
+    @include m.flex(row, center, flex-start, v.$space-md);
+    margin-bottom: v.$space-md;
+    flex-wrap: wrap;
+    gap: v.$space-sm;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: v.$primary-light;
+    color: v.$primary;
+    font-weight: 700;
+    @include m.flex(row, center, center);
+  }
+
+  &__name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: v.$text-dark;
+  }
+  &__date {
+    font-size: 0.75rem;
+    color: v.$text-light;
+    margin-top: 2px;
+  }
+}
+
+.review-stars {
+  @include m.flex(row, center, flex-start, 2px);
+  margin-left: auto;
+  &__num {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: v.$text-dark;
+    margin-left: 4px;
+  }
+}
+
+.review-rating-badge {
+  padding: 3px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.72rem;
+  font-weight: 700;
+  &.excellent {
+    background: v.$green-light;
+    color: v.$green;
+  }
+  &.good {
+    background: #f1f8e9;
+    color: #558b2f;
+  }
+  &.average {
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+  }
+  &.poor {
+    background: v.$primary-light;
+    color: v.$primary;
+  }
+}
+
+.review-comment {
+  font-size: 0.9rem;
+  color: v.$text-mid;
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: v.$space-md;
+  padding-left: v.$space-md;
+  border-left: 3px solid v.$border;
+}
+
+/* Admin reply */
+.admin-reply {
+  background: v.$green-light;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md;
+  margin-bottom: v.$space-sm;
+  border: 1px solid rgba(46, 125, 82, 0.15);
+
+  &__header {
+    @include m.flex(row, center, flex-start, v.$space-xs);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: v.$green;
+    margin-bottom: v.$space-sm;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: v.$text-mid;
+    line-height: 1.6;
+  }
+
+  &__actions {
+    @include m.flex(row, center, flex-start, v.$space-md);
+    margin-top: v.$space-sm;
+  }
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: v.$green;
+  padding: 0;
+  transition: opacity v.$transition-fast;
+  &:hover {
+    opacity: 0.7;
+  }
+  &--danger {
+    color: v.$primary;
+  }
+}
+
+/* Reply form */
+.reply-form {
+  @include m.flex(column, stretch, flex-start, v.$space-sm);
+  margin-top: v.$space-sm;
+
+  &__actions {
+    @include m.flex(row, center, flex-end, v.$space-sm);
+  }
+}
+
+.reply-textarea {
+  width: 100%;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-md;
+  padding: 10px 14px;
+  font-family: v.$font-body;
+  font-size: 0.875rem;
+  color: v.$text-dark;
+  resize: vertical;
+  outline: none;
+  background: v.$ivory;
+  transition: border-color v.$transition-fast;
+  &:focus {
+    border-color: v.$green;
+  }
+  &::placeholder {
+    color: v.$text-light;
+  }
+}
+
+.reply-trigger-btn {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  background: none;
+  border: 1px dashed v.$border;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: v.$radius-full;
+  font-family: v.$font-body;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: v.$text-light;
+  transition: all v.$transition-fast;
+  margin-top: v.$space-xs;
+  &:hover {
+    border-color: v.$green;
+    color: v.$green;
+    background: v.$green-light;
+  }
+}
+
+.btn-ghost-sm {
+  padding: 7px 14px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid v.$border;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &:hover {
+    border-color: v.$text-dark;
+    color: v.$text-dark;
+  }
+}
+
+.btn-primary-sm {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 7px 16px;
+  border-radius: v.$radius-full;
+  background: v.$green;
+  color: v.$white;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: background v.$transition-fast;
+  &:hover:not(:disabled) {
+    background: darken(#2e7d52, 8%);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.spinner-sm {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* Pagination */
+.pagination {
+  @include m.flex(row, center, center, v.$space-sm);
+  margin-top: v.$space-lg;
+  button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid v.$border;
+    background: v.$white;
+    cursor: pointer;
+    font-weight: 600;
+    color: v.$text-mid;
+    transition: all v.$transition-fast;
+    &.active {
+      background: v.$primary;
+      border-color: v.$primary;
+      color: v.$white;
+    }
+    &:hover:not(.active):not(:disabled) {
+      border-color: v.$primary;
+      color: v.$primary;
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}

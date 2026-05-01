@@ -1,0 +1,333 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.page-wrap {
+  @include m.flex(column, stretch, flex-start, v.$space-xl);
+}
+.page-top {
+  @include m.flex(row, center, space-between);
+  flex-wrap: wrap;
+  gap: v.$space-md;
+}
+.page-title {
+  font-family: v.$font-display;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.page-sub {
+  color: v.$text-light;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.search-row {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  flex-wrap: wrap;
+}
+
+.search-inline {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 9px 16px;
+  flex: 1;
+  max-width: 340px;
+  &:focus-within {
+    border-color: v.$primary;
+  }
+  svg {
+    color: v.$text-light;
+    flex-shrink: 0;
+  }
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: v.$font-body;
+    font-size: 0.875rem;
+    background: none;
+    &::placeholder {
+      color: v.$text-light;
+    }
+  }
+}
+
+.tab-switcher {
+  @include m.flex(row, center, flex-start, 0);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 3px;
+}
+
+.tab-btn {
+  padding: 7px 14px;
+  border-radius: v.$radius-full;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &.active {
+    background: v.$white;
+    color: v.$primary;
+    box-shadow: v.$shadow-sm;
+  }
+}
+
+/* Table */
+.admins-table-wrap {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  overflow-x: auto;
+}
+
+.admins-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th {
+    text-align: left;
+    padding: v.$space-sm v.$space-md;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: v.$text-light;
+    border-bottom: 1px solid v.$border;
+    background: v.$ivory;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px v.$space-md;
+    border-bottom: 1px solid v.$border;
+    color: v.$text-mid;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:hover td {
+    background: v.$ivory;
+  }
+}
+
+.admin-cell {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+    font-weight: 700;
+    @include m.flex(row, center, center);
+  }
+  &__name {
+    font-weight: 600;
+    color: v.$text-dark;
+  }
+}
+
+.mono-cell {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: v.$text-dark;
+}
+.center-cell {
+  text-align: center;
+  font-weight: 700;
+  color: v.$text-dark;
+}
+
+/* Toggle */
+.tgl {
+  cursor: pointer;
+  input {
+    display: none;
+  }
+}
+.tgl-track {
+  display: block;
+  width: 38px;
+  height: 20px;
+  border-radius: v.$radius-full;
+  background: v.$border;
+  position: relative;
+  transition: background v.$transition-fast;
+  .tgl input:checked + & {
+    background: v.$green;
+  }
+}
+.tgl-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: v.$white;
+  transition: transform v.$transition-fast;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  .tgl input:checked ~ .tgl-track & {
+    transform: translateX(18px);
+  }
+}
+
+.row-actions {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+}
+
+.ra-btn {
+  padding: 4px 10px;
+  border-radius: v.$radius-full;
+  border: 1px solid v.$border;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &:hover {
+    border-color: v.$primary;
+    color: v.$primary;
+    background: v.$primary-light;
+  }
+  &--danger:hover {
+    border-color: v.$primary;
+    color: v.$primary;
+  }
+}
+
+/* Modals */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(26, 26, 46, 0.55);
+  backdrop-filter: blur(4px);
+  @include m.flex(row, center, center);
+  padding: v.$space-md;
+}
+
+.modal-box {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeInUp 0.25s ease;
+  &--sm {
+    max-width: 380px;
+  }
+}
+
+.modal-header {
+  @include m.flex(row, center, space-between);
+  padding: v.$space-lg v.$space-xl;
+  border-bottom: 1px solid v.$border;
+  h3 {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-light;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  @include m.flex(row, center, center);
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$ivory-dark;
+  }
+}
+
+.modal-form {
+  padding: v.$space-xl;
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+}
+
+.modal-actions {
+  @include m.flex(row, center, flex-end, v.$space-sm);
+  margin-top: v.$space-sm;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: v.$space-md;
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.req {
+  color: v.$primary;
+}
+
+.info-note {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: #ebf4ff;
+  border-radius: v.$radius-md;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #1565c0;
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.delete-confirm {
+  @include m.flex(column, center, center, v.$space-md);
+  padding: v.$space-xl;
+  text-align: center;
+  h3 {
+    font-size: 1.05rem;
+  }
+  p {
+    font-size: 0.875rem;
+    color: v.$text-light;
+  }
+}
+
+.btn-danger {
+  @include m.btn-base;
+  background: v.$primary;
+  color: v.$white;
+  @include m.flex(row, center, center, v.$space-xs);
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.admins-list {
+  @include m.flex(column, stretch, flex-start, v.$space-sm);
+}
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}

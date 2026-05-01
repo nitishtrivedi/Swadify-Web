@@ -1,5 +1,5 @@
-@use '../../../../styles/variables' as v;
-@use '../../../../styles/mixins' as m;
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
 
 .empty-state {
   @include m.flex(column, center, center, v.$space-md);

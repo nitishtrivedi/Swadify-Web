@@ -1,0 +1,242 @@
+<div class="dp-dash">
+  <!-- Stats row -->
+  <div class="dp-stats">
+    @for (stat of stats; track stat.label) {
+      <div class="dp-stat-card" [style.--col]="stat.color">
+        <span class="dp-stat-card__icon">{{ stat.icon }}</span>
+        <div>
+          <p class="dp-stat-card__value">{{ stat.value }}</p>
+          <p class="dp-stat-card__label">{{ stat.label }}</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Active order (if any) -->
+  @if (activeOrder()) {
+    <div class="active-order-card">
+      <div class="active-order-card__header">
+        <span class="live-label"> <span class="live-dot"></span> Active Delivery </span>
+        <span class="active-order-card__id">
+          #{{ activeOrder()!.id.slice(-6).toUpperCase() }}
+        </span>
+      </div>
+
+      <div class="active-order-card__info">
+        <div class="active-order-info-row">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M3 11l19-9-9 19-2-8-8-2z" />
+          </svg>
+          <div>
+            <p class="aoi-label">Pick up from</p>
+            <p class="aoi-value">{{ activeOrder()!.restaurant.name }}</p>
+          </div>
+        </div>
+        <div class="route-line"></div>
+        <div class="active-order-info-row">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2E7D52"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <div>
+            <p class="aoi-label">Deliver to</p>
+            <p class="aoi-value">{{ activeOrder()!.deliveryAddress.line1 }}</p>
+            <p class="aoi-sub">{{ activeOrder()!.deliveryAddress.city }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- OTP -->
+      @if (activeOrder()!.otp) {
+        <div class="active-otp">
+          <span>Delivery OTP:</span>
+          <div class="otp-digits">
+            @for (d of activeOrder()!.otp!.split(''); track $index) {
+              <span>{{ d }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Status actions -->
+      <div class="active-order-card__actions">
+        @if (activeOrder()!.status === 'PartnerAssigned') {
+          <button
+            class="dp-action-btn dp-action-btn--primary"
+            (click)="markPickedUp()"
+            [disabled]="updating()"
+          >
+            @if (updating()) {
+              <span class="spinner-sm"></span>
+            }
+            📦 Mark as Picked Up
+          </button>
+        }
+        @if (activeOrder()!.status === 'OutForDelivery') {
+          <button
+            class="dp-action-btn dp-action-btn--success"
+            (click)="markDelivered()"
+            [disabled]="updating()"
+          >
+            @if (updating()) {
+              <span class="spinner-sm"></span>
+            }
+            ✅ Mark as Delivered
+          </button>
+          <button
+            class="dp-action-btn dp-action-btn--danger"
+            (click)="showCancelPrompt.set(true)"
+            [disabled]="updating()"
+          >
+            ❌ Report Issue
+          </button>
+        }
+      </div>
+
+      <!-- Bill summary -->
+      <div class="active-order-bill">
+        <span>{{ activeOrder()!.items.length }} items</span>
+        <span>·</span>
+        <span>₹{{ activeOrder()!.total }}</span>
+        <span>·</span>
+        <span class="pay-method" [class.cod]="activeOrder()!.paymentMethod === 'COD'">
+          {{
+            activeOrder()!.paymentMethod === 'COD'
+              ? '💵 Collect ₹' + activeOrder()!.total
+              : '✅ Paid Online'
+          }}
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- Available orders -->
+  <div class="dp-section">
+    <div class="dp-section__header">
+      <h3>Available Orders Near You</h3>
+      <button class="refresh-btn" (click)="loadAvailableOrders()">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    @if (loadingOrders()) {
+      @for (n of [1, 2]; track n) {
+        <div class="skeleton" style="height: 130px; border-radius: 14px; margin-bottom: 12px"></div>
+      }
+    } @else if (availableOrders().length === 0) {
+      <div class="dp-empty">
+        <span>🏍️</span>
+        <p>No available orders right now. Check back soon!</p>
+      </div>
+    } @else {
+      @for (order of availableOrders(); track order.id) {
+        <div class="avail-order-card">
+          <div class="avail-order-card__header">
+            <div class="avail-order-card__restaurant">
+              <span class="rest-icon">🏪</span>
+              <div>
+                <p class="avail-order-restaurant">{{ order.restaurant.name }}</p>
+                <p class="avail-order-meta">{{ order.items.length }} items · ₹{{ order.total }}</p>
+              </div>
+            </div>
+            <div class="avail-order-card__distance">
+              <p class="distance-val">~2.4 km</p>
+              <p class="distance-label">away</p>
+            </div>
+          </div>
+
+          <div class="avail-order-card__addr">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            {{ order.deliveryAddress.line1 }}, {{ order.deliveryAddress.city }}
+          </div>
+
+          <div class="avail-order-card__footer">
+            <span class="pay-tag" [class.cod]="order.paymentMethod === 'COD'">
+              {{ order.paymentMethod === 'COD' ? '💵 COD' : '✅ Paid' }}
+            </span>
+            <div class="avail-order-card__actions">
+              <button
+                class="dp-accept-btn"
+                (click)="acceptOrder(order)"
+                [disabled]="accepting() === order.id"
+              >
+                @if (accepting() === order.id) {
+                  <span class="spinner-sm"></span>
+                }
+                Accept Order
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Cancel prompt -->
+@if (showCancelPrompt()) {
+  <div class="modal-backdrop" (click)="showCancelPrompt.set(false)">
+    <div class="dp-modal" (click)="$event.stopPropagation()">
+      <h3>Report Delivery Issue</h3>
+      <p>Please provide a reason for cancelling this delivery.</p>
+      <textarea
+        class="cancel-textarea"
+        [(ngModel)]="cancelReason"
+        rows="3"
+        placeholder="e.g. Customer not reachable, wrong address…"
+      ></textarea>
+      <div class="dp-modal-actions">
+        <button class="btn-outline" (click)="showCancelPrompt.set(false)">Back</button>
+        <button
+          class="btn-danger-dp"
+          (click)="cancelDelivery()"
+          [disabled]="!cancelReason || updating()"
+        >
+          @if (updating()) {
+            <span class="spinner-sm"></span>
+          }
+          Report & Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}

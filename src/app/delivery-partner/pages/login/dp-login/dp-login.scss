@@ -1,0 +1,136 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.dp-login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, v.$primary 100%);
+  @include m.flex(row, center, center);
+  padding: v.$space-lg;
+}
+
+.dp-login-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  padding: v.$space-2xl;
+  width: 100%;
+  max-width: 420px;
+  @include m.flex(column, stretch, flex-start, v.$space-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.4s ease;
+
+  &__logo {
+    @include m.flex(row, center, flex-start, v.$space-md);
+  }
+
+  &__brand {
+    font-family: v.$font-display;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: v.$text-dark;
+  }
+  &__sub {
+    font-size: 0.75rem;
+    color: v.$text-light;
+    margin-top: 2px;
+  }
+
+  &__art {
+    @include m.flex(row, center, center);
+    background: v.$ivory;
+    border-radius: v.$radius-lg;
+    padding: v.$space-md;
+  }
+
+  &__title {
+    font-family: v.$font-display;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: v.$text-dark;
+    text-align: center;
+  }
+  &__desc {
+    font-size: 0.875rem;
+    color: v.$text-light;
+    text-align: center;
+    margin-top: v.$space-sm;
+  }
+
+  &__admin-link {
+    text-align: center;
+    font-size: 0.78rem;
+    color: v.$text-light;
+    transition: color v.$transition-fast;
+    &:hover {
+      color: v.$primary;
+    }
+  }
+}
+
+.dp-login-form {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: v.$text-dark;
+  }
+}
+
+.pwd-wrap {
+  position: relative;
+  .eye-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+}
+
+.error-alert {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$primary-light;
+  border-radius: v.$radius-md;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  color: v.$primary;
+  border: 1px solid rgba(217, 79, 61, 0.3);
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.dp-signin-btn {
+  @include m.flex(row, center, center, v.$space-sm);
+  width: 100%;
+  padding: 14px;
+  border-radius: v.$radius-full;
+  background: v.$primary;
+  color: v.$white;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all v.$transition-fast;
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+    box-shadow: 0 6px 20px rgba(217, 79, 61, 0.35);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}

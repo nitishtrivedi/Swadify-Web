@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth-service';
 import { ToastService } from '../../../shared/components/toast';
+import { LoginRequest, RegisterRequest } from '../../../core/models';
 
 @Component({
   selector: 'app-auth-modal',
@@ -32,11 +33,11 @@ export class AuthModal {
 
   registerForm = this.fb.group({
     firstName: ['', Validators.required],
-    lastName: [''],
+    lastName: ['', Validators.required], // ✅ FIXED
     username: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    phone: [''],
+    phone: ['', [Validators.required]], // ✅ FIXED
   });
 
   get rf() {
@@ -53,8 +54,13 @@ export class AuthModal {
       return;
     }
     this.loading.set(true);
-    this.auth.login(this.loginForm.value as any).subscribe({
-      next: () => {
+    const payload: LoginRequest = {
+      identifier: this.loginForm.value.usernameOrEmail!, // ✅ FIXED mapping
+      password: this.loginForm.value.password!,
+    };
+    this.auth.login(payload).subscribe({
+      next: (res) => {
+        console.log(res);
         this.loading.set(false);
         this.close.emit();
         this.toast.success('Welcome back!');
@@ -67,12 +73,41 @@ export class AuthModal {
   }
 
   doRegister() {
+    // if (this.registerForm.invalid) {
+    //   this.registerForm.markAllAsTouched();
+    //   return;
+    // }
+    // this.loading.set(true);
+    // this.auth.register(this.registerForm.value as any, 'customer-register').subscribe({
+    //   next: (res) => {
+    //     console.log(res);
+    //     this.loading.set(false);
+    //     this.registered.set(true);
+    //   },
+    //   error: (err) => {
+    //     this.loading.set(false);
+    //     this.toast.error(err?.error?.message ?? 'Registration failed');
+    //   },
+    // });
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
+
     this.loading.set(true);
-    this.auth.register(this.registerForm.value as any).subscribe({
+
+    const form = this.registerForm.value;
+
+    const payload: RegisterRequest = {
+      firstName: form.firstName!,
+      lastName: form.lastName!,
+      username: form.username!,
+      email: form.email!,
+      password: form.password!,
+      phoneNumber: form.phone!, // ✅ FIXED mapping
+    };
+
+    this.auth.register(payload, 'customer-register').subscribe({
       next: () => {
         this.loading.set(false);
         this.registered.set(true);

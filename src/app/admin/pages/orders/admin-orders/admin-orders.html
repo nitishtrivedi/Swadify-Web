@@ -1,0 +1,361 @@
+<div class="page-wrap">
+  <div class="page-top">
+    <div>
+      <h1 class="page-title">Orders</h1>
+      <p class="page-sub">{{ totalCount() }} total orders</p>
+    </div>
+    <div class="top-actions">
+      <button class="refresh-btn" (click)="loadOrders()" [class.spinning]="loading()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+        </svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="order-filters">
+    <div class="status-tabs">
+      @for (tab of statusTabs(); track tab.value) {
+        <button
+          class="stab"
+          [class.active]="statusFilter() === tab.value"
+          (click)="statusFilter.set(tab.value); loadOrders()"
+        >
+          {{ tab.label }}
+          @if (tab.count > 0) {
+            <span class="stab-count" [class.primary]="tab.value !== 'all'">{{ tab.count }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    <div class="filter-row">
+      <div class="search-bar-admin">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          [(ngModel)]="search"
+          (ngModelChange)="applyLocalFilter()"
+          placeholder="Search by order ID, customer…"
+        />
+      </div>
+      <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="loadOrders()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="amount_high">Highest Amount</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Table / Cards -->
+  @if (loading()) {
+    <div class="orders-skeleton">
+      @for (n of [1, 2, 3, 4, 5]; track n) {
+        <div class="skeleton" style="height: 80px; border-radius: 12px"></div>
+      }
+    </div>
+  } @else if (displayedOrders().length === 0) {
+    <app-empty-state icon="orders" title="No orders found" message="Try adjusting your filters." />
+  } @else {
+    <!-- Desktop table -->
+    <div class="orders-table-wrap">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Restaurant</th>
+            <th>Items</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of displayedOrders(); track order.id) {
+            <tr [class.row-highlight]="order.status === 'Placed'">
+              <td class="order-id-cell">#{{ order.id.slice(-6).toUpperCase() }}</td>
+              <td class="customer-cell">
+                <div class="customer-cell__avatar">
+                  {{ order.customerId.slice(0, 1).toUpperCase() }}
+                </div>
+                {{ order.deliveryAddress.line1.split(',')[0] || '—' }}
+              </td>
+              <td>{{ order.restaurant.name }}</td>
+              <td class="items-cell">
+                {{ order.items.length }} item{{ order.items.length !== 1 ? 's' : '' }}
+                <span class="item-names">
+                  {{ getItemNames(order) }}
+                  {{ order.items.length > 2 ? '…' : '' }}
+                </span>
+              </td>
+              <td class="amount-cell">₹{{ order.total }}</td>
+              <td>
+                <span class="pay-badge" [class.cod]="order.paymentMethod === 'COD'">
+                  {{ order.paymentMethod }}
+                </span>
+              </td>
+              <td>
+                <span class="status-chip status-chip--{{ order.status.toLowerCase() }}">
+                  {{ statusLabel(order.status) }}
+                </span>
+              </td>
+              <td class="time-cell">{{ order.createdAt | date: 'd MMM, h:mm a' }}</td>
+              <td>
+                <button class="manage-btn" (click)="openManage(order)">Manage</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile cards -->
+    <div class="mobile-orders">
+      @for (order of displayedOrders(); track order.id) {
+        <div class="mob-order-card" (click)="openManage(order)">
+          <div class="mob-order-card__top">
+            <span class="mob-order-id">#{{ order.id.slice(-6).toUpperCase() }}</span>
+            <span class="status-chip status-chip--{{ order.status.toLowerCase() }}">
+              {{ statusLabel(order.status) }}
+            </span>
+          </div>
+          <p class="mob-order-rest">{{ order.restaurant.name }}</p>
+          <div class="mob-order-meta">
+            <span>{{ order.items.length }} items</span>
+            <span>₹{{ order.total }}</span>
+            <span>{{ order.paymentMethod }}</span>
+            <span>{{ order.createdAt | date: 'h:mm a' }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button [disabled]="page() === 1" (click)="setPage(page() - 1)">‹</button>
+        @for (p of pageRange(); track p) {
+          <button [class.active]="p === page()" (click)="setPage(p)">{{ p }}</button>
+        }
+        <button [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">›</button>
+      </div>
+    }
+  }
+</div>
+
+<!-- ── ORDER MANAGE DRAWER ─────────────────────────────────── -->
+@if (manageOrder()) {
+  <div class="drawer-backdrop" (click)="manageOrder.set(null)">
+    <div class="order-drawer" (click)="$event.stopPropagation()">
+      <div class="order-drawer__header">
+        <div>
+          <h3>Order #{{ manageOrder()!.id.slice(-6).toUpperCase() }}</h3>
+          <p class="drawer-sub">{{ manageOrder()!.createdAt | date: 'd MMM y, h:mm a' }}</p>
+        </div>
+        <button class="modal-close" (click)="manageOrder.set(null)">✕</button>
+      </div>
+
+      <div class="order-drawer__body">
+        <!-- Current status -->
+        <div class="drawer-status-hero status-hero--{{ manageOrder()!.status.toLowerCase() }}">
+          <span class="status-hero-icon">{{ statusIcon(manageOrder()!.status) }}</span>
+          <div>
+            <p class="status-hero-label">{{ statusLabel(manageOrder()!.status) }}</p>
+            <p class="status-hero-sub">{{ manageOrder()!.restaurant.name }}</p>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="drawer-section">
+          <h4>Items Ordered</h4>
+          @for (item of manageOrder()!.items; track item.menuItem.id) {
+            <div class="drawer-item">
+              <div class="veg-dot-sm" [class.non-veg]="!item.menuItem.isVeg"></div>
+              <span class="di-name">{{ item.menuItem.name }}</span>
+              <span class="di-qty">× {{ item.quantity }}</span>
+              <span class="di-price">₹{{ item.menuItem.price * item.quantity }}</span>
+            </div>
+          }
+          <div class="drawer-total">
+            <span>Total</span>
+            <span>₹{{ manageOrder()!.total }}</span>
+          </div>
+        </div>
+
+        <!-- Delivery address -->
+        <div class="drawer-section">
+          <h4>Delivery Address</h4>
+          <p class="drawer-addr">
+            {{ manageOrder()!.deliveryAddress.line1 }}
+            @if (manageOrder()!.deliveryAddress.line2) {
+              , {{ manageOrder()!.deliveryAddress.line2 }}
+            }
+            <br />{{ manageOrder()!.deliveryAddress.city }},
+            {{ manageOrder()!.deliveryAddress.state }} –
+            {{ manageOrder()!.deliveryAddress.pincode }}
+          </p>
+        </div>
+
+        <!-- OTP -->
+        @if (manageOrder()!.otp) {
+          <div class="otp-row">
+            <span>Delivery OTP:</span>
+            <div class="otp-digits">
+              @for (d of manageOrder()!.otp!.split(''); track $index) {
+                <span>{{ d }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Status actions -->
+        <div class="drawer-section">
+          <h4>Update Status</h4>
+          <div class="status-actions">
+            @for (action of availableActions(); track action.status) {
+              <button
+                class="status-action-btn"
+                [style.--col]="action.color"
+                (click)="updateStatus(action.status)"
+                [disabled]="updatingStatus()"
+              >
+                {{ action.icon }} {{ action.label }}
+              </button>
+            }
+            @if (availableActions().length === 0) {
+              <p class="no-actions-hint">No further status changes available.</p>
+            }
+          </div>
+
+          <!-- Cancel with reason -->
+          @if (canCancel()) {
+            <div class="cancel-section">
+              <label class="cancel-section__label">Cancel Order</label>
+              <div class="cancel-row">
+                <input
+                  class="input"
+                  [(ngModel)]="cancelReason"
+                  placeholder="Reason for cancellation…"
+                />
+                <button
+                  class="btn-danger-sm"
+                  (click)="cancelOrder()"
+                  [disabled]="!cancelReason || updatingStatus()"
+                >
+                  Cancel Order
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Assign delivery partner -->
+        @if (canAssignPartner()) {
+          <div class="drawer-section">
+            <h4>Assign Delivery Partner</h4>
+            @if (partners().length === 0) {
+              <p class="hint-text">No available partners right now.</p>
+            } @else {
+              <div class="partner-select-list">
+                @for (p of availablePartners(); track p.id) {
+                  <label class="partner-radio" [class.selected]="selectedPartnerId() === p.id">
+                    <input
+                      type="radio"
+                      name="partner"
+                      [value]="p.id"
+                      (change)="selectedPartnerId.set(p.id)"
+                    />
+                    <div class="partner-radio__avatar">{{ p.name[0] }}</div>
+                    <div class="partner-radio__info">
+                      <p class="partner-radio__name">{{ p.name }}</p>
+                      <p class="partner-radio__meta">
+                        {{ p.vehicleType }} · ⭐ {{ p.rating | number: '1.1-1' }}
+                      </p>
+                    </div>
+                    <div class="partner-radio__check">
+                      @if (selectedPartnerId() === p.id) {
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                        >
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                      }
+                    </div>
+                  </label>
+                }
+              </div>
+              <button
+                class="btn-primary assign-btn"
+                (click)="assignPartner()"
+                [disabled]="!selectedPartnerId() || updatingStatus()"
+              >
+                Assign Partner
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Refund section -->
+        @if (
+          manageOrder()!.status === 'Cancelled' &&
+          manageOrder()!.paymentMethod !== 'COD' &&
+          manageOrder()!.paymentStatus === 'Paid'
+        ) {
+          <div class="drawer-section">
+            <div class="refund-card">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#2E7D52"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+              </svg>
+              <div>
+                <p class="refund-card__title">Refund Required</p>
+                <p class="refund-card__amt">₹{{ manageOrder()!.total }} to be refunded</p>
+              </div>
+              <button class="btn-success" (click)="issueRefund()" [disabled]="updatingStatus()">
+                Issue Refund
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

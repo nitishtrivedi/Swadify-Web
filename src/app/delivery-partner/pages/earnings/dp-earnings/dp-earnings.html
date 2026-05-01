@@ -1,0 +1,105 @@
+<div class="earnings-page">
+  <div class="earnings-page__header">
+    <h1>My Earnings</h1>
+    <select class="period-select" [(ngModel)]="period" (ngModelChange)="loadEarnings()">
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+      <option value="all">All Time</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton" style="height: 200px; border-radius: 20px; margin-bottom: 16px"></div>
+    <div class="skeleton" style="height: 300px; border-radius: 20px"></div>
+  } @else if (earnings()) {
+    <!-- Hero card -->
+    <div class="earnings-hero">
+      <div class="earnings-hero__main">
+        <p class="earnings-hero__label">Total Earned</p>
+        <p class="earnings-hero__value">₹{{ earnings()!.thisMonth }}</p>
+        <p class="earnings-hero__sub">{{ earnings()!.deliveriesWeek }} deliveries this week</p>
+      </div>
+
+      <div class="earnings-hero__grid">
+        <div class="eh-stat">
+          <p class="eh-stat__value">₹{{ earnings()!.today }}</p>
+          <p class="eh-stat__label">Today</p>
+        </div>
+        <div class="eh-stat">
+          <p class="eh-stat__value">₹{{ earnings()!.thisWeek }}</p>
+          <p class="eh-stat__label">This Week</p>
+        </div>
+        <div class="eh-stat">
+          <p class="eh-stat__value">{{ earnings()!.deliveriesToday }}</p>
+          <p class="eh-stat__label">Deliveries</p>
+        </div>
+        <div class="eh-stat">
+          <p class="eh-stat__value">₹{{ perDelivery() }}</p>
+          <p class="eh-stat__label">Per Delivery</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SVG bar chart (daily) -->
+    <div class="earnings-chart-card">
+      <h3>Daily Earnings</h3>
+      <div class="bar-chart">
+        <svg viewBox="0 0 320 120" preserveAspectRatio="none" class="bar-svg">
+          @for (bar of weekBars; track bar.day; let i = $index) {
+            <rect
+              [attr.x]="i * 46 + 8"
+              [attr.y]="120 - bar.height"
+              [attr.width]="30"
+              [attr.height]="bar.height"
+              [attr.fill]="bar.isToday ? '#D94F3D' : '#FDECEA'"
+              rx="4"
+            />
+            <text [attr.x]="i * 46 + 23" y="118" text-anchor="middle" font-size="8" fill="#8888AA">
+              {{ bar.day }}
+            </text>
+            @if (bar.height > 0) {
+              <text
+                [attr.x]="i * 46 + 23"
+                [attr.y]="120 - bar.height - 4"
+                text-anchor="middle"
+                font-size="7"
+                fill="#D94F3D"
+                font-weight="700"
+              >
+                {{ bar.amount > 0 ? '₹' + bar.amount : '' }}
+              </text>
+            }
+          }
+        </svg>
+      </div>
+    </div>
+
+    <!-- Payout history -->
+    <div class="payout-card">
+      <h3>Payout History</h3>
+      @for (payout of earnings()!.recentPayouts; track payout.id) {
+        <div class="payout-row">
+          <div class="payout-row__icon" [class.paid]="payout.status === 'Paid'">
+            {{ payout.status === 'Paid' ? '✅' : '🕐' }}
+          </div>
+          <div class="payout-row__info">
+            <p class="payout-row__period">{{ payout.period }}</p>
+            @if (payout.paidAt) {
+              <p class="payout-row__date">Paid {{ payout.paidAt | date: 'd MMM y' }}</p>
+            } @else {
+              <p class="payout-row__date">Pending</p>
+            }
+          </div>
+          <p class="payout-row__amount" [class.paid-amt]="payout.status === 'Paid'">
+            ₹{{ payout.amount }}
+          </p>
+        </div>
+      }
+      @if (earnings()!.recentPayouts.length === 0) {
+        <p style="text-align: center; color: #8888aa; padding: 24px; font-size: 0.875rem">
+          No payouts yet.
+        </p>
+      }
+    </div>
+  }
+</div>

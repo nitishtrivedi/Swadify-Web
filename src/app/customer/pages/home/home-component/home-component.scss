@@ -188,10 +188,23 @@
   display: flex;
   gap: v.$space-md;
   overflow-x: auto;
-  padding-bottom: v.$space-md;
+  margin: 10px 0;
+  padding: 10px 0;
+
   scrollbar-width: none;
+
   &::-webkit-scrollbar {
-    display: none;
+    height: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      opacity: 1;
+    }
   }
 }
 

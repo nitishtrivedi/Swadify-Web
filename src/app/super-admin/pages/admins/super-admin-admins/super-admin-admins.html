@@ -1,0 +1,230 @@
+<div class="page-wrap">
+  <div class="page-top">
+    <div>
+      <h1 class="page-title">Admin Management</h1>
+      <p class="page-sub">{{ admins().length }} admins registered</p>
+    </div>
+    <button class="btn-primary" (click)="openAdd()">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      Add Admin
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="search-row">
+    <div class="search-inline">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <input [(ngModel)]="search" placeholder="Search by name or email…" />
+    </div>
+    <div class="tab-switcher">
+      @for (tab of tabs; track tab.value) {
+        <button
+          class="tab-btn"
+          [class.active]="activeTab() === tab.value"
+          (click)="activeTab.set(tab.value)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="admins-list">
+      @for (n of [1, 2, 3]; track n) {
+        <div class="skeleton" style="height: 80px; border-radius: 14px"></div>
+      }
+    </div>
+  } @else if (filtered().length === 0) {
+    <app-empty-state
+      icon="👔"
+      title="No admins found"
+      message="Add your first admin to let them manage restaurants."
+      actionLabel="Add Admin"
+      [actionClick]="openAdd.bind(this)"
+    />
+  } @else {
+    <div class="admins-table-wrap">
+      <table class="admins-table">
+        <thead>
+          <tr>
+            <th>Admin</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Restaurants</th>
+            <th>Joined</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (admin of filtered(); track admin.id) {
+            <tr>
+              <td>
+                <div class="admin-cell">
+                  <div class="admin-cell__avatar">{{ admin.firstName[0] }}</div>
+                  <div>
+                    <p class="admin-cell__name">{{ admin.firstName }} {{ admin.lastName }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="mono-cell">@{{ admin.username }}</td>
+              <td>{{ admin.email }}</td>
+              <td class="center-cell">{{ admin.restaurantCount }}</td>
+              <td>{{ admin.createdAt | date: 'd MMM y' }}</td>
+              <td>
+                <label class="tgl">
+                  <input type="checkbox" [checked]="admin.isActive" (change)="toggleAdmin(admin)" />
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
+                </label>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button class="ra-btn" (click)="editAdmin(admin)">Edit</button>
+                  <button class="ra-btn ra-btn--danger" (click)="confirmDelete(admin)">
+                    Remove
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Add/Edit Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingId() ? 'Edit Admin' : 'Add New Admin' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="adminForm" (ngSubmit)="saveAdmin()" class="modal-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>First Name <span class="req">*</span></label>
+            <input class="input" formControlName="firstName" placeholder="Ravi" />
+            @if (af['firstName'].touched && af['firstName'].invalid) {
+              <span class="error-msg">Required</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input class="input" formControlName="lastName" placeholder="Kumar" />
+          </div>
+          <div class="form-group">
+            <label>Username <span class="req">*</span></label>
+            <input class="input" formControlName="username" placeholder="ravi_admin" />
+            @if (af['username'].touched && af['username'].invalid) {
+              <span class="error-msg">Min 3 characters</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Email <span class="req">*</span></label>
+            <input
+              class="input"
+              formControlName="email"
+              type="email"
+              placeholder="ravi@swadify.in"
+            />
+            @if (af['email'].touched && af['email'].invalid) {
+              <span class="error-msg">Valid email required</span>
+            }
+          </div>
+          @if (!editingId()) {
+            <div class="form-group" style="grid-column: 1/-1">
+              <label>Temporary Password <span class="req">*</span></label>
+              <input
+                class="input"
+                formControlName="password"
+                type="password"
+                placeholder="Min 8 characters"
+              />
+              @if (af['password'].touched && af['password'].invalid) {
+                <span class="error-msg">Min 8 characters required</span>
+              }
+            </div>
+          }
+        </div>
+
+        @if (!editingId()) {
+          <div class="info-note">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#5B8DEF"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Admin will receive login credentials by email. They cannot self-register.
+          </div>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span class="spinner"></span> Saving…
+            } @else {
+              {{ editingId() ? 'Update' : 'Create' }} Admin
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete confirm -->
+@if (deleteTarget()) {
+  <div class="modal-backdrop" (click)="deleteTarget.set(null)">
+    <div class="modal-box modal-box--sm" (click)="$event.stopPropagation()">
+      <div class="delete-confirm">
+        <span style="font-size: 2.5rem">👔</span>
+        <h3>Remove {{ deleteTarget()!.firstName }}?</h3>
+        <p>They will lose access to the admin dashboard immediately.</p>
+        <div class="modal-actions" style="justify-content: center; margin-top: 8px">
+          <button class="btn-outline" (click)="deleteTarget.set(null)">Cancel</button>
+          <button class="btn-danger" (click)="doDelete()" [disabled]="saving()">
+            @if (saving()) {
+              <span class="spinner"></span>
+            }
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

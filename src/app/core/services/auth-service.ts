@@ -2,7 +2,14 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap, catchError, EMPTY } from 'rxjs';
 import { ApiService } from './api-service';
-import { AuthTokens, LoginRequest, RegisterRequest, User } from '../models';
+import {
+  ApiResponse,
+  AuthTokens,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  User,
+} from '../models';
 
 const TOKEN_KEY = 'swadify_token';
 const REFRESH_KEY = 'swadify_refresh';
@@ -27,15 +34,35 @@ export class AuthService {
   readonly isVerified = computed(() => !!this._user()?.isEmailVerified);
 
   // ── Register ──────────────────────────────────────────────
-  register(req: RegisterRequest) {
-    return this.api.post<void>('/auth/register', req);
+  register(req: RegisterRequest, source?: string) {
+    if (source === 'customer-register') {
+      return this.api.post<void>('/auth/register/customer', req);
+    } else {
+      return this.api.post<void>('/auth/register', req);
+    }
   }
 
   // ── Login ─────────────────────────────────────────────────
   login(req: LoginRequest) {
-    return this.api
-      .post<{ tokens: AuthTokens; user: User }>('/auth/login', req)
-      .pipe(tap((res) => this.setSession(res.data.tokens, res.data.user)));
+    // return this.api.post<ApiResponse<{ tokens: AuthTokens; user: User }>>('/auth/login', req).pipe(
+    //   tap((res) => {
+    //     console.log('LOGIN RES:', res);
+    //     //this.setSession(res.data.tokens, res.data.user);
+    //   }),
+    // );
+    return this.api.post<LoginResponse>('/auth/login', req).pipe(
+      tap((res) => {
+        console.log(res);
+        this.setSession(
+          {
+            accessToken: res.data.accessToken,
+            refreshToken: res.data.refreshToken,
+            expiresIn: new Date(res.data.expiresAt).getTime() - Date.now(),
+          },
+          res.data.user,
+        );
+      }),
+    );
   }
 
   // ── Admin/DP Login ────────────────────────────────────────

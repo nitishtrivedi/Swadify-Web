@@ -27,62 +27,86 @@ export const routes: Routes = [
             (m) => m.RestaurantDetail,
           ),
       },
-      // {
-      //   path: 'cart',
-      //   canActivate: [authGuard],
-      //   loadComponent: () =>
-      //     import('./customer/pages/car').then((m) => m.CartComponent),
-      // },
-      // {
-      //   path: 'checkout',
-      //   canActivate: [authGuard],
-      //   loadComponent: () =>
-      //     import('./customer/pages/checkout/checkout.component').then((m) => m.CheckoutComponent),
-      // },
-      // {
-      //   path: 'orders',
-      //   canActivate: [authGuard],
-      //   loadComponent: () =>
-      //     import('./customer/pages/orders/orders.component').then((m) => m.OrdersComponent),
-      // },
-      // {
-      //   path: 'orders/:id',
-      //   canActivate: [authGuard],
-      //   loadComponent: () =>
-      //     import('./customer/pages/order-tracking/order-tracking.component').then(
-      //       (m) => m.OrderTrackingComponent,
-      //     ),
-      // },
-      // {
-      //   path: 'profile',
-      //   canActivate: [authGuard],
-      //   loadComponent: () =>
-      //     import('./customer/pages/profile/profile.component').then((m) => m.ProfileComponent),
-      // },
+      {
+        path: 'cart',
+        canActivate: [authGuard],
+        loadComponent: () => import('./customer/pages/cart/cart/cart').then((m) => m.Cart),
+      },
+      {
+        path: 'checkout',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./customer/pages/checkout/checkout/checkout').then((m) => m.Checkout),
+      },
+      {
+        path: 'orders',
+        canActivate: [authGuard],
+        loadComponent: () => import('./customer/pages/orders/orders/orders').then((m) => m.Orders),
+      },
+      {
+        path: 'orders/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./customer/pages/order-tracking/order-tracking/order-tracking').then(
+            (m) => m.OrderTracking,
+          ),
+      },
+      {
+        path: 'profile',
+        canActivate: [authGuard],
+        loadComponent: () => import('./customer/pages/profile/profile').then((m) => m.Profile),
+      },
     ],
   },
 
   //   // ── Admin routes ──────────────────────────────────────────
-  //   {
-  //     path: 'admin',
-  //     children: [
-  //       { path: 'login', loadComponent: () => import('./admin/pages/login/admin-login.component').then(m => m.AdminLoginComponent) },
-  //       {
-  //         path: '',
-  //         canActivate: [adminGuard],
-  //         loadComponent: () => import('./admin/layout/admin-layout.component').then(m => m.AdminLayoutComponent),
-  //         children: [
-  //           { path: 'dashboard',  loadComponent: () => import('./admin/pages/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
-  //           { path: 'restaurants',loadComponent: () => import('./admin/pages/restaurants/admin-restaurants.component').then(m => m.AdminRestaurantsComponent) },
-  //           { path: 'orders',     loadComponent: () => import('./admin/pages/orders/admin-orders.component').then(m => m.AdminOrdersComponent) },
-  //           { path: 'partners',   loadComponent: () => import('./admin/pages/partners/admin-partners.component').then(m => m.AdminPartnersComponent) },
-  //           { path: 'reviews',    loadComponent: () => import('./admin/pages/reviews/admin-reviews.component').then(m => m.AdminReviewsComponent) },
-  //           { path: 'discounts',  loadComponent: () => import('./admin/pages/discounts/admin-discounts.component').then(m => m.AdminDiscountsComponent) },
-  //           { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-  //         ]
-  //       }
-  //     ]
-  //   },
+  {
+    path: 'admin',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./admin/pages/login/admin-login/admin-login').then((m) => m.AdminLogin),
+      },
+      {
+        path: '',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./admin/layout/admin-layout/admin-layout').then((m) => m.AdminLayout),
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./admin/pages/dashboard/admin-dashboard/admin-dashboard').then(
+                (m) => m.AdminDashboard,
+              ),
+          },
+          {
+            path: 'restaurants',
+            loadComponent: () =>
+              import('./admin/pages/restaurants/admin-restaurants/admin-restaurants').then(
+                (m) => m.AdminRestaurants,
+              ),
+          },
+          {
+            path: 'orders',
+            loadComponent: () =>
+              import('./admin/pages/orders/admin-orders/admin-orders').then((m) => m.AdminOrders),
+          },
+          {
+            path: 'partners',
+            loadComponent: () =>
+              import('./admin/pages/partners/admin-partners/admin-partners').then(
+                (m) => m.AdminPartners,
+              ),
+          },
+          //           { path: 'reviews',    loadComponent: () => import('./admin/pages/reviews/admin-reviews.component').then(m => m.AdminReviewsComponent) },
+          //           { path: 'discounts',  loadComponent: () => import('./admin/pages/discounts/admin-discounts.component').then(m => m.AdminDiscountsComponent) },
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        ],
+      },
+    ],
+  },
 
   //   // ── SuperAdmin routes ─────────────────────────────────────
   //   {

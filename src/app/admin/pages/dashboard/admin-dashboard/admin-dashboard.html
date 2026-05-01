@@ -1,0 +1,295 @@
+<div class="dash-page">
+  <!-- Page title -->
+  <div class="dash-page__header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome back! Here's what's happening today.</p>
+    </div>
+    <div class="dash-page__actions">
+      <button class="topbar-btn-secondary">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Export Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats cards -->
+  @if (loadingStats()) {
+    <div class="stats-grid">
+      @for (n of [1, 2, 3, 4]; track n) {
+        <div class="skeleton" style="height: 110px; border-radius: 16px"></div>
+      }
+    </div>
+  } @else {
+    <div class="stats-grid">
+      @for (card of statCards; track card.label) {
+        <div class="stat-card" [style.--accent]="card.accent">
+          <div class="stat-card__icon" [style.background]="card.iconBg">
+            <span>{{ card.icon }}</span>
+          </div>
+          <div class="stat-card__body">
+            <p class="stat-card__label">{{ card.label }}</p>
+            <p class="stat-card__value">{{ card.value }}</p>
+          </div>
+          <div class="stat-card__trend" [class.up]="card.trendUp" [class.down]="!card.trendUp">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              @if (card.trendUp) {
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                <polyline points="17 6 23 6 23 12" />
+              } @else {
+                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+                <polyline points="17 18 23 18 23 12" />
+              }
+            </svg>
+            {{ card.trend }}
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Main grid: chart + recent orders -->
+  <div class="dash-grid">
+    <!-- Revenue chart (SVG-based sparkline) -->
+    <div class="dash-card revenue-chart">
+      <div class="dash-card__header">
+        <h3>Revenue Overview</h3>
+        <div class="period-tabs">
+          @for (p of ['7D', '30D', '90D']; track p) {
+            <button class="period-tab" [class.active]="period() === p" (click)="period.set(p)">
+              {{ p }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="chart-area">
+        <svg viewBox="0 0 600 200" preserveAspectRatio="none" class="chart-svg">
+          <!-- Grid lines -->
+          @for (y of [40, 80, 120, 160]; track y) {
+            <line
+              x1="0"
+              [attr.y1]="y"
+              x2="600"
+              [attr.y2]="y"
+              stroke="#EDE8DF"
+              stroke-width="1"
+              stroke-dasharray="4 4"
+            />
+          }
+          <!-- Area fill -->
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D94F3D" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#D94F3D" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path [attr.d]="areaPath" fill="url(#areaGrad)" />
+          <!-- Line -->
+          <polyline
+            [attr.points]="chartPoints"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <!-- Dots -->
+          @for (pt of chartDots; track pt.x) {
+            <circle
+              [attr.cx]="pt.x"
+              [attr.cy]="pt.y"
+              r="4"
+              fill="#D94F3D"
+              stroke="white"
+              stroke-width="2"
+            />
+          }
+          <!-- Saffron secondary line -->
+          <polyline
+            [attr.points]="chartPoints2"
+            fill="none"
+            stroke="#FF9933"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            opacity="0.5"
+          />
+        </svg>
+
+        <div class="chart-labels">
+          @for (label of chartLabels(); track label) {
+            <span>{{ label }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="chart-legend">
+        <div class="legend-item">
+          <span class="legend-dot" style="background: #d94f3d"></span> Revenue
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: #ff9933"></span> Orders
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick stats panel -->
+    <div class="dash-card quick-stats">
+      <div class="dash-card__header">
+        <h3>Quick Stats</h3>
+      </div>
+
+      <div class="qs-list">
+        @for (qs of quickStats; track qs.label) {
+          <div class="qs-item">
+            <div class="qs-item__icon">{{ qs.icon }}</div>
+            <div class="qs-item__info">
+              <p class="qs-item__label">{{ qs.label }}</p>
+              <div class="qs-bar">
+                <div
+                  class="qs-bar__fill"
+                  [style.width]="qs.pct + '%'"
+                  [style.background]="qs.color"
+                ></div>
+              </div>
+            </div>
+            <span class="qs-item__value" [style.color]="qs.color">{{ qs.value }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="qs-actions">
+        <a routerLink="/admin/orders" class="qs-action-btn">View All Orders</a>
+        <a routerLink="/admin/restaurants" class="qs-action-btn">Manage Restaurants</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders table -->
+  <div class="dash-card recent-orders">
+    <div class="dash-card__header">
+      <h3>Recent Orders</h3>
+      <a routerLink="/admin/orders" class="view-all-link">View all →</a>
+    </div>
+
+    @if (loadingOrders()) {
+      <div class="table-skeleton">
+        @for (n of [1, 2, 3, 4, 5]; track n) {
+          <div class="skeleton" style="height: 48px; border-radius: 8px; margin-bottom: 8px"></div>
+        }
+      </div>
+    } @else if (recentOrders().length === 0) {
+      <div class="no-orders">
+        <span>📋</span>
+        <p>No orders yet today.</p>
+      </div>
+    } @else {
+      <div class="orders-table-wrap">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Restaurant</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Time</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of recentOrders(); track order.id) {
+              <tr>
+                <td class="order-id-cell">#{{ order.id.slice(-6).toUpperCase() }}</td>
+                <td>{{ order.customerName }}</td>
+                <td>{{ order.restaurantName }}</td>
+                <td class="amount-cell">₹{{ order.total }}</td>
+                <td>
+                  <span class="status-chip status-chip--{{ order.status.toLowerCase() }}">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td class="time-cell">{{ order.createdAt | date: 'h:mm a' }}</td>
+                <td>
+                  <a
+                    [routerLink]="['/admin/orders']"
+                    [queryParams]="{ id: order.id }"
+                    class="view-btn"
+                    >View</a
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <!-- Bottom row: active partners + top restaurants -->
+  <div class="dash-bottom-grid">
+    <!-- Active delivery partners -->
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <h3>Active Delivery Partners</h3>
+        <a routerLink="/admin/partners" class="view-all-link">Manage →</a>
+      </div>
+      <div class="dp-list">
+        @for (dp of activePartners; track dp.name) {
+          <div class="dp-row">
+            <div class="dp-row__avatar">{{ dp.name[0] }}</div>
+            <div class="dp-row__info">
+              <p class="dp-row__name">{{ dp.name }}</p>
+              <p class="dp-row__orders">{{ dp.orders }} deliveries today</p>
+            </div>
+            <div class="dp-row__status" [class.online]="dp.online">
+              {{ dp.online ? '🟢 Active' : '⚫ Offline' }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Top restaurants -->
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <h3>Top Restaurants Today</h3>
+        <a routerLink="/admin/restaurants" class="view-all-link">See all →</a>
+      </div>
+      <div class="top-restaurants">
+        @for (r of topRestaurants; track r.name; let i = $index) {
+          <div class="tr-row">
+            <span class="tr-rank">{{ i + 1 }}</span>
+            <div class="tr-icon">🏪</div>
+            <div class="tr-info">
+              <p class="tr-name">{{ r.name }}</p>
+              <p class="tr-orders">{{ r.orders }} orders</p>
+            </div>
+            <span class="tr-revenue">₹{{ r.revenue | number }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

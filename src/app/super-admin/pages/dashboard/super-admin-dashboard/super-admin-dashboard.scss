@@ -1,0 +1,247 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.sa-dash {
+  @include m.flex(column, stretch, flex-start, v.$space-xl);
+
+  &__header {
+    h1 {
+      font-family: v.$font-display;
+      font-size: 1.6rem;
+    }
+    p {
+      color: v.$text-light;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+  }
+}
+
+.stats-grid {
+  display: grid;
+  gap: v.$space-md;
+  grid-template-columns: repeat(2, 1fr);
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @include m.respond-to(xl) {
+    grid-template-columns: repeat(8, 1fr) !important;
+  }
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.sa-stat-card {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$border;
+  padding: v.$space-md;
+  border-left: 4px solid var(--accent);
+  transition: box-shadow v.$transition-fast;
+  &:hover {
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  &__value {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: v.$text-dark;
+  }
+  &__label {
+    font-size: 0.7rem;
+    color: v.$text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 2px;
+  }
+}
+
+.sa-dash-grid {
+  display: grid;
+  gap: v.$space-lg;
+  grid-template-columns: 1fr;
+  @include m.respond-to(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.sa-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-xl;
+
+  &__header {
+    @include m.flex(row, center, space-between);
+    margin-bottom: v.$space-lg;
+    h3 {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
+}
+
+.sa-view-all {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: v.$saffron;
+}
+.sa-empty {
+  font-size: 0.875rem;
+  color: v.$text-light;
+  text-align: center;
+  padding: v.$space-lg;
+}
+
+.sa-admin-row {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  padding: 10px 0;
+  border-bottom: 1px solid v.$border;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+    font-weight: 700;
+    @include m.flex(row, center, center);
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    p:first-child {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: v.$text-dark;
+      @include m.truncate;
+    }
+  }
+
+  &__meta {
+    @include m.flex(column, flex-end, center, 4px);
+    flex-shrink: 0;
+  }
+}
+
+.muted {
+  font-size: 0.75rem;
+  color: v.$text-light;
+}
+
+.mini-badge {
+  padding: 2px 8px;
+  border-radius: v.$radius-full;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: v.$border;
+  color: v.$text-light;
+  &.active {
+    background: v.$green-light;
+    color: v.$green;
+  }
+}
+
+/* Activity log */
+.sa-log-row {
+  @include m.flex(row, flex-start, flex-start, v.$space-sm);
+  padding: 8px 0;
+  border-bottom: 1px solid v.$border;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: v.$saffron;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  &__action {
+    font-size: 0.85rem;
+    color: v.$text-mid;
+    line-height: 1.5;
+    strong {
+      color: v.$text-dark;
+    }
+  }
+}
+
+.log-entity {
+  background: v.$ivory-dark;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  margin-left: 4px;
+}
+
+/* Platform health */
+.platform-health {
+}
+
+.health-badge {
+  @include m.flex(row, center, flex-start, 6px);
+  background: v.$green-light;
+  border-radius: v.$radius-full;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: v.$green;
+}
+
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: v.$green;
+  animation: pulse 1.5s infinite;
+}
+
+.health-grid {
+  display: grid;
+  gap: v.$space-lg;
+  grid-template-columns: 1fr 1fr;
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.health-item {
+  &__top {
+    @include m.flex(row, center, space-between);
+    font-size: 0.8rem;
+    color: v.$text-mid;
+    margin-bottom: 6px;
+  }
+  &__value {
+    font-weight: 700;
+  }
+}
+
+.health-bar {
+  height: 6px;
+  background: v.$ivory-dark;
+  border-radius: 3px;
+  overflow: hidden;
+  &__fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+}

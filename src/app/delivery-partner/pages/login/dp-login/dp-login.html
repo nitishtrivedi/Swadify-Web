@@ -1,0 +1,153 @@
+<div class="dp-login-page">
+  <div class="dp-login-card">
+    <!-- Logo -->
+    <div class="dp-login-card__logo">
+      <svg width="52" height="52" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#D94F3D" />
+        <path
+          d="M10 22 Q14 10 18 14 Q22 18 26 10"
+          stroke="#FFFDF5"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          fill="none"
+        />
+        <circle cx="18" cy="25" r="3" fill="#FF9933" />
+        <path
+          d="M12 28 Q18 24 24 28"
+          stroke="#FFFDF5"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          fill="none"
+        />
+      </svg>
+      <div>
+        <p class="dp-login-card__brand">Swadify</p>
+        <p class="dp-login-card__sub">Delivery Partner Portal</p>
+      </div>
+    </div>
+
+    <!-- Illustration -->
+    <div class="dp-login-card__art">
+      <svg viewBox="0 0 280 160" fill="none" width="280">
+        <circle cx="140" cy="80" r="75" fill="#FDECEA" opacity="0.4" />
+        <!-- Road -->
+        <rect x="20" y="110" width="240" height="16" rx="8" fill="#EDE8DF" />
+        <rect x="80" y="116" width="30" height="4" rx="2" fill="white" />
+        <rect x="130" y="116" width="30" height="4" rx="2" fill="white" />
+        <rect x="180" y="116" width="30" height="4" rx="2" fill="white" />
+        <!-- Bike -->
+        <g transform="translate(80, 60)">
+          <circle cx="16" cy="36" r="13" fill="none" stroke="#D94F3D" stroke-width="3" />
+          <circle cx="16" cy="36" r="4" fill="#D94F3D" />
+          <circle cx="66" cy="36" r="13" fill="none" stroke="#D94F3D" stroke-width="3" />
+          <circle cx="66" cy="36" r="4" fill="#D94F3D" />
+          <path
+            d="M16 36 L30 16 L56 16 L66 36"
+            stroke="#D94F3D"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+          <path d="M30 16 L34 6 L54 6 L56 16" fill="#FF9933" opacity="0.9" />
+          <!-- Rider -->
+          <circle cx="41" cy="4" r="7" fill="#FF9933" />
+          <path d="M30 18 Q41 10 52 18" fill="#1A1A2E" opacity="0.7" />
+          <!-- Delivery box -->
+          <rect
+            x="50"
+            y="8"
+            width="20"
+            height="16"
+            rx="3"
+            fill="#FFFDF5"
+            stroke="#D94F3D"
+            stroke-width="1.5"
+          />
+          <path d="M50 14 L70 14" stroke="#D94F3D" stroke-width="1" />
+        </g>
+        <!-- Speed lines -->
+        <path
+          d="M10 90 L40 90"
+          stroke="#D94F3D"
+          stroke-width="2"
+          stroke-linecap="round"
+          opacity="0.3"
+        />
+        <path
+          d="M10 100 L30 100"
+          stroke="#FF9933"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          opacity="0.25"
+        />
+      </svg>
+    </div>
+
+    <h2 class="dp-login-card__title">Welcome Back!</h2>
+    <p class="dp-login-card__desc">Sign in to start accepting deliveries.</p>
+
+    <form [formGroup]="form" (ngSubmit)="login()" class="dp-login-form">
+      <div class="form-group">
+        <label>Phone or Username</label>
+        <input
+          class="input"
+          formControlName="usernameOrEmail"
+          placeholder="Your registered phone/username"
+          autocomplete="username"
+        />
+        @if (f['usernameOrEmail'].touched && f['usernameOrEmail'].invalid) {
+          <span class="error-msg">This field is required</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pwd-wrap">
+          <input
+            class="input"
+            [type]="showPwd() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          <button type="button" class="eye-btn" (click)="showPwd.set(!showPwd())">
+            {{ showPwd() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (f['password'].touched && f['password'].invalid) {
+          <span class="error-msg">Password is required</span>
+        }
+      </div>
+
+      @if (error()) {
+        <div class="error-alert">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <button type="submit" class="dp-signin-btn" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner"></span> Signing in…
+        } @else {
+          Start Delivering 🚀
+        }
+      </button>
+    </form>
+
+    <a href="/admin/login" class="dp-login-card__admin-link"> Are you an admin? Sign in here → </a>
+  </div>
+</div>

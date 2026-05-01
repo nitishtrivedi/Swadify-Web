@@ -1,0 +1,541 @@
+<!-- ── LIST VIEW ──────────────────────────────────────────── -->
+@if (view() === 'list') {
+  <div class="page-wrap">
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">Restaurants</h1>
+        <p class="page-sub">
+          {{ restaurants().length }} restaurant{{ restaurants().length !== 1 ? 's' : '' }} managed
+        </p>
+      </div>
+      <button class="btn-primary" (click)="openAddModal()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Add Restaurant
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar-admin">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <input [(ngModel)]="search" placeholder="Search restaurants…" />
+    </div>
+
+    @if (loading()) {
+      <div class="rest-grid">
+        @for (n of [1, 2, 3]; track n) {
+          <div class="skeleton" style="height: 220px; border-radius: 16px"></div>
+        }
+      </div>
+    } @else if (filteredRestaurants().length === 0) {
+      <app-empty-state
+        icon="restaurant"
+        title="No restaurants yet"
+        message="Add your first restaurant to get started."
+        actionLabel="Add Restaurant"
+        [actionClick]="openAddModal.bind(this)"
+      />
+    } @else {
+      <div class="rest-grid">
+        @for (r of filteredRestaurants(); track r.id) {
+          <div class="rest-card">
+            <!-- Cover -->
+            <div class="rest-card__cover">
+              @if (r.coverUrl) {
+                <img [src]="r.coverUrl" [alt]="r.name" />
+              } @else {
+                <div class="rest-card__cover-placeholder">🏪</div>
+              }
+              <!-- Open/Close toggle -->
+              <label class="open-toggle" [title]="r.isOpen ? 'Mark as Closed' : 'Mark as Open'">
+                <input type="checkbox" [checked]="r.isOpen" (change)="toggleOpen(r)" />
+                <span class="open-toggle__track">
+                  <span class="open-toggle__thumb"></span>
+                </span>
+                <span class="open-toggle__label">{{ r.isOpen ? 'Open' : 'Closed' }}</span>
+              </label>
+            </div>
+
+            <!-- Body -->
+            <div class="rest-card__body">
+              <div class="rest-card__row">
+                <h3>{{ r.name }}</h3>
+                <div class="rest-card__rating">⭐ {{ r.rating | number: '1.1-1' }}</div>
+              </div>
+              <p class="rest-card__cuisine">{{ r.cuisineType }}</p>
+              <div class="rest-card__meta">
+                <span>🕐 {{ r.openTime }}–{{ r.closeTime }}</span>
+                <span>₹{{ r.minOrderAmount }} min</span>
+                <span>{{ r.deliveryTimeMin }}–{{ r.deliveryTimeMax }}min</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="rest-card__actions">
+              <button class="action-btn" (click)="viewMenu(r)">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                  <rect x="9" y="3" width="6" height="4" rx="1" />
+                </svg>
+                Menu
+              </button>
+              <button class="action-btn" (click)="editRestaurant(r)">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Edit
+              </button>
+              <button class="action-btn action-btn--danger" (click)="confirmDelete(r)">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2" />
+                </svg>
+                Delete
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- ── MENU VIEW ──────────────────────────────────────────── -->
+@if (view() === 'menu') {
+  <div class="page-wrap">
+    <div class="page-top">
+      <div class="page-top__back">
+        <button class="back-btn" (click)="view.set('list')">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div>
+          <h1 class="page-title">Menu — {{ selectedRestaurant()?.name }}</h1>
+          <p class="page-sub">Manage categories and items</p>
+        </div>
+      </div>
+      <button class="btn-primary" (click)="openAddCategory()">+ Add Category</button>
+    </div>
+
+    @if (loadingMenu()) {
+      <div class="skeleton" style="height: 300px; border-radius: 16px"></div>
+    } @else {
+      <div class="menu-admin-layout">
+        <!-- Category list -->
+        @for (cat of menuCategories(); track cat.id) {
+          <div class="menu-section-admin">
+            <div class="menu-section-admin__header">
+              <h3>{{ cat.name }}</h3>
+              <div class="menu-section-admin__actions">
+                <span class="item-count-badge">{{ cat.items.length }} items</span>
+                <button class="icon-btn" (click)="openAddItem(cat)">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Item
+                </button>
+                <button class="icon-btn icon-btn--warn" (click)="editCategory(cat)">Edit</button>
+                <button class="icon-btn icon-btn--danger" (click)="deleteCat(cat.id)">
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            @if (cat.items.length === 0) {
+              <p class="no-items-hint">No items yet. Add your first item.</p>
+            } @else {
+              <div class="menu-items-table">
+                <div class="mit-header">
+                  <span>Item</span><span>Price</span><span>Prep Time</span> <span>Available</span
+                  ><span>Actions</span>
+                </div>
+                @for (item of cat.items; track item.id) {
+                  <div class="mit-row" [class.unavailable]="!item.isAvailable">
+                    <div class="mit-name">
+                      <div class="veg-dot-sm" [class.non-veg]="!item.isVeg"></div>
+                      <div>
+                        <p class="mit-item-name">{{ item.name }}</p>
+                        @if (item.description) {
+                          <p class="mit-item-desc">{{ item.description }}</p>
+                        }
+                      </div>
+                    </div>
+                    <span class="mit-price">₹{{ item.price }}</span>
+                    <span class="mit-time">{{ item.preparationTimeMin }} min</span>
+                    <label class="avail-toggle">
+                      <input
+                        type="checkbox"
+                        [checked]="item.isAvailable"
+                        (change)="toggleItem(item)"
+                      />
+                      <span class="avail-track">
+                        <span class="avail-thumb"></span>
+                      </span>
+                    </label>
+                    <div class="mit-actions">
+                      <button class="icon-btn" (click)="editItem(item, cat)">Edit</button>
+                      <button class="icon-btn icon-btn--danger" (click)="deleteItem(item.id)">
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (menuCategories().length === 0) {
+          <app-empty-state
+            icon="🍽️"
+            title="No menu categories"
+            message="Add a category first, then add items to it."
+            actionLabel="Add Category"
+            [actionClick]="openAddCategory.bind(this)"
+          />
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- ── RESTAURANT FORM MODAL ──────────────────────────────── -->
+@if (showRestaurantModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-box modal-box--lg" (click)="$event.stopPropagation()">
+      <div class="modal-box__header">
+        <h3>{{ editingId() ? 'Edit Restaurant' : 'Add New Restaurant' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="restForm" (ngSubmit)="saveRestaurant()" class="modal-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Restaurant Name <span class="req">*</span></label>
+            <input class="input" formControlName="name" placeholder="Biryani House" />
+            @if (rf['name'].touched && rf['name'].invalid) {
+              <span class="error-msg">Required</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Cuisine Type <span class="req">*</span></label>
+            <input
+              class="input"
+              formControlName="cuisineType"
+              placeholder="North Indian, Biryani"
+            />
+            @if (rf['cuisineType'].touched && rf['cuisineType'].invalid) {
+              <span class="error-msg">Required</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            class="input"
+            formControlName="description"
+            rows="2"
+            placeholder="Short description of the restaurant…"
+            style="resize: vertical"
+          ></textarea>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Phone <span class="req">*</span></label>
+            <input class="input" formControlName="phone" placeholder="+91 98765 43210" />
+          </div>
+          <div class="form-group">
+            <label>Email <span class="req">*</span></label>
+            <input
+              class="input"
+              formControlName="email"
+              type="email"
+              placeholder="info@restaurant.com"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label>Opens At <span class="req">*</span></label>
+            <input class="input" formControlName="openTime" type="time" />
+          </div>
+          <div class="form-group">
+            <label>Closes At <span class="req">*</span></label>
+            <input class="input" formControlName="closeTime" type="time" />
+          </div>
+          <div class="form-group">
+            <label>Min Order (₹) <span class="req">*</span></label>
+            <input class="input" formControlName="minOrderAmount" type="number" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Delivery Fee (₹) <span class="req">*</span></label>
+            <input class="input" formControlName="deliveryFee" type="number" min="0" />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Min Delivery Time (min)</label>
+            <input class="input" formControlName="deliveryTimeMin" type="number" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Max Delivery Time (min)</label>
+            <input class="input" formControlName="deliveryTimeMax" type="number" min="0" />
+          </div>
+        </div>
+
+        <div class="form-section-title">Address</div>
+
+        <div class="form-group" formGroupName="address">
+          <div class="form-grid-1">
+            <div class="form-group">
+              <label>Street Address <span class="req">*</span></label>
+              <input class="input" formControlName="line1" placeholder="Shop 4, MG Road" />
+            </div>
+          </div>
+          <div class="form-grid-3" style="margin-top: 12px">
+            <div class="form-group">
+              <label>City <span class="req">*</span></label>
+              <input class="input" formControlName="city" placeholder="Pune" />
+            </div>
+            <div class="form-group">
+              <label>State <span class="req">*</span></label>
+              <input class="input" formControlName="state" placeholder="Maharashtra" />
+            </div>
+            <div class="form-group">
+              <label>Pincode <span class="req">*</span></label>
+              <input class="input" formControlName="pincode" placeholder="411001" maxlength="6" />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span class="spinner"></span> Saving…
+            } @else {
+              {{ editingId() ? 'Update' : 'Create' }} Restaurant
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ── CATEGORY MODAL ─────────────────────────────────────── -->
+@if (showCategoryModal()) {
+  <div class="modal-backdrop" (click)="showCategoryModal.set(false)">
+    <div class="modal-box modal-box--sm" (click)="$event.stopPropagation()">
+      <div class="modal-box__header">
+        <h3>{{ editingCatId() ? 'Edit Category' : 'Add Category' }}</h3>
+        <button class="modal-close" (click)="showCategoryModal.set(false)">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label>Category Name <span class="req">*</span></label>
+          <input class="input" [(ngModel)]="categoryName" placeholder="Starters, Main Course…" />
+        </div>
+        <div class="modal-actions">
+          <button class="btn-outline" (click)="showCategoryModal.set(false)">Cancel</button>
+          <button
+            class="btn-primary"
+            (click)="saveCategory()"
+            [disabled]="saving() || !categoryName"
+          >
+            @if (saving()) {
+              <span class="spinner"></span>
+            }
+            Save Category
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── MENU ITEM MODAL ────────────────────────────────────── -->
+@if (showItemModal()) {
+  <div class="modal-backdrop" (click)="showItemModal.set(false)">
+    <div class="modal-box modal-box--md" (click)="$event.stopPropagation()">
+      <div class="modal-box__header">
+        <h3>{{ editingItemId() ? 'Edit Item' : 'Add Menu Item' }}</h3>
+        <button class="modal-close" (click)="showItemModal.set(false)">✕</button>
+      </div>
+      <form [formGroup]="itemForm" (ngSubmit)="saveItem()" class="modal-form">
+        <div class="form-grid-2">
+          <div class="form-group" style="grid-column: 1/-1">
+            <label>Item Name <span class="req">*</span></label>
+            <input class="input" formControlName="name" placeholder="Chicken Biryani" />
+            @if (itemF['name'].touched && itemF['name'].invalid) {
+              <span class="error-msg">Required</span>
+            }
+          </div>
+          <div class="form-group" style="grid-column: 1/-1">
+            <label>Description</label>
+            <textarea
+              class="input"
+              formControlName="description"
+              rows="2"
+              placeholder="Aromatic basmati rice with spices…"
+              style="resize: vertical"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label>Price (₹) <span class="req">*</span></label>
+            <input class="input" formControlName="price" type="number" min="0" />
+            @if (itemF['price'].touched && itemF['price'].invalid) {
+              <span class="error-msg">Required</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Prep Time (min) <span class="req">*</span></label>
+            <input class="input" formControlName="preparationTimeMin" type="number" min="1" />
+          </div>
+        </div>
+
+        <!-- Veg toggle -->
+        <div class="veg-radio-group">
+          <button
+            type="button"
+            class="veg-radio-btn"
+            [class.active-veg]="itemForm.get('isVeg')?.value === true"
+            (click)="itemForm.patchValue({ isVeg: true })"
+          >
+            <div class="veg-indicator veg"></div>
+            Veg
+          </button>
+          <button
+            type="button"
+            class="veg-radio-btn"
+            [class.active-nonveg]="itemForm.get('isVeg')?.value === false"
+            (click)="itemForm.patchValue({ isVeg: false })"
+          >
+            <div class="veg-indicator nonveg"></div>
+            Non-Veg
+          </button>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+          <label>Tags</label>
+          <div class="tag-chips">
+            @for (tag of availableTags; track tag) {
+              <button
+                type="button"
+                class="tag-chip"
+                [class.active]="selectedTags().includes(tag)"
+                (click)="toggleTag(tag)"
+              >
+                {{ tag }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" (click)="showItemModal.set(false)">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span class="spinner"></span> Saving…
+            } @else {
+              {{ editingItemId() ? 'Update' : 'Add' }} Item
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ── DELETE CONFIRM ─────────────────────────────────────── -->
+@if (showDeleteConfirm()) {
+  <div class="modal-backdrop" (click)="showDeleteConfirm.set(false)">
+    <div class="modal-box modal-box--sm" (click)="$event.stopPropagation()">
+      <div class="delete-confirm">
+        <span class="delete-confirm__icon">🗑️</span>
+        <h3>Delete "{{ deleteTarget()?.name }}"?</h3>
+        <p>This action cannot be undone. All menu items will be removed.</p>
+        <div class="modal-actions">
+          <button class="btn-outline" (click)="showDeleteConfirm.set(false)">Cancel</button>
+          <button class="btn-danger" (click)="doDeleteRestaurant()" [disabled]="saving()">
+            @if (saving()) {
+              <span class="spinner"></span>
+            }
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

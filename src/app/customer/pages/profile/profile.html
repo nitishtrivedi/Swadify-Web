@@ -1,0 +1,618 @@
+<!-- Header -->
+<div class="profile-header">
+  <div class="container">
+    <div class="profile-header__inner">
+      <!-- Avatar -->
+      <div class="avatar-wrap">
+        <div class="avatar-circle">
+          @if (user()?.profilePicUrl) {
+            <img [src]="user()!.profilePicUrl" [alt]="user()!.firstName" />
+          } @else {
+            <span class="avatar-initials">{{ initials() }}</span>
+          }
+        </div>
+        <label class="avatar-edit" title="Change photo">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          >
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+          <input type="file" accept="image/*" (change)="onAvatarChange($event)" hidden />
+        </label>
+      </div>
+
+      <!-- Name + meta -->
+      <div class="profile-header__info">
+        <h1>{{ user()?.firstName }} {{ user()?.lastName }}</h1>
+        <p class="profile-header__username">@{{ user()?.username }}</p>
+        <div class="profile-header__badges">
+          <!-- Email verified -->
+          <span class="verify-badge" [class.verified]="user()?.isEmailVerified">
+            @if (user()?.isEmailVerified) {
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              Email Verified
+            } @else {
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              Email Not Verified
+            }
+          </span>
+
+          <span class="member-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            Member since {{ user()?.createdAt | date: 'MMM y' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unverified email banner -->
+    @if (!user()?.isEmailVerified) {
+      <div class="verify-banner">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#E65100"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <p>
+          Your email is not verified. Verify it to place orders.
+          <button
+            class="verify-resend-btn"
+            (click)="resendVerification()"
+            [disabled]="resendLoading()"
+          >
+            {{ resendLoading() ? 'Sending…' : 'Resend email' }}
+          </button>
+        </p>
+      </div>
+    }
+  </div>
+</div>
+
+<div class="container profile-layout">
+  <!-- Sidebar tabs -->
+  <aside class="profile-sidebar">
+    @for (tab of profileTabs; track tab.value) {
+      <button
+        class="sidebar-tab"
+        [class.active]="activeTab() === tab.value"
+        (click)="activeTab.set(tab.value)"
+      >
+        <span class="sidebar-tab__icon" [innerHTML]="tab.icon"></span>
+        <span>{{ tab.label }}</span>
+        @if (activeTab() === tab.value) {
+          <svg
+            class="sidebar-tab__arrow"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        }
+      </button>
+    }
+
+    <div class="sidebar-divider"></div>
+
+    <button class="sidebar-tab sidebar-tab--danger" (click)="showDeleteModal.set(true)">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <polyline points="3 6 5 6 21 6" />
+        <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2" />
+      </svg>
+      <span>Delete Account</span>
+    </button>
+  </aside>
+
+  <!-- Content -->
+  <div class="profile-content">
+    <!-- ── DETAILS TAB ─────────────────────────────── -->
+    @if (activeTab() === 'details') {
+      <div class="profile-section animate-fade-up">
+        <div class="section-header">
+          <h2>Personal Information</h2>
+          <p>Update your name, username and phone number.</p>
+        </div>
+
+        <form [formGroup]="detailsForm" (ngSubmit)="saveDetails()" class="profile-form">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>First Name <span class="req">*</span></label>
+              <input class="input" formControlName="firstName" placeholder="Arjun" />
+              @if (df['firstName'].touched && df['firstName'].invalid) {
+                <span class="error-msg">First name is required</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input class="input" formControlName="lastName" placeholder="Sharma" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Username <span class="req">*</span></label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">@</span>
+              <input
+                class="input input--prefixed"
+                formControlName="username"
+                placeholder="arjun_sharma"
+              />
+            </div>
+            @if (df['username'].touched && df['username'].invalid) {
+              <span class="error-msg">Min 3 characters required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <div class="email-field">
+              <input class="input" [value]="user()?.email" readonly />
+              <span class="email-locked-hint">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+                Change in Security tab
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              Phone
+              <span class="field-hint">(optional)</span>
+            </label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">🇮🇳 +91</span>
+              <input
+                class="input input--prefixed"
+                formControlName="phone"
+                placeholder="98765 43210"
+                maxlength="10"
+              />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary save-btn" [disabled]="savingDetails()">
+              @if (savingDetails()) {
+                <span class="spinner"></span> Saving…
+              } @else {
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                >
+                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+                Save Changes
+              }
+            </button>
+            <button type="button" class="btn-ghost" (click)="resetDetails()">Reset</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- ── SECURITY TAB ────────────────────────────── -->
+    @if (activeTab() === 'security') {
+      <div class="profile-section animate-fade-up">
+        <!-- Change Email -->
+        <div class="security-block">
+          <div class="security-block__header">
+            <div class="security-block__icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#5B8DEF"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </div>
+            <div>
+              <h3>Change Email</h3>
+              <p>
+                Current: <strong>{{ user()?.email }}</strong>
+              </p>
+            </div>
+            <button class="toggle-btn" (click)="showEmailForm.set(!showEmailForm())">
+              {{ showEmailForm() ? 'Cancel' : 'Change' }}
+            </button>
+          </div>
+
+          @if (showEmailForm()) {
+            <form
+              [formGroup]="emailForm"
+              (ngSubmit)="saveEmail()"
+              class="security-form animate-fade-in"
+            >
+              <div class="form-group">
+                <label>New Email <span class="req">*</span></label>
+                <input
+                  class="input"
+                  formControlName="newEmail"
+                  type="email"
+                  placeholder="newemail@example.com"
+                />
+                @if (ef['newEmail'].touched && ef['newEmail'].invalid) {
+                  <span class="error-msg">Enter a valid email</span>
+                }
+              </div>
+              <div class="form-group">
+                <label>Current Password <span class="req">*</span></label>
+                <div class="input-wrap">
+                  <input
+                    class="input"
+                    [type]="showPwd1() ? 'text' : 'password'"
+                    formControlName="password"
+                    placeholder="Confirm with your password"
+                  />
+                  <button type="button" class="eye-btn" (click)="showPwd1.set(!showPwd1())">
+                    {{ showPwd1() ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+                @if (ef['password'].touched && ef['password'].invalid) {
+                  <span class="error-msg">Password is required</span>
+                }
+              </div>
+              <div class="security-form-note">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#5B8DEF"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                A verification link will be sent to your new email address. You must verify it
+                before the change takes effect.
+              </div>
+              <button type="submit" class="btn-primary" [disabled]="savingEmail()">
+                @if (savingEmail()) {
+                  <span class="spinner"></span> Sending…
+                } @else {
+                  Send Verification Link
+                }
+              </button>
+            </form>
+          }
+        </div>
+
+        <!-- Change Password -->
+        <div class="security-block">
+          <div class="security-block__header">
+            <div class="security-block__icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FF9933"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0110 0v4" />
+              </svg>
+            </div>
+            <div>
+              <h3>Change Password</h3>
+              <p>Use a strong password to keep your account safe.</p>
+            </div>
+            <button class="toggle-btn" (click)="showPwdForm.set(!showPwdForm())">
+              {{ showPwdForm() ? 'Cancel' : 'Change' }}
+            </button>
+          </div>
+
+          @if (showPwdForm()) {
+            <form
+              [formGroup]="passwordForm"
+              (ngSubmit)="savePassword()"
+              class="security-form animate-fade-in"
+            >
+              <div class="form-group">
+                <label>Current Password <span class="req">*</span></label>
+                <div class="input-wrap">
+                  <input
+                    class="input"
+                    [type]="showPwd2() ? 'text' : 'password'"
+                    formControlName="currentPassword"
+                    placeholder="Your current password"
+                  />
+                  <button type="button" class="eye-btn" (click)="showPwd2.set(!showPwd2())">
+                    {{ showPwd2() ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>New Password <span class="req">*</span></label>
+                <div class="input-wrap">
+                  <input
+                    class="input"
+                    [type]="showPwd3() ? 'text' : 'password'"
+                    formControlName="newPassword"
+                    placeholder="Min 8 characters"
+                  />
+                  <button type="button" class="eye-btn" (click)="showPwd3.set(!showPwd3())">
+                    {{ showPwd3() ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+
+                <!-- Password strength -->
+                @if (passwordForm.get('newPassword')?.value) {
+                  <div class="pwd-strength">
+                    <div class="pwd-strength__bars">
+                      @for (bar of [1, 2, 3, 4]; track bar) {
+                        <div
+                          class="pwd-bar"
+                          [class.filled]="bar <= pwdStrength()"
+                          [ngClass]="pwdStrengthClass()"
+                        ></div>
+                      }
+                    </div>
+                    <span class="pwd-strength__label" [ngClass]="pwdStrengthClass()">{{
+                      pwdStrengthLabel()
+                    }}</span>
+                  </div>
+                }
+
+                @if (pf['newPassword'].touched && pf['newPassword'].invalid) {
+                  <span class="error-msg">Min 8 characters required</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label>Confirm New Password <span class="req">*</span></label>
+                <div class="input-wrap">
+                  <input
+                    class="input"
+                    [type]="showPwd3() ? 'text' : 'password'"
+                    formControlName="confirmPassword"
+                    placeholder="Repeat new password"
+                  />
+                </div>
+                @if (pf['confirmPassword'].touched && passwordForm.hasError('mismatch')) {
+                  <span class="error-msg">Passwords do not match</span>
+                }
+              </div>
+
+              <button type="submit" class="btn-primary" [disabled]="savingPwd()">
+                @if (savingPwd()) {
+                  <span class="spinner"></span> Updating…
+                } @else {
+                  Update Password
+                }
+              </button>
+            </form>
+          }
+        </div>
+
+        <!-- Active sessions info -->
+        <div class="security-block security-block--info">
+          <div class="security-block__header">
+            <div class="security-block__icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#2E7D52"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <div>
+              <h3>Account Security</h3>
+              <p>Your account is protected by email authentication.</p>
+            </div>
+            <span class="secure-badge">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              Secure
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ── PREFERENCES TAB ─────────────────────────── -->
+    @if (activeTab() === 'preferences') {
+      <div class="profile-section animate-fade-up">
+        <div class="section-header">
+          <h2>Preferences</h2>
+          <p>Personalise your Swadify experience.</p>
+        </div>
+
+        <!-- Notifications -->
+        <div class="pref-group">
+          <h3 class="pref-group__title">Notifications</h3>
+          @for (pref of notifPrefs; track pref.key) {
+            <div class="pref-row">
+              <div class="pref-row__info">
+                <p class="pref-row__label">{{ pref.label }}</p>
+                <p class="pref-row__sub">{{ pref.desc }}</p>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" [(ngModel)]="pref.enabled" />
+                <span class="switch-track">
+                  <span class="switch-thumb"></span>
+                </span>
+              </label>
+            </div>
+          }
+        </div>
+
+        <!-- Dietary -->
+        <div class="pref-group">
+          <h3 class="pref-group__title">Dietary Preference</h3>
+          <div class="diet-chips">
+            @for (d of dietOptions; track d.value) {
+              <button
+                class="diet-chip"
+                [class.active]="dietPref() === d.value"
+                (click)="dietPref.set(d.value)"
+              >
+                {{ d.icon }} {{ d.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Save prefs -->
+        <button class="btn-primary save-btn" (click)="savePreferences()" [disabled]="savingPrefs()">
+          @if (savingPrefs()) {
+            <span class="spinner"></span> Saving…
+          } @else {
+            Save Preferences
+          }
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Delete account modal -->
+@if (showDeleteModal()) {
+  <div class="modal-backdrop" (click)="showDeleteModal.set(false)">
+    <div class="delete-modal" (click)="$event.stopPropagation()">
+      <div class="delete-modal__icon">
+        <svg viewBox="0 0 80 80" fill="none" width="80">
+          <circle cx="40" cy="40" r="40" fill="#FDECEA" />
+          <path
+            d="M25 30 L30 30 L50 30"
+            stroke="#D94F3D"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+          <path
+            d="M32 30 L32 52 M40 30 L40 52 M48 30 L48 52"
+            stroke="#D94F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M27 30 L29 56 L51 56 L53 30"
+            stroke="#D94F3D"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+          <path d="M35 26 L45 26" stroke="#D94F3D" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </div>
+      <h3>Delete Your Account?</h3>
+      <p>
+        This action is <strong>permanent</strong> and cannot be undone. All your orders, reviews and
+        data will be removed.
+      </p>
+      <div class="form-group" style="width: 100%">
+        <label>Type <strong>DELETE</strong> to confirm</label>
+        <input class="input" [(ngModel)]="deleteConfirmText" placeholder="Type DELETE here" />
+      </div>
+      <div class="delete-modal__btns">
+        <button class="btn-outline" (click)="showDeleteModal.set(false)">Cancel</button>
+        <button
+          class="btn-danger"
+          (click)="deleteAccount()"
+          [disabled]="deleteConfirmText !== 'DELETE' || deletingAccount()"
+        >
+          @if (deletingAccount()) {
+            <span class="spinner"></span>
+          }
+          Delete Account
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,108 @@
+<div class="sa-dash">
+  <div class="sa-dash__header">
+    <h1>Super Admin Dashboard</h1>
+    <p>Platform-wide overview — {{ today | date: 'EEEE, d MMMM y' }}</p>
+  </div>
+
+  <!-- Stats -->
+  @if (loading()) {
+    <div class="stats-grid">
+      @for (n of [1, 2, 3, 4, 5, 6, 7, 8]; track n) {
+        <div class="skeleton" style="height: 100px; border-radius: 14px"></div>
+      }
+    </div>
+  } @else {
+    <div class="stats-grid">
+      @for (card of statCards(); track card.label) {
+        <div class="sa-stat-card" [style.--accent]="card.accent">
+          <span class="sa-stat-card__icon">{{ card.icon }}</span>
+          <div>
+            <p class="sa-stat-card__value">{{ card.value }}</p>
+            <p class="sa-stat-card__label">{{ card.label }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="sa-dash-grid">
+    <!-- Recent admins -->
+    <div class="sa-card">
+      <div class="sa-card__header">
+        <h3>Recent Admins</h3>
+        <a routerLink="/super-admin/admins" class="sa-view-all">Manage all →</a>
+      </div>
+      @if (recentAdmins().length === 0) {
+        <p class="sa-empty">No admins added yet.</p>
+      } @else {
+        @for (admin of recentAdmins(); track admin.id) {
+          <div class="sa-admin-row">
+            <div class="sa-admin-row__avatar">{{ admin.firstName[0] }}</div>
+            <div class="sa-admin-row__info">
+              <p>{{ admin.firstName }} {{ admin.lastName }}</p>
+              <p class="muted">{{ admin.email }}</p>
+            </div>
+            <div class="sa-admin-row__meta">
+              <span class="mini-badge" [class.active]="admin.isActive">
+                {{ admin.isActive ? 'Active' : 'Disabled' }}
+              </span>
+              <span class="muted" style="font-size: 0.72rem">
+                {{ admin.restaurantCount }} restaurant{{ admin.restaurantCount !== 1 ? 's' : '' }}
+              </span>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Activity log -->
+    <div class="sa-card">
+      <div class="sa-card__header">
+        <h3>Recent Activity</h3>
+      </div>
+      @if (activityLog().length === 0) {
+        <p class="sa-empty">No recent activity.</p>
+      } @else {
+        @for (log of activityLog(); track log.id) {
+          <div class="sa-log-row">
+            <div class="sa-log-row__dot"></div>
+            <div class="sa-log-row__info">
+              <p class="sa-log-row__action">
+                <strong>{{ log.adminName }}</strong> {{ log.action }}
+                <span class="log-entity">{{ log.entity }}</span>
+              </p>
+              <p class="muted" style="font-size: 0.72rem">
+                {{ log.createdAt | date: 'd MMM, h:mm a' }}
+              </p>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Platform health -->
+  <div class="sa-card platform-health">
+    <div class="sa-card__header">
+      <h3>Platform Health</h3>
+      <span class="health-badge"> <span class="health-dot"></span> All Systems Operational </span>
+    </div>
+    <div class="health-grid">
+      @for (h of healthItems; track h.label) {
+        <div class="health-item">
+          <div class="health-item__top">
+            <span>{{ h.label }}</span>
+            <span class="health-item__value" [style.color]="h.color">{{ h.value }}</span>
+          </div>
+          <div class="health-bar">
+            <div
+              class="health-bar__fill"
+              [style.width]="h.pct + '%'"
+              [style.background]="h.color"
+            ></div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

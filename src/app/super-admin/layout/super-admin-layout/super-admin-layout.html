@@ -1,0 +1,126 @@
+<div class="sa-shell" [class.collapsed]="collapsed()">
+  <!-- Sidebar -->
+  <aside class="sa-sidebar" [class.mobile-open]="mobileOpen()">
+    <div class="sa-sidebar__logo">
+      <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#FF9933" />
+        <path
+          d="M10 22 Q14 10 18 14 Q22 18 26 10"
+          stroke="#FFFDF5"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          fill="none"
+        />
+        <polygon points="18,22 22,28 14,28" fill="#FFFDF5" opacity="0.8" />
+      </svg>
+      @if (!collapsed()) {
+        <div>
+          <p class="sa-sidebar__name">Swadify</p>
+          <p class="sa-sidebar__role">Super Admin</p>
+        </div>
+      }
+    </div>
+
+    <nav class="sa-sidebar__nav">
+      @for (item of navItems; track item.route) {
+        <a
+          class="sa-nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [title]="collapsed() ? item.label : ''"
+          (click)="mobileOpen.set(false)"
+        >
+          <span class="sa-nav-item__icon">{{ item.icon }}</span>
+          @if (!collapsed()) {
+            <span>{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sa-sidebar__bottom">
+      <div class="sa-user">
+        <div class="sa-user__avatar">SA</div>
+        @if (!collapsed()) {
+          <div class="sa-user__info">
+            <p>{{ auth.user()?.firstName }}</p>
+            <p class="sa-user__role-tag">Super Admin</p>
+          </div>
+          <button class="sa-logout" (click)="logout()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        }
+      </div>
+      <button
+        class="sa-collapse-btn"
+        (click)="collapsed.set(!collapsed())"
+        style="display: none"
+        [style.display]="'flex'"
+        [style.visibility]="'visible'"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          @if (collapsed()) {
+            <path d="M9 18l6-6-6-6" />
+          } @else {
+            <path d="M15 18l-6-6 6-6" />
+          }
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  @if (mobileOpen()) {
+    <div class="sa-backdrop" (click)="mobileOpen.set(false)"></div>
+  }
+
+  <!-- Main -->
+  <div class="sa-main">
+    <header class="sa-topbar">
+      <button class="sa-hamburger" (click)="mobileOpen.set(!mobileOpen())">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div class="sa-topbar__brand">
+        <span class="sa-topbar__tag">Super Admin Console</span>
+      </div>
+      <div class="sa-topbar__user">
+        <div class="sa-avatar-sm">SA</div>
+      </div>
+    </header>
+    <main class="sa-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+<app-toast-component />
