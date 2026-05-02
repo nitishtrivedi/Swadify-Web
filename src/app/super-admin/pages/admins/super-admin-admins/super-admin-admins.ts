@@ -18,7 +18,6 @@ export class SuperAdminAdmins implements OnInit {
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
 
-  //admins = signal<AdminUser[]>([]);
   admins = signal<AdminUser[]>([]);
   users = signal<User[]>([]);
   loading = signal(true);
@@ -27,22 +26,7 @@ export class SuperAdminAdmins implements OnInit {
   activeTab = signal<'all' | 'active' | 'inactive'>('all');
   showModal = signal(false);
   editingId = signal<string | null>(null);
-  deleteTarget = signal<AdminUser | null>(null);
-
-  // filtered = computed(() => {
-  //   let list = this.admins();
-  //   const q = this.search().toLowerCase();
-  //   if (q)
-  //     list = list.filter(
-  //       (a) =>
-  //         a.firstName.toLowerCase().includes(q) ||
-  //         a.email.toLowerCase().includes(q) ||
-  //         a.username.toLowerCase().includes(q),
-  //     );
-  //   if (this.activeTab() === 'active') list = list.filter((a) => a.isActive);
-  //   if (this.activeTab() === 'inactive') list = list.filter((a) => !a.isActive);
-  //   return list;
-  // });
+  deleteTarget = signal<User | null>(null);
 
   filtered = computed(() => {
     let list = this.users(); // 🔥 use users, not admins
@@ -94,25 +78,11 @@ export class SuperAdminAdmins implements OnInit {
     this.loadAdmins();
   }
 
-  // loadAdmins() {
-  //   this.loading.set(true);
-  //   this.svc.getAdmins({ page: 1, pageSize: 20 }).subscribe({
-  //     next: (res) => {
-  //       console.log(res);
-  //       this.admins.set(res.data);
-  //       this.loading.set(false);
-  //     },
-  //     error: () => this.loading.set(false),
-  //   });
-  // }
-
   loadAdmins() {
     this.loading.set(true);
-    this.svc.getAdmins({ page: 1, pageSize: 20 }).subscribe({
+    this.svc.getAdminsNew().subscribe({
       next: (res) => {
-        //console.log(res.data);
-        var admins = res.data.filter((u) => u.role === 'Admin' || u.role === UserRole.Admin);
-        this.users.set(admins);
+        this.users.set(res);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -127,7 +97,7 @@ export class SuperAdminAdmins implements OnInit {
     this.showModal.set(true);
   }
 
-  editAdmin(a: AdminUser) {
+  editAdmin(a: User) {
     this.editingId.set(a.id);
     this.adminForm.patchValue({
       firstName: a.firstName,
@@ -140,39 +110,21 @@ export class SuperAdminAdmins implements OnInit {
     this.showModal.set(true);
   }
 
-  saveAdmin() {
+  updateAdmin() {
+    const id = this.editingId();
     if (this.adminForm.invalid) {
       this.adminForm.markAllAsTouched();
       return;
     }
     this.saving.set(true);
     const val = this.adminForm.value;
-    debugger;
-    console.log(val);
-    const obs = this.editingId()
-      ? this.svc.updateAdmin(this.editingId()!, {
-          firstName: val.firstName!,
-          lastName: val.lastName ?? undefined,
-          email: val.email!,
-        })
-      : this.svc.createAdmin({
-          firstName: val.firstName!,
-          lastName: val.lastName ?? undefined,
-          username: val.username!,
-          email: val.email!,
-          password: val.password!,
-        });
-
-    obs.subscribe({
+    this.svc.updateAdminNew(Number(id), val).subscribe({
       next: (res) => {
-        if (this.editingId()) {
-          this.admins.update((list) => list.map((a) => (a.id === res.data.id ? res.data : a)));
-        } else {
-          this.admins.update((list) => [res.data, ...list]);
-        }
+        this.users.update((list) => list.map((u) => (u.id === res.id ? res : u)));
         this.saving.set(false);
         this.closeModal();
-        this.toast.success(this.editingId() ? 'Admin updated!' : 'Admin created!');
+        this.toast.success('Admin updated!');
+        this.loadAdmins();
       },
       error: () => {
         this.saving.set(false);
@@ -181,17 +133,81 @@ export class SuperAdminAdmins implements OnInit {
     });
   }
 
-  toggleAdmin(a: AdminUser) {
-    this.svc.toggleAdmin(a.id, !a.isActive).subscribe({
+  createNewAdmin() {
+    const val = this.adminForm.value;
+
+    const payload = {
+      firstName: val.firstName,
+      lastName: val.lastName,
+      username: val.username,
+      email: val.email,
+      password: val.password,
+      role: UserRole.Admin, // ✅ NOT string
+    };
+    this.svc.createAdminNew(payload).subscribe({
       next: (res) => {
-        this.admins.update((list) => list.map((x) => (x.id === res.data.id ? res.data : x)));
-        this.toast.info(`${a.firstName} ${res.data.isActive ? 'enabled' : 'disabled'}`);
+        //this.users.update((list) => list.map((u) => (u.id === res.id ? res : u)));
+        this.saving.set(false);
+        this.closeModal();
+        this.toast.success('Admin created!');
+        this.loadAdmins();
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error('Failed to add admin');
+      },
+    });
+  }
+
+  saveAdmin() {
+    if (this.adminForm.invalid) {
+      this.adminForm.markAllAsTouched();
+      return;
+    }
+    this.saving.set(true);
+    const val = this.adminForm.value;
+    const obs = this.editingId()
+      ? this.updateAdmin()
+      : // : this.svc.createAdmin({
+        //     firstName: val.firstName!,
+        //     lastName: val.lastName ?? undefined,
+        //     username: val.username!,
+        //     email: val.email!,
+        //     password: val.password!,
+        //   });
+        this.createNewAdmin();
+
+    // obs.subscribe({
+    //   next: (res) => {
+    //     if (this.editingId()) {
+    //       this.admins.update((list) => list.map((a) => (a.id === res.data.id ? res.data : a)));
+    //     } else {
+    //       this.admins.update((list) => [res.data, ...list]);
+    //     }
+    //     this.saving.set(false);
+    //     this.closeModal();
+    //     this.toast.success(this.editingId() ? 'Admin updated!' : 'Admin created!');
+    //   },
+    //   error: () => {
+    //     this.saving.set(false);
+    //     this.toast.error('Failed to save admin');
+    //   },
+    // });
+  }
+
+  toggleAdmin(a: User) {
+    this.svc.toggleActiveNew(Number(a.id), !a.isActive).subscribe({
+      next: (res) => {
+        this.loadAdmins();
+        this.users.update((list) => list.map((x) => (x.id === res.id ? res : x)));
+        const newStatus = !a.isActive;
+        this.toast.info(`${a.firstName} ${newStatus ? 'enabled' : 'disabled'}`);
       },
       error: () => this.toast.error('Toggle failed'),
     });
   }
 
-  confirmDelete(a: AdminUser) {
+  confirmDelete(a: User) {
     this.deleteTarget.set(a);
   }
 
@@ -199,9 +215,9 @@ export class SuperAdminAdmins implements OnInit {
     const id = this.deleteTarget()?.id;
     if (!id) return;
     this.saving.set(true);
-    this.svc.deleteAdmin(id).subscribe({
+    this.svc.deleteAdminNew(Number(id)).subscribe({
       next: () => {
-        this.admins.update((list) => list.filter((a) => a.id !== id));
+        this.users.update((list) => list.filter((a) => a.id !== id));
         this.saving.set(false);
         this.deleteTarget.set(null);
         this.toast.success('Admin removed');

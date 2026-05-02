@@ -1,5 +1,5 @@
-@use '../../../../styles/variables' as v;
-@use '../../../../styles/mixins' as m;
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
 
 .page-wrap {
   @include m.flex(column, stretch, flex-start, v.$space-xl);
