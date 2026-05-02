@@ -1,0 +1,227 @@
+<div class="analytics-page">
+  <div class="page-top">
+    <div>
+      <h1 class="page-title">Platform Analytics</h1>
+      <p class="page-sub">High-level metrics across all admins and restaurants</p>
+    </div>
+    <select class="period-select" [(ngModel)]="period" (ngModelChange)="loadStats()">
+      <option value="7d">Last 7 Days</option>
+      <option value="30d">Last 30 Days</option>
+      <option value="90d">Last 90 Days</option>
+      <option value="all">All Time</option>
+    </select>
+  </div>
+
+  <!-- KPI grid -->
+  <div class="kpi-grid">
+    @for (kpi of kpis; track kpi.label) {
+      <div class="kpi-card" [style.--accent]="kpi.accent">
+        <div class="kpi-card__icon">{{ kpi.icon }}</div>
+        <div class="kpi-card__body">
+          <p class="kpi-card__value">{{ kpi.value }}</p>
+          <p class="kpi-card__label">{{ kpi.label }}</p>
+        </div>
+        <div class="kpi-card__trend" [class.up]="kpi.trendUp">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          >
+            @if (kpi.trendUp) {
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            } @else {
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+              <polyline points="17 18 23 18 23 12" />
+            }
+          </svg>
+          {{ kpi.trend }}
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Two-column charts -->
+  <div class="charts-grid">
+    <!-- Revenue trend (SVG line chart) -->
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3>Revenue Trend</h3>
+        <span class="chart-card__total">₹{{ totalRevenue | number }}</span>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 500 160" preserveAspectRatio="none" class="line-chart-svg">
+          <defs>
+            <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D94F3D" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#D94F3D" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="ordGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FF9933" stop-opacity="0.14" />
+              <stop offset="100%" stop-color="#FF9933" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          @for (y of [40, 80, 120]; track y) {
+            <line
+              x1="0"
+              [attr.y1]="y"
+              x2="500"
+              [attr.y2]="y"
+              stroke="#EDE8DF"
+              stroke-width="1"
+              stroke-dasharray="4 4"
+            />
+          }
+          <!-- Revenue area -->
+          <path [attr.d]="revenueArea" fill="url(#revGrad)" />
+          <polyline
+            [attr.points]="revenuePoints"
+            fill="none"
+            stroke="#D94F3D"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <!-- Orders area -->
+          <path [attr.d]="ordersArea" fill="url(#ordGrad)" />
+          <polyline
+            [attr.points]="ordersPoints"
+            fill="none"
+            stroke="#FF9933"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-dasharray="5 3"
+          />
+          <!-- Dot on last point -->
+          <circle cx="500" cy="35" r="4" fill="#D94F3D" stroke="white" stroke-width="2" />
+        </svg>
+        <div class="chart-x-labels">
+          @for (l of chartLabels; track l) {
+            <span>{{ l }}</span>
+          }
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="ld" style="background: #d94f3d"></span> Revenue</div>
+        <div class="legend-item">
+          <span
+            class="ld"
+            style="background: #ff9933; border: 1px dashed #ff9933; background: none"
+          ></span>
+          Orders
+        </div>
+      </div>
+    </div>
+
+    <!-- Top admins by revenue -->
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3>Top Admins by Revenue</h3>
+      </div>
+      <div class="top-admins-list">
+        @for (admin of topAdmins; track admin.name; let i = $index) {
+          <div class="ta-row">
+            <span
+              class="ta-rank"
+              [class.gold]="i === 0"
+              [class.silver]="i === 1"
+              [class.bronze]="i === 2"
+            >
+              {{ i + 1 }}
+            </span>
+            <div class="ta-avatar">{{ admin.name[0] }}</div>
+            <div class="ta-info">
+              <p class="ta-name">{{ admin.name }}</p>
+              <div class="ta-bar">
+                <div
+                  class="ta-bar__fill"
+                  [style.width]="(admin.revenue / topAdmins[0].revenue) * 100 + '%'"
+                ></div>
+              </div>
+            </div>
+            <span class="ta-revenue">₹{{ admin.revenue | number }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="bottom-grid">
+    <!-- Order status breakdown (donut-ish) -->
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3>Order Status Breakdown</h3>
+      </div>
+      <div class="status-breakdown">
+        @for (s of statusBreakdown; track s.label) {
+          <div class="sb-row">
+            <div class="sb-dot" [style.background]="s.color"></div>
+            <span class="sb-label">{{ s.label }}</span>
+            <div class="sb-bar">
+              <div class="sb-fill" [style.width]="s.pct + '%'" [style.background]="s.color"></div>
+            </div>
+            <span class="sb-count">{{ s.count }}</span>
+            <span class="sb-pct">({{ s.pct }}%)</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Growth metrics -->
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3>Growth Metrics</h3>
+      </div>
+      <div class="growth-list">
+        @for (g of growthMetrics; track g.label) {
+          <div class="gm-row">
+            <div class="gm-icon">{{ g.icon }}</div>
+            <div class="gm-info">
+              <p class="gm-label">{{ g.label }}</p>
+              <p class="gm-sub">{{ g.sub }}</p>
+            </div>
+            <div class="gm-right">
+              <p class="gm-value">{{ g.value }}</p>
+              <p class="gm-change" [class.up]="g.up" [class.down]="!g.up">
+                {{ g.up ? '↑' : '↓' }} {{ g.change }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Geographic distribution -->
+    <div class="chart-card chart-card--full">
+      <div class="chart-card__header">
+        <h3>Orders by City</h3>
+      </div>
+      <div class="city-grid">
+        @for (city of cityData; track city.name) {
+          <div class="city-tile">
+            <div class="city-tile__header">
+              <span class="city-tile__name">{{ city.name }}</span>
+              <span class="city-tile__orders">{{ city.orders }} orders</span>
+            </div>
+            <div class="city-bar">
+              <div
+                class="city-bar__fill"
+                [style.width]="(city.orders / cityData[0].orders) * 100 + '%'"
+              ></div>
+            </div>
+            <div class="city-tile__footer">
+              <span>₹{{ city.revenue | number }}</span>
+              <span class="city-tile__restaurants">{{ city.restaurants }} restaurants</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

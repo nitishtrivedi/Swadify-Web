@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastService } from '../../../../shared/components/toast';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth-service';
+import { LoginRequest } from '../../../../core/models';
 
 @Component({
   selector: 'app-admin-login',
@@ -46,8 +47,13 @@ export class AdminLogin {
     }
     this.loading.set(true);
     this.errorMsg.set('');
-    this.auth.adminLogin(this.loginForm.value as any).subscribe({
-      next: () => {
+    var requrest: LoginRequest = {
+      identifier: this.lf['usernameOrEmail'].value!,
+      password: this.lf['password'].value!,
+    };
+    this.auth.adminLogin(requrest).subscribe({
+      next: (res) => {
+        console.log(res);
         this.loading.set(false);
         const dest = this.auth.isSuperAdmin() ? '/super-admin' : '/admin';
         this.router.navigate([dest]);

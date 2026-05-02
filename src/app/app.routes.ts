@@ -100,8 +100,20 @@ export const routes: Routes = [
                 (m) => m.AdminPartners,
               ),
           },
-          //           { path: 'reviews',    loadComponent: () => import('./admin/pages/reviews/admin-reviews.component').then(m => m.AdminReviewsComponent) },
-          //           { path: 'discounts',  loadComponent: () => import('./admin/pages/discounts/admin-discounts.component').then(m => m.AdminDiscountsComponent) },
+          {
+            path: 'reviews',
+            loadComponent: () =>
+              import('./admin/pages/reviews/admin-reviews/admin-reviews').then(
+                (m) => m.AdminReviews,
+              ),
+          },
+          {
+            path: 'discounts',
+            loadComponent: () =>
+              import('./admin/pages/discounts/admin-discounts/admin-discounts').then(
+                (m) => m.AdminDiscounts,
+              ),
+          },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],
       },
@@ -109,44 +121,104 @@ export const routes: Routes = [
   },
 
   //   // ── SuperAdmin routes ─────────────────────────────────────
-  //   {
-  //     path: 'super-admin',
-  //     children: [
-  //       { path: 'login', loadComponent: () => import('./super-admin/pages/login/super-admin-login.component').then(m => m.SuperAdminLoginComponent) },
-  //       {
-  //         path: '',
-  //         canActivate: [adminGuard],
-  //         loadComponent: () => import('./super-admin/layout/super-admin-layout.component').then(m => m.SuperAdminLayoutComponent),
-  //         children: [
-  //           { path: 'dashboard', loadComponent: () => import('./super-admin/pages/dashboard/super-admin-dashboard.component').then(m => m.SuperAdminDashboardComponent) },
-  //           { path: 'admins',    loadComponent: () => import('./super-admin/pages/admins/super-admin-admins.component').then(m => m.SuperAdminAdminsComponent) },
-  //           { path: 'customers', loadComponent: () => import('./super-admin/pages/customers/super-admin-customers.component').then(m => m.SuperAdminCustomersComponent) },
-  //           { path: 'analytics', loadComponent: () => import('./super-admin/pages/analytics/super-admin-analytics.component').then(m => m.SuperAdminAnalyticsComponent) },
-  //           { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-  //         ]
-  //       }
-  //     ]
-  //   },
+  {
+    path: 'super-admin',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./super-admin/pages/login/super-admin-login/super-admin-login').then(
+            (m) => m.SuperAdminLogin,
+          ),
+      },
+      {
+        path: '',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./super-admin/layout/super-admin-layout/super-admin-layout').then(
+            (m) => m.SuperAdminLayout,
+          ),
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./super-admin/pages/dashboard/super-admin-dashboard/super-admin-dashboard').then(
+                (m) => m.SuperAdminDashboard,
+              ),
+          },
+          {
+            path: 'admins',
+            loadComponent: () =>
+              import('./super-admin/pages/admins/super-admin-admins/super-admin-admins').then(
+                (m) => m.SuperAdminAdmins,
+              ),
+          },
+          {
+            path: 'customers',
+            loadComponent: () =>
+              import('./super-admin/pages/customers/super-admin-customers/super-admin-customers').then(
+                (m) => m.SuperAdminCustomers,
+              ),
+          },
+          {
+            path: 'analytics',
+            loadComponent: () =>
+              import('./super-admin/pages/analytics/super-admin-analytics/super-admin-analytics').then(
+                (m) => m.SuperAdminAnalytics,
+              ),
+          },
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        ],
+      },
+    ],
+  },
 
   //   // ── Delivery Partner routes ────────────────────────────────
-  //   {
-  //     path: 'delivery',
-  //     children: [
-  //       { path: 'login', loadComponent: () => import('./delivery-partner/pages/login/dp-login.component').then(m => m.DpLoginComponent) },
-  //       {
-  //         path: '',
-  //         canActivate: [dpGuard],
-  //         loadComponent: () => import('./delivery-partner/layout/dp-layout.component').then(m => m.DpLayoutComponent),
-  //         children: [
-  //           { path: 'dashboard', loadComponent: () => import('./delivery-partner/pages/dashboard/dp-dashboard.component').then(m => m.DpDashboardComponent) },
-  //           { path: 'orders',    loadComponent: () => import('./delivery-partner/pages/orders/dp-orders.component').then(m => m.DpOrdersComponent) },
-  //           { path: 'earnings',  loadComponent: () => import('./delivery-partner/pages/earnings/dp-earnings.component').then(m => m.DpEarningsComponent) },
-  //           { path: 'profile',   loadComponent: () => import('./delivery-partner/pages/profile/dp-profile.component').then(m => m.DpProfileComponent) },
-  //           { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-  //         ]
-  //       }
-  //     ]
-  //   },
+  {
+    path: 'delivery',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./delivery-partner/pages/login/dp-login/dp-login').then((m) => m.DpLogin),
+      },
+      {
+        path: '',
+        canActivate: [dpGuard],
+        loadComponent: () =>
+          import('./delivery-partner/layout/dp-layout/dp-layout').then((m) => m.DpLayout),
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./delivery-partner/pages/dashboard/dp-dashboard/dp-dashboard').then(
+                (m) => m.DpDashboard,
+              ),
+          },
+          {
+            path: 'orders',
+            loadComponent: () =>
+              import('./delivery-partner/pages/orders/dp-orders/dp-orders').then((m) => m.DpOrders),
+          },
+          {
+            path: 'earnings',
+            loadComponent: () =>
+              import('./delivery-partner/pages/earnings/dp-earnings/dp-earnings').then(
+                (m) => m.DpEarningsComponent,
+              ),
+          },
+          {
+            path: 'profile',
+            loadComponent: () =>
+              import('./delivery-partner/pages/profile/dp-profile/dp-profile').then(
+                (m) => m.DpProfileComponent,
+              ),
+          },
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        ],
+      },
+    ],
+  },
 
   { path: '**', redirectTo: '' },
 ];

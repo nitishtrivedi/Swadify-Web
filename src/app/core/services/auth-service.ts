@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap, catchError, EMPTY } from 'rxjs';
-import { ApiService } from './api-service';
+import { ApiService, UserRole } from './api-service';
 import {
   ApiResponse,
   AuthTokens,
@@ -27,10 +27,10 @@ export class AuthService {
   readonly user = this._user.asReadonly();
   readonly token = this._token.asReadonly();
   readonly isLoggedIn = computed(() => !!this._token());
-  readonly isCustomer = computed(() => this._user()?.role === 'Customer');
-  readonly isAdmin = computed(() => this._user()?.role === 'Admin');
-  readonly isSuperAdmin = computed(() => this._user()?.role === 'SuperAdmin');
-  readonly isDP = computed(() => this._user()?.role === 'DeliveryPartner');
+  readonly isCustomer = computed(() => this._user()?.role === UserRole.Customer);
+  readonly isAdmin = computed(() => this._user()?.role === UserRole.Admin);
+  readonly isSuperAdmin = computed(() => this._user()?.role === UserRole.SuperAdmin);
+  readonly isDP = computed(() => this._user()?.role === UserRole.DeliveryPartner);
   readonly isVerified = computed(() => !!this._user()?.isEmailVerified);
 
   // ── Register ──────────────────────────────────────────────
@@ -52,7 +52,6 @@ export class AuthService {
     // );
     return this.api.post<LoginResponse>('/auth/login', req).pipe(
       tap((res) => {
-        console.log(res);
         this.setSession(
           {
             accessToken: res.data.accessToken,
@@ -67,9 +66,18 @@ export class AuthService {
 
   // ── Admin/DP Login ────────────────────────────────────────
   adminLogin(req: LoginRequest) {
-    return this.api
-      .post<{ tokens: AuthTokens; user: User }>('/auth/admin-login', req)
-      .pipe(tap((res) => this.setSession(res.data.tokens, res.data.user)));
+    return this.api.post<LoginResponse>('/auth/login', req).pipe(
+      tap((res) => {
+        this.setSession(
+          {
+            accessToken: res.data.accessToken,
+            refreshToken: res.data.refreshToken,
+            expiresIn: new Date(res.data.expiresAt).getTime() - Date.now(),
+          },
+          res.data.user,
+        );
+      }),
+    );
   }
 
   dpLogin(req: LoginRequest) {

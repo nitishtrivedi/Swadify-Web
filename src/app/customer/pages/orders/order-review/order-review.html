@@ -1,0 +1,160 @@
+<div class="review-page">
+  <div class="container review-container">
+    <a [routerLink]="['/orders', orderId()]" class="back-link">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      Back to Order
+    </a>
+
+    @if (submitted()) {
+      <!-- Success state -->
+      <div class="review-success">
+        <svg viewBox="0 0 140 140" fill="none" width="140">
+          <circle cx="70" cy="70" r="70" fill="#E8F5EE" />
+          <circle cx="70" cy="70" r="52" fill="#2E7D52" />
+          <path
+            d="M46 70 L62 86 L94 58"
+            stroke="white"
+            stroke-width="5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </svg>
+        <h2>Thank you for your review!</h2>
+        <p>Your feedback helps us improve and rewards great restaurants.</p>
+        <a routerLink="/orders" class="btn-primary">Back to Orders</a>
+      </div>
+    } @else {
+      <div class="review-card">
+        <div class="review-card__header">
+          <span class="review-card__icon">⭐</span>
+          <div>
+            <h2>Rate Your Experience</h2>
+            <p>
+              Tell us how your order from <strong>{{ restaurantName() }}</strong> was.
+            </p>
+          </div>
+        </div>
+
+        <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+          <!-- Star rating -->
+          <div class="star-section">
+            <label>Overall Rating <span class="req">*</span></label>
+            <div class="star-picker">
+              @for (s of [1, 2, 3, 4, 5]; track s) {
+                <button
+                  type="button"
+                  class="star-pick-btn"
+                  (mouseenter)="hoverRating.set(s)"
+                  (mouseleave)="hoverRating.set(0)"
+                  (click)="setRating(s)"
+                >
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    [attr.fill]="s <= (hoverRating() || selectedRating()) ? '#FF9933' : 'none'"
+                    stroke="#FF9933"
+                    stroke-width="1.5"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
+                  </svg>
+                </button>
+              }
+            </div>
+            <p class="rating-desc">
+              {{ ratingDesc(hoverRating() || selectedRating()) }}
+            </p>
+            @if (reviewForm.get('rating')?.touched && !selectedRating()) {
+              <span class="error-msg">Please select a rating</span>
+            }
+          </div>
+
+          <!-- Comment -->
+          <div class="form-group">
+            <label>Your Review</label>
+            <textarea
+              class="review-textarea"
+              formControlName="comment"
+              rows="4"
+              placeholder="How was the food quality, packaging and delivery speed?"
+            ></textarea>
+            <p class="char-count">{{ reviewForm.get('comment')?.value?.length ?? 0 }} / 500</p>
+          </div>
+
+          <!-- Quick tags -->
+          <div class="form-group">
+            <label>What stood out? <span class="optional">(optional)</span></label>
+            <div class="quick-tags">
+              @for (tag of quickTags; track tag) {
+                <button
+                  type="button"
+                  class="qtag"
+                  [class.selected]="selectedQuickTags().includes(tag)"
+                  (click)="toggleQuickTag(tag)"
+                >
+                  {{ tag }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Delivery partner rating -->
+          @if (hasDeliveryPartner()) {
+            <div class="form-group dp-rating-section">
+              <label>Rate your Delivery Partner</label>
+              <div class="dp-star-row">
+                @for (s of [1, 2, 3, 4, 5]; track s) {
+                  <button
+                    type="button"
+                    (click)="reviewForm.patchValue({ dpRating: s })"
+                    [class.filled]="s <= (reviewForm.get('dpRating')?.value ?? 0)"
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      [attr.fill]="
+                        s <= (reviewForm.get('dpRating')?.value ?? 0) ? '#5B8DEF' : 'none'
+                      "
+                      stroke="#5B8DEF"
+                      stroke-width="1.5"
+                    >
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <button
+            type="submit"
+            class="btn-primary submit-btn"
+            [disabled]="!selectedRating() || submitting()"
+          >
+            @if (submitting()) {
+              <span class="spinner"></span> Submitting…
+            } @else {
+              Submit Review
+            }
+          </button>
+        </form>
+      </div>
+    }
+  </div>
+</div>

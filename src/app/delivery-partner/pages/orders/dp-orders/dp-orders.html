@@ -1,0 +1,158 @@
+<div class="dp-orders">
+  <div class="dp-orders__header">
+    <h1>My Deliveries</h1>
+    <p class="dp-orders__sub">{{ allOrders().length }} total deliveries</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dp-tabs">
+    @for (tab of tabs; track tab.value) {
+      <button
+        class="dp-tab"
+        [class.active]="activeTab() === tab.value"
+        (click)="activeTab.set(tab.value)"
+      >
+        {{ tab.label }}
+        @if (tabCount(tab.value) > 0) {
+          <span class="dp-tab__count">{{ tabCount(tab.value) }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Search -->
+  <div class="dp-search">
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+    <input [(ngModel)]="search" placeholder="Search by order ID or restaurant…" />
+  </div>
+
+  @if (loading()) {
+    <div class="order-cards">
+      @for (n of [1, 2, 3]; track n) {
+        <div class="skeleton" style="height: 140px; border-radius: 16px"></div>
+      }
+    </div>
+  } @else if (filtered().length === 0) {
+    <app-empty-state
+      icon="📦"
+      title="No deliveries found"
+      [message]="
+        activeTab() === 'active'
+          ? 'You have no active deliveries right now.'
+          : 'No delivery history to show.'
+      "
+    />
+  } @else {
+    <div class="order-cards">
+      @for (order of filtered(); track order.id) {
+        <div class="dp-order-card" [class.active-card]="isActive(order.status)">
+          <!-- Status banner -->
+          <div
+            class="dp-order-card__status-bar"
+            [class]="'status-bar--' + order.status.toLowerCase()"
+          >
+            <span class="status-bar__icon">{{ statusIcon(order.status) }}</span>
+            <span class="status-bar__label">{{ statusLabel(order.status) }}</span>
+            @if (isActive(order.status)) {
+              <span class="status-bar__live"> <span class="live-dot"></span> Active </span>
+            }
+          </div>
+
+          <!-- Body -->
+          <div class="dp-order-card__body">
+            <div class="dp-order-card__row">
+              <div class="dp-order-card__info">
+                <p class="dp-order-card__id">#{{ order.id.slice(-8).toUpperCase() }}</p>
+                <p class="dp-order-card__restaurant">
+                  {{ order.restaurant.name }}
+                </p>
+                <p class="dp-order-card__addr">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {{ order.deliveryAddress.line1 }},
+                  {{ order.deliveryAddress.city }}
+                </p>
+              </div>
+              <div class="dp-order-card__meta">
+                <div class="dp-order-amount">₹{{ order.total }}</div>
+                <span class="pay-chip" [class.cod]="order.paymentMethod === 'COD'">
+                  {{ order.paymentMethod }}
+                </span>
+                <p class="dp-order-time">{{ order.createdAt | date: 'd MMM, h:mm a' }}</p>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div class="dp-order-items">
+              @for (item of order.items.slice(0, 2); track item.menuItem.id) {
+                <span class="dp-item-chip">
+                  {{ item.menuItem.name }}
+                  @if (item.quantity > 1) {
+                    ×{{ item.quantity }}
+                  }
+                </span>
+              }
+              @if (order.items.length > 2) {
+                <span class="dp-item-chip dp-item-chip--more">
+                  +{{ order.items.length - 2 }} more
+                </span>
+              }
+            </div>
+
+            <!-- OTP (active only) -->
+            @if (isActive(order.status) && order.otp) {
+              <div class="dp-otp-row">
+                <span>OTP:</span>
+                <div class="otp-boxes">
+                  @for (d of order.otp.split(''); track $index) {
+                    <span>{{ d }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Earnings chip -->
+            @if (order.status === 'Delivered') {
+              <div class="dp-earning-chip">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                </svg>
+                Earned: ₹{{ estimatedEarning(order.total) }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

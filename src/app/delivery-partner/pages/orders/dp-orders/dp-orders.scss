@@ -1,0 +1,290 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.dp-orders {
+  @include m.flex(column, stretch, flex-start, v.$space-lg);
+
+  &__header {
+  }
+  h1 {
+    font-family: v.$font-display;
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  &__sub {
+    color: v.$text-light;
+    font-size: 0.875rem;
+    margin-top: 4px;
+  }
+}
+
+/* Tabs */
+.dp-tabs {
+  @include m.flex(row, center, flex-start, 0);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.dp-tab {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 9px 18px;
+  border-radius: v.$radius-full;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  white-space: nowrap;
+  transition: all v.$transition-fast;
+  &.active {
+    background: v.$white;
+    color: v.$primary;
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__count {
+    background: v.$primary-light;
+    color: v.$primary;
+    border-radius: v.$radius-full;
+    padding: 1px 7px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    .active & {
+      background: v.$primary;
+      color: v.$white;
+    }
+  }
+}
+
+/* Search */
+.dp-search {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 10px 16px;
+  &:focus-within {
+    border-color: v.$primary;
+  }
+  svg {
+    color: v.$text-light;
+    flex-shrink: 0;
+  }
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: v.$font-body;
+    font-size: 0.875rem;
+    background: none;
+    color: v.$text-dark;
+    &::placeholder {
+      color: v.$text-light;
+    }
+  }
+}
+
+/* Order cards */
+.order-cards {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+}
+
+.dp-order-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  overflow: hidden;
+  transition: box-shadow v.$transition-normal;
+  &:hover {
+    box-shadow: v.$shadow-md;
+  }
+
+  &.active-card {
+    border-color: v.$primary;
+    box-shadow: 0 2px 12px rgba(217, 79, 61, 0.12);
+  }
+
+  &__status-bar {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    padding: 8px v.$space-md;
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    &.status-bar--delivered {
+      background: v.$green-light;
+      color: v.$green;
+    }
+    &.status-bar--partnerassigned,
+    &.status-bar--outfordelivery {
+      background: #ebf4ff;
+      color: #1565c0;
+    }
+    &.status-bar--cancelled {
+      background: v.$primary-light;
+      color: v.$primary;
+    }
+    &.status-bar--placed,
+    &.status-bar--confirmed,
+    &.status-bar--preparing {
+      background: v.$saffron-light;
+      color: darken(#ff9933, 20%);
+    }
+  }
+
+  &__body {
+    padding: v.$space-md v.$space-lg;
+    @include m.flex(column, stretch, flex-start, v.$space-sm);
+  }
+
+  &__row {
+    @include m.flex(row, flex-start, space-between, v.$space-md);
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+  &__id {
+    font-family: monospace;
+    font-weight: 700;
+    color: v.$text-dark;
+    font-size: 0.9rem;
+  }
+  &__restaurant {
+    font-weight: 600;
+    color: v.$text-dark;
+    font-size: 0.875rem;
+    margin-top: 2px;
+  }
+  &__addr {
+    @include m.flex(row, center, flex-start, 4px);
+    font-size: 0.75rem;
+    color: v.$text-light;
+    margin-top: 4px;
+    svg {
+      flex-shrink: 0;
+      color: v.$primary;
+    }
+  }
+
+  &__meta {
+    @include m.flex(column, flex-end, flex-start, 4px);
+    flex-shrink: 0;
+  }
+}
+
+.status-bar__icon {
+  font-size: 1rem;
+}
+.status-bar__label {
+  flex: 1;
+}
+.status-bar__live {
+  @include m.flex(row, center, flex-start, 5px);
+  margin-left: auto;
+  font-size: 0.68rem;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.2s infinite;
+}
+
+.dp-order-amount {
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: v.$text-dark;
+  text-align: right;
+}
+
+.pay-chip {
+  padding: 2px 8px;
+  border-radius: v.$radius-full;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: v.$ivory-dark;
+  color: v.$text-mid;
+  &.cod {
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+  }
+}
+
+.dp-order-time {
+  font-size: 0.72rem;
+  color: v.$text-light;
+  margin-top: 2px;
+}
+
+/* Items */
+.dp-order-items {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  flex-wrap: wrap;
+}
+
+.dp-item-chip {
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  color: v.$text-mid;
+  border: 1px solid v.$border;
+  &--more {
+    color: v.$primary;
+    background: v.$primary-light;
+    border-color: rgba(217, 79, 61, 0.2);
+  }
+}
+
+/* OTP */
+.dp-otp-row {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  span:first-child {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1565c0;
+  }
+}
+
+.otp-boxes {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  span {
+    width: 30px;
+    height: 36px;
+    border-radius: v.$radius-sm;
+    background: #ebf4ff;
+    border: 1.5px solid #90caf9;
+    @include m.flex(row, center, center);
+    font-weight: 800;
+    font-size: 1rem;
+    color: #1565c0;
+  }
+}
+
+/* Earning chip */
+.dp-earning-chip {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  background: v.$green-light;
+  border-radius: v.$radius-full;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: v.$green;
+  display: inline-flex;
+  width: fit-content;
+  svg {
+    color: v.$green;
+  }
+}

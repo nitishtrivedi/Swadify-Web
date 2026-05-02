@@ -92,20 +92,22 @@
               </td>
               <td class="mono-cell">@{{ admin.username }}</td>
               <td>{{ admin.email }}</td>
-              <td class="center-cell">{{ admin.restaurantCount }}</td>
+              <!-- <td class="center-cell">{{ admin.restaurantCount }}</td> -->
+              <td class="center-cell"></td>
               <td>{{ admin.createdAt | date: 'd MMM y' }}</td>
               <td>
                 <label class="tgl">
-                  <input type="checkbox" [checked]="admin.isActive" (change)="toggleAdmin(admin)" />
+                  <!-- <input type="checkbox" [checked]="admin.isActive" (change)="toggleAdmin(admin)" /> -->
+                  <input type="checkbox" [checked]="admin.isActive" />
                   <span class="tgl-track"><span class="tgl-thumb"></span></span>
                 </label>
               </td>
               <td>
                 <div class="row-actions">
-                  <button class="ra-btn" (click)="editAdmin(admin)">Edit</button>
-                  <button class="ra-btn ra-btn--danger" (click)="confirmDelete(admin)">
-                    Remove
-                  </button>
+                  <!-- <button class="ra-btn" (click)="editAdmin(admin)">Edit</button> -->
+                  <button class="ra-btn">Edit</button>
+                  <!-- <button class="ra-btn ra-btn--danger" (click)="confirmDelete(admin)"> -->
+                  <button class="ra-btn ra-btn--danger">Remove</button>
                 </div>
               </td>
             </tr>

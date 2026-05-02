@@ -1,3 +1,5 @@
+import { UserRole } from '../services/api-service';
+
 // ── Auth ──────────────────────────────────────────────────
 export interface AuthTokens {
   accessToken: string;
@@ -27,7 +29,7 @@ export interface LoginResponse {
 }
 
 // ── User ──────────────────────────────────────────────────
-export type UserRole = 'Customer' | 'Admin' | 'SuperAdmin' | 'DeliveryPartner';
+//export type UserRole = 'Customer' | 'Admin' | 'SuperAdmin' | 'DeliveryPartner';
 
 export interface User {
   id: string;
@@ -36,10 +38,11 @@ export interface User {
   username: string;
   email: string;
   phone?: string;
-  role: UserRole;
+  role: UserRole | keyof typeof UserRole; // 🔥 can be number or string
   isEmailVerified: boolean;
   profilePicUrl?: string;
   createdAt: string;
+  isActive: boolean;
 }
 
 // ── Restaurant ────────────────────────────────────────────

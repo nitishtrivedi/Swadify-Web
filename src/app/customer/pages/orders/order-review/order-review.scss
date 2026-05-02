@@ -1,0 +1,211 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.review-page {
+  background: v.$ivory;
+  min-height: 100vh;
+  padding: v.$space-xl 0 v.$space-3xl;
+}
+
+.review-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.back-link {
+  @include m.flex(row, center, flex-start, 6px);
+  font-size: 0.85rem;
+  color: v.$text-light;
+  margin-bottom: v.$space-lg;
+  display: inline-flex;
+  transition: color v.$transition-fast;
+  &:hover {
+    color: v.$primary;
+  }
+}
+
+/* Success */
+.review-success {
+  @include m.flex(column, center, center, v.$space-lg);
+  padding: v.$space-3xl v.$space-lg;
+  text-align: center;
+  h2 {
+    font-family: v.$font-display;
+    font-size: 1.6rem;
+  }
+  p {
+    color: v.$text-mid;
+    max-width: 320px;
+  }
+}
+
+/* Card */
+.review-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-2xl;
+  @include m.flex(column, stretch, flex-start, v.$space-xl);
+
+  &__header {
+    @include m.flex(row, flex-start, flex-start, v.$space-md);
+    &__icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+    h2 {
+      font-family: v.$font-display;
+      font-size: 1.4rem;
+    }
+    p {
+      color: v.$text-light;
+      margin-top: 4px;
+    }
+  }
+}
+
+/* Stars */
+.star-section {
+  @include m.flex(column, flex-start, flex-start, v.$space-sm);
+}
+
+.star-picker {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+}
+
+.star-pick-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform v.$transition-fast;
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+.rating-desc {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: v.$saffron;
+  min-height: 22px;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: v.$text-dark;
+}
+
+.req {
+  color: v.$primary;
+}
+.optional {
+  font-size: 0.75rem;
+  color: v.$text-light;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* Textarea */
+.review-textarea {
+  width: 100%;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-md;
+  padding: 12px 14px;
+  font-family: v.$font-body;
+  font-size: 0.9rem;
+  color: v.$text-dark;
+  resize: vertical;
+  outline: none;
+  background: v.$ivory;
+  transition: border-color v.$transition-fast;
+  &:focus {
+    border-color: v.$primary;
+  }
+  &::placeholder {
+    color: v.$text-light;
+  }
+}
+
+.char-count {
+  font-size: 0.72rem;
+  color: v.$text-light;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Quick tags */
+.quick-tags {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  flex-wrap: wrap;
+  margin-top: v.$space-xs;
+}
+
+.qtag {
+  padding: 7px 14px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid v.$border;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &.selected {
+    border-color: v.$primary;
+    background: v.$primary-light;
+    color: v.$primary;
+  }
+  &:hover {
+    border-color: v.$primary;
+  }
+}
+
+/* DP rating */
+.dp-rating-section {
+  background: v.$ivory-dark;
+  border-radius: v.$radius-lg;
+  padding: v.$space-md;
+}
+
+.dp-star-row {
+  @include m.flex(row, center, flex-start, v.$space-xs);
+  margin-top: v.$space-sm;
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    transition: transform v.$transition-fast;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Submit */
+.submit-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 1rem;
+  border-radius: v.$radius-full;
+  @include m.flex(row, center, center, v.$space-sm);
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+.error-msg {
+  font-size: 0.78rem;
+  color: v.$primary;
+}

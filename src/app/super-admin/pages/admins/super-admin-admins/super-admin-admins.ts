@@ -4,6 +4,8 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state/empty-state';
 import { ToastService } from '../../../../shared/components/toast';
 import { SuperAdminService, AdminUser } from '../../../services/super-admin-service';
+import { User } from '../../../../core/models';
+import { UserRole } from '../../../../core/services/api-service';
 
 @Component({
   selector: 'app-super-admin-admins',
@@ -16,7 +18,9 @@ export class SuperAdminAdmins implements OnInit {
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
 
+  //admins = signal<AdminUser[]>([]);
   admins = signal<AdminUser[]>([]);
+  users = signal<User[]>([]);
   loading = signal(true);
   saving = signal(false);
   search = signal('');
@@ -25,18 +29,45 @@ export class SuperAdminAdmins implements OnInit {
   editingId = signal<string | null>(null);
   deleteTarget = signal<AdminUser | null>(null);
 
+  // filtered = computed(() => {
+  //   let list = this.admins();
+  //   const q = this.search().toLowerCase();
+  //   if (q)
+  //     list = list.filter(
+  //       (a) =>
+  //         a.firstName.toLowerCase().includes(q) ||
+  //         a.email.toLowerCase().includes(q) ||
+  //         a.username.toLowerCase().includes(q),
+  //     );
+  //   if (this.activeTab() === 'active') list = list.filter((a) => a.isActive);
+  //   if (this.activeTab() === 'inactive') list = list.filter((a) => !a.isActive);
+  //   return list;
+  // });
+
   filtered = computed(() => {
-    let list = this.admins();
+    let list = this.users(); // 🔥 use users, not admins
+    // 👉 filter by role (string, since your API sends "Admin")
+    list = list.filter((u) => u.role === UserRole.Admin || u.role === 'Admin');
+
     const q = this.search().toLowerCase();
-    if (q)
+
+    if (q) {
       list = list.filter(
-        (a) =>
-          a.firstName.toLowerCase().includes(q) ||
-          a.email.toLowerCase().includes(q) ||
-          a.username.toLowerCase().includes(q),
+        (u) =>
+          u.firstName?.toLowerCase().includes(q) ||
+          u.email?.toLowerCase().includes(q) ||
+          u.username?.toLowerCase().includes(q),
       );
-    if (this.activeTab() === 'active') list = list.filter((a) => a.isActive);
-    if (this.activeTab() === 'inactive') list = list.filter((a) => !a.isActive);
+    }
+
+    if (this.activeTab() === 'active') {
+      list = list.filter((u) => u.isActive);
+    }
+
+    if (this.activeTab() === 'inactive') {
+      list = list.filter((u) => !u.isActive);
+    }
+
     return list;
   });
 
@@ -52,6 +83,7 @@ export class SuperAdminAdmins implements OnInit {
     username: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: [''],
+    role: ['Admin'],
   });
 
   get af() {
@@ -62,11 +94,25 @@ export class SuperAdminAdmins implements OnInit {
     this.loadAdmins();
   }
 
+  // loadAdmins() {
+  //   this.loading.set(true);
+  //   this.svc.getAdmins({ page: 1, pageSize: 20 }).subscribe({
+  //     next: (res) => {
+  //       console.log(res);
+  //       this.admins.set(res.data);
+  //       this.loading.set(false);
+  //     },
+  //     error: () => this.loading.set(false),
+  //   });
+  // }
+
   loadAdmins() {
     this.loading.set(true);
-    this.svc.getAdmins({ page: 1, pageSize: 50 }).subscribe({
+    this.svc.getAdmins({ page: 1, pageSize: 20 }).subscribe({
       next: (res) => {
-        this.admins.set(res.data);
+        //console.log(res.data);
+        var admins = res.data.filter((u) => u.role === 'Admin' || u.role === UserRole.Admin);
+        this.users.set(admins);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -101,6 +147,8 @@ export class SuperAdminAdmins implements OnInit {
     }
     this.saving.set(true);
     const val = this.adminForm.value;
+    debugger;
+    console.log(val);
     const obs = this.editingId()
       ? this.svc.updateAdmin(this.editingId()!, {
           firstName: val.firstName!,

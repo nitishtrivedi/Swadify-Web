@@ -44,7 +44,8 @@ export class SuperAdminService {
   }
 
   getAdmins(params?: Record<string, any>) {
-    return this.api.getPaged<AdminUser>('/super-admin/admins', params);
+    //return this.api.getPaged<AdminUser>('/super-admin/admins', params);
+    return this.api.getPaged<User>('/user', params);
   }
   createAdmin(req: {
     firstName: string;

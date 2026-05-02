@@ -1,0 +1,222 @@
+<div class="page-wrap">
+  <div class="page-top">
+    <div>
+      <h1 class="page-title">Customers</h1>
+      <p class="page-sub">
+        <span class="pill">{{ totalCount() }} registered</span>
+        <span class="pill pill--green">{{ verifiedCount() }} verified</span>
+      </p>
+    </div>
+    <button class="export-btn" (click)="exportCsv()">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Export CSV
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-inline">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <input
+        [(ngModel)]="search"
+        (ngModelChange)="onSearch()"
+        placeholder="Search by name, email or username…"
+      />
+      @if (search()) {
+        <button class="clear-btn" (click)="search.set(''); onSearch()">✕</button>
+      }
+    </div>
+
+    <div class="filter-chips">
+      @for (f of filterOptions; track f.value) {
+        <button
+          class="fchip"
+          [class.active]="verifyFilter() === f.value"
+          (click)="verifyFilter.set(f.value); loadCustomers()"
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="loadCustomers()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+
+  <!-- Summary row -->
+  <div class="summary-row">
+    @for (s of summaryStats(); track s.label) {
+      <div class="summary-tile" [style.--col]="s.color">
+        <p class="summary-tile__value">{{ s.value }}</p>
+        <p class="summary-tile__label">{{ s.label }}</p>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="cust-skeleton">
+      @for (n of [1, 2, 3, 4, 5]; track n) {
+        <div class="skeleton" style="height: 64px; border-radius: 12px"></div>
+      }
+    </div>
+  } @else if (customers().length === 0) {
+    <app-empty-state
+      icon="👥"
+      title="No customers found"
+      message="Registered customers will appear here."
+    />
+  } @else {
+    <!-- Table -->
+    <div class="cust-table-wrap">
+      <table class="cust-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Verified</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of customers(); track c.id) {
+            <tr>
+              <td>
+                <div class="cust-cell">
+                  <div class="cust-cell__avatar" [style.background]="avatarColor(c.firstName)">
+                    {{ c.firstName[0].toUpperCase() }}
+                  </div>
+                  <div>
+                    <p class="cust-cell__name">{{ c.firstName }} {{ c.lastName }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="mono-cell">@{{ c.username }}</td>
+              <td class="email-cell">{{ c.email }}</td>
+              <td class="light-cell">{{ c.phone ?? '—' }}</td>
+              <td>
+                <span class="verify-chip" [class.verified]="c.isEmailVerified">
+                  @if (c.isEmailVerified) {
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    >
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    Verified
+                  } @else {
+                    Unverified
+                  }
+                </span>
+              </td>
+              <td class="light-cell">{{ c.createdAt | date: 'd MMM y' }}</td>
+              <td>
+                <button class="view-btn" (click)="openDetail(c)">View</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button [disabled]="page() === 1" (click)="setPage(page() - 1)">‹</button>
+        @for (p of pageRange(); track p) {
+          <button [class.active]="p === page()" (click)="setPage(p)">{{ p }}</button>
+        }
+        <button [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">›</button>
+      </div>
+    }
+  }
+</div>
+
+<!-- Detail panel -->
+@if (selectedCustomer()) {
+  <div class="drawer-backdrop" (click)="selectedCustomer.set(null)">
+    <div class="cust-drawer" (click)="$event.stopPropagation()">
+      <div class="cust-drawer__header">
+        <h3>Customer Profile</h3>
+        <button class="modal-close" (click)="selectedCustomer.set(null)">✕</button>
+      </div>
+
+      <div class="cust-drawer__body">
+        <!-- Avatar + name -->
+        <div class="cust-profile-hero">
+          <div
+            class="cust-profile-hero__avatar"
+            [style.background]="avatarColor(selectedCustomer()!.firstName)"
+          >
+            {{ selectedCustomer()!.firstName[0].toUpperCase() }}
+          </div>
+          <div>
+            <h2>{{ selectedCustomer()!.firstName }} {{ selectedCustomer()!.lastName }}</h2>
+            <p class="cust-profile-hero__username">@{{ selectedCustomer()!.username }}</p>
+          </div>
+        </div>
+
+        <!-- Info rows -->
+        <div class="detail-rows">
+          @for (row of detailRows(); track row.label) {
+            <div class="detail-row">
+              <span class="detail-row__label">{{ row.label }}</span>
+              <span class="detail-row__value">{{ row.value }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Read-only note -->
+        <div class="readonly-notice">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#5B8DEF"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          Customer data is read-only for Super Admins. Contact the customer directly for changes.
+        </div>
+      </div>
+    </div>
+  </div>
+}

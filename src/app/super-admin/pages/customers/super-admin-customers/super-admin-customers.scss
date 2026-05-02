@@ -1,0 +1,431 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+
+.page-wrap {
+  @include m.flex(column, stretch, flex-start, v.$space-xl);
+}
+.page-top {
+  @include m.flex(row, center, space-between);
+  flex-wrap: wrap;
+  gap: v.$space-md;
+}
+.page-title {
+  font-family: v.$font-display;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.page-sub {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  margin-top: 6px;
+}
+
+.pill {
+  padding: 3px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: v.$border;
+  color: v.$text-mid;
+  &--green {
+    background: v.$green-light;
+    color: v.$green;
+  }
+}
+
+.export-btn {
+  @include m.flex(row, center, center, v.$space-xs);
+  padding: 9px 18px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid v.$border;
+  background: v.$white;
+  font-family: v.$font-body;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  cursor: pointer;
+  transition: all v.$transition-fast;
+  &:hover {
+    border-color: v.$green;
+    color: v.$green;
+  }
+}
+
+.filter-bar {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  flex-wrap: wrap;
+}
+
+.search-inline {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: v.$white;
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 9px 16px;
+  flex: 1;
+  max-width: 360px;
+  &:focus-within {
+    border-color: v.$primary;
+  }
+  svg {
+    color: v.$text-light;
+    flex-shrink: 0;
+  }
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: v.$font-body;
+    font-size: 0.875rem;
+    background: none;
+    &::placeholder {
+      color: v.$text-light;
+    }
+  }
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-light;
+  font-size: 0.8rem;
+  &:hover {
+    color: v.$primary;
+  }
+}
+
+.filter-chips {
+  @include m.flex(row, center, flex-start, 0);
+  background: v.$ivory-dark;
+  border-radius: v.$radius-full;
+  padding: 3px;
+}
+
+.fchip {
+  padding: 7px 14px;
+  border-radius: v.$radius-full;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &.active {
+    background: v.$white;
+    color: v.$primary;
+    box-shadow: v.$shadow-sm;
+  }
+}
+
+.filter-select {
+  border: 1.5px solid v.$border;
+  border-radius: v.$radius-full;
+  padding: 9px 14px;
+  font-family: v.$font-body;
+  font-size: 0.85rem;
+  color: v.$text-mid;
+  background: v.$white;
+  cursor: pointer;
+  outline: none;
+  &:focus {
+    border-color: v.$primary;
+  }
+}
+
+/* Summary row */
+.summary-row {
+  display: grid;
+  gap: v.$space-sm;
+  grid-template-columns: repeat(2, 1fr);
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.summary-tile {
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$border;
+  padding: v.$space-md;
+  text-align: center;
+  border-top: 3px solid var(--col);
+
+  &__value {
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: v.$text-dark;
+  }
+  &__label {
+    font-size: 0.72rem;
+    color: v.$text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 4px;
+  }
+}
+
+/* Table */
+.cust-table-wrap {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  overflow-x: auto;
+}
+
+.cust-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+
+  th {
+    text-align: left;
+    padding: v.$space-sm v.$space-md;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: v.$text-light;
+    border-bottom: 1px solid v.$border;
+    background: v.$ivory;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 11px v.$space-md;
+    border-bottom: 1px solid v.$border;
+    color: v.$text-mid;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:hover td {
+    background: v.$ivory;
+  }
+}
+
+.cust-cell {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: v.$white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    @include m.flex(row, center, center);
+  }
+  &__name {
+    font-weight: 600;
+    color: v.$text-dark;
+    font-size: 0.875rem;
+  }
+}
+
+.mono-cell {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: v.$text-dark;
+}
+.email-cell {
+  font-size: 0.82rem;
+  color: v.$text-mid;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.light-cell {
+  font-size: 0.82rem;
+  color: v.$text-light;
+}
+
+.verify-chip {
+  @include m.flex(row, center, flex-start, 4px);
+  display: inline-flex;
+  padding: 3px 9px;
+  border-radius: v.$radius-full;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: v.$primary-light;
+  color: v.$primary;
+  &.verified {
+    background: v.$green-light;
+    color: v.$green;
+  }
+}
+
+.view-btn {
+  padding: 4px 12px;
+  border-radius: v.$radius-full;
+  border: 1px solid v.$border;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: v.$text-mid;
+  transition: all v.$transition-fast;
+  &:hover {
+    border-color: v.$primary;
+    color: v.$primary;
+    background: v.$primary-light;
+  }
+}
+
+/* Pagination */
+.pagination {
+  @include m.flex(row, center, center, v.$space-sm);
+  margin-top: v.$space-lg;
+  button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid v.$border;
+    background: v.$white;
+    cursor: pointer;
+    font-weight: 600;
+    color: v.$text-mid;
+    transition: all v.$transition-fast;
+    &.active {
+      background: v.$primary;
+      border-color: v.$primary;
+      color: v.$white;
+    }
+    &:hover:not(.active):not(:disabled) {
+      border-color: v.$primary;
+      color: v.$primary;
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+
+/* Drawer */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.cust-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 400px;
+  background: v.$white;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.1);
+  @include m.flex(column, stretch, flex-start, 0);
+  animation: slideInRight 0.3s ease;
+  overflow-y: auto;
+
+  &__header {
+    @include m.flex(row, center, space-between);
+    padding: v.$space-lg v.$space-xl;
+    border-bottom: 1px solid v.$border;
+    flex-shrink: 0;
+    h3 {
+      font-weight: 700;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    padding: v.$space-xl;
+    @include m.flex(column, stretch, flex-start, v.$space-lg);
+  }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-light;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  @include m.flex(row, center, center);
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$ivory-dark;
+  }
+}
+
+.cust-profile-hero {
+  @include m.flex(row, center, flex-start, v.$space-md);
+  padding-bottom: v.$space-lg;
+  border-bottom: 1px solid v.$border;
+
+  &__avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: v.$white;
+    font-weight: 800;
+    font-size: 1.4rem;
+    @include m.flex(row, center, center);
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: v.$text-dark;
+  }
+  &__username {
+    font-size: 0.82rem;
+    color: v.$text-light;
+    margin-top: 3px;
+  }
+}
+
+.detail-rows {
+  @include m.flex(column, stretch, flex-start, 0);
+}
+
+.detail-row {
+  @include m.flex(row, center, space-between, v.$space-md);
+  padding: v.$space-sm 0;
+  border-bottom: 1px solid v.$border;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: v.$text-light;
+    font-weight: 500;
+  }
+  &__value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: v.$text-dark;
+    text-align: right;
+  }
+}
+
+.readonly-notice {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  background: #ebf4ff;
+  border-radius: v.$radius-md;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: #1565c0;
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.cust-skeleton {
+  @include m.flex(column, stretch, flex-start, v.$space-sm);
+}

@@ -1,0 +1,323 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.dp-profile {
+  @include m.flex(column, stretch, flex-start, v.$space-lg);
+}
+
+/* Hero */
+.dp-profile-hero {
+  @include m.flex(row, center, flex-start, v.$space-lg);
+  background: linear-gradient(135deg, #1a1a2e, v.$primary);
+  border-radius: v.$radius-xl;
+  padding: v.$space-xl;
+
+  &__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.2);
+    color: v.$white;
+    font-weight: 800;
+    font-size: 1.6rem;
+    @include m.flex(row, center, center);
+    position: relative;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+
+  &__avail-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: v.$border;
+    border: 2px solid white;
+    &.online {
+      background: v.$green;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  &__info {
+    h2 {
+      color: v.$white;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+  }
+
+  &__phone {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    margin-top: 3px;
+  }
+
+  &__badges {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    margin-top: v.$space-sm;
+    flex-wrap: wrap;
+  }
+}
+
+.badge-chip {
+  @include m.flex(row, center, flex-start, 4px);
+  padding: 4px 10px;
+  border-radius: v.$radius-full;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  &--green {
+    background: rgba(46, 125, 82, 0.3);
+    color: #a5d6a7;
+  }
+}
+
+/* Performance grid */
+.perf-grid {
+  display: grid;
+  gap: v.$space-sm;
+  grid-template-columns: repeat(2, 1fr);
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.perf-card {
+  background: v.$white;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$border;
+  padding: v.$space-md;
+  @include m.flex(column, center, center, v.$space-xs);
+  text-align: center;
+  border-top: 3px solid var(--col);
+
+  &__icon {
+    font-size: 1.5rem;
+  }
+  &__value {
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: v.$text-dark;
+  }
+  &__label {
+    font-size: 0.7rem;
+    color: v.$text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Section card */
+.dp-section-card {
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
+  padding: v.$space-lg;
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+
+  h3 {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  &__header {
+    @include m.flex(row, center, space-between);
+  }
+}
+
+.edit-toggle-btn {
+  padding: 6px 14px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid v.$primary;
+  background: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: v.$primary;
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$primary;
+    color: v.$white;
+  }
+}
+
+/* Rating breakdown */
+.rating-breakdown {
+  @include m.flex(column, stretch, flex-start, v.$space-xs);
+}
+
+.rb-row {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  font-size: 0.78rem;
+}
+
+.rb-stars {
+  width: 22px;
+  font-weight: 700;
+  color: v.$text-mid;
+}
+.rb-bar {
+  flex: 1;
+  height: 6px;
+  background: v.$ivory-dark;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rb-fill {
+  height: 100%;
+  background: v.$saffron;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.rb-count {
+  width: 28px;
+  text-align: right;
+  color: v.$text-light;
+}
+
+.rating-avg {
+  @include m.flex(row, center, flex-start, v.$space-sm);
+  padding-top: v.$space-md;
+  border-top: 1px solid v.$border;
+
+  &__num {
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: v.$text-dark;
+  }
+  &__stars {
+    @include m.flex(row, center, flex-start, 2px);
+  }
+  &__label {
+    font-size: 0.78rem;
+    color: v.$text-light;
+  }
+}
+
+/* Profile form */
+.profile-fields {
+  display: grid;
+  gap: v.$space-md;
+  grid-template-columns: 1fr 1fr;
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input.readonly {
+  background: v.$ivory;
+  color: v.$text-mid;
+  cursor: default;
+}
+
+label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: v.$text-dark;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.save-profile-btn {
+  @include m.flex(row, center, center, v.$space-sm);
+  width: 100%;
+  padding: 13px;
+  border-radius: v.$radius-full;
+  background: v.$primary;
+  color: v.$white;
+  border: none;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-top: v.$space-md;
+  transition: background v.$transition-fast;
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* Feedback */
+.feedback-list {
+  @include m.flex(column, stretch, flex-start, v.$space-md);
+}
+
+.feedback-item {
+  padding: v.$space-sm 0;
+  border-bottom: 1px solid v.$border;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__top {
+    @include m.flex(row, center, flex-start, v.$space-sm);
+    margin-bottom: 6px;
+  }
+
+  &__text {
+    font-size: 0.875rem;
+    color: v.$text-mid;
+    font-style: italic;
+  }
+}
+
+.fb-stars-row {
+  @include m.flex(row, center, flex-start, 2px);
+}
+
+.fb-tag {
+  padding: 2px 8px;
+  border-radius: v.$radius-full;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: v.$primary-light;
+  color: v.$primary;
+  &.admin {
+    background: v.$saffron-light;
+    color: darken(#ff9933, 20%);
+  }
+}
+
+.fb-date {
+  font-size: 0.72rem;
+  color: v.$text-light;
+  margin-left: auto;
+}
+
+/* Logout */
+.dp-logout-btn {
+  @include m.flex(row, center, center, v.$space-sm);
+  padding: 13px;
+  border-radius: v.$radius-full;
+  border: 1.5px solid v.$border;
+  background: v.$white;
+  cursor: pointer;
+  font-family: v.$font-body;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: v.$primary;
+  transition: all v.$transition-fast;
+  &:hover {
+    background: v.$primary-light;
+    border-color: v.$primary;
+  }
+}
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
