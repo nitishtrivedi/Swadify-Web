@@ -34,11 +34,13 @@ export class SuperAdminDashboard implements OnInit {
   ngOnInit() {
     this.svc.getStats().subscribe({
       next: (res) => {
-        this.stats.set(res.data);
-        this.buildCards(res.data);
+        console.log(res);
+        this.stats.set(res);
+        this.buildCards(res);
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        console.error(err);
         this.buildCards({
           totalAdmins: 0,
           activeAdmins: 0,
@@ -53,8 +55,8 @@ export class SuperAdminDashboard implements OnInit {
       },
     });
 
-    this.svc.getAdmins({ page: 1, pageSize: 5 }).subscribe({
-      next: (res) => this.recentAdmins.set(res.data),
+    this.svc.getAdminsNew().subscribe({
+      next: (res) => this.recentAdmins.set(res),
     });
 
     this.svc.getActivityLog({ page: 1, pageSize: 8 }).subscribe({

@@ -2,7 +2,7 @@
   <div class="page-top">
     <div>
       <h1 class="page-title">Admin Management</h1>
-      <p class="page-sub">{{ admins().length }} admins registered</p>
+      <p class="page-sub">{{ users().length }} admins registered</p>
     </div>
     <button class="btn-primary" (click)="openAdd()">
       <svg
@@ -92,8 +92,7 @@
               </td>
               <td class="mono-cell">@{{ admin.username }}</td>
               <td>{{ admin.email }}</td>
-              <!-- <td class="center-cell">{{ admin.restaurantCount }}</td> -->
-              <td class="center-cell"></td>
+              <td class="center-cell">{{ admin.ownedRestaurants?.length || 0 }}</td>
               <td>{{ admin.createdAt | date: 'd MMM y' }}</td>
               <td>
                 <label class="tgl">

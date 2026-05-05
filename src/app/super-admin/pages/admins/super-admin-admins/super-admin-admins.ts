@@ -82,7 +82,11 @@ export class SuperAdminAdmins implements OnInit {
     this.loading.set(true);
     this.svc.getAdminsNew().subscribe({
       next: (res) => {
-        this.users.set(res);
+        const admins = res.map((u: any) => ({
+          ...u,
+          restaurantCount: u.ownedRestaurants?.length || 0, // ✅ add count
+        }));
+        this.users.set(admins);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

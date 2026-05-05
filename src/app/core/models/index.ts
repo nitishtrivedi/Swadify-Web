@@ -43,6 +43,7 @@ export interface User {
   profilePicUrl?: string;
   createdAt: string;
   isActive: boolean;
+  ownedRestaurants?: any[];
 }
 
 // ── Restaurant ────────────────────────────────────────────
@@ -63,6 +64,7 @@ export interface Restaurant {
   minOrderAmount: number;
   deliveryFee: number;
   address: Address;
+  status: number; // 0 = pending, 1 = approved, 2 = rejected
 }
 
 export interface Address {

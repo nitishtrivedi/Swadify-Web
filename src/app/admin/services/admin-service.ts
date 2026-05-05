@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { DeliveryPartner, MenuCategory, MenuItem, Order, Restaurant } from '../../core/models';
 import { ApiService } from '../../core/services/api-service';
+import { HttpClient } from '@angular/common/http';
 
 export interface CreateRestaurantRequest {
   name: string;
@@ -95,11 +96,12 @@ export interface CreateDiscountRequest {
 })
 export class AdminService {
   private api = inject(ApiService);
+  private http = inject(HttpClient);
 
   // ── Restaurants ───────────────────────────────
-  getMyRestaurants() {
-    return this.api.getPaged<Restaurant>('/restaurants');
-  }
+  // getMyRestaurants() {
+  //   return this.api.getPaged<Restaurant>('/admin/restaurants/get-all');
+  // }
   getRestaurant(id: string) {
     return this.api.get<Restaurant>(`/restaurants/${id}`);
   }
@@ -155,6 +157,10 @@ export class AdminService {
   // ── Orders ────────────────────────────────────
   getOrders(params?: Record<string, any>) {
     return this.api.getPaged<Order>('/orders', params);
+  }
+
+  getRecentOrders() {
+    return this.http.get<any>(`${this.api['base']}/admin/dashboard/recent-orders`);
   }
   getOrder(id: string) {
     return this.api.get<Order>(`/orders/${id}`);
@@ -219,6 +225,29 @@ export class AdminService {
 
   // ── Dashboard ─────────────────────────────────────────────
   getDashboardStats() {
-    return this.api.get<any>('/admin/dashboard/stats');
+    //return this.api.get<any>('/admin/dashboard/stats');
+    return this.http.get<any>(`${this.api['base']}/admin/dashboard/stats`);
+  }
+
+  getChartData(period: string) {
+    return this.http.get<any[]>(`${this.api['base']}/admin/dashboard/chart-data?period=${period}`);
+  }
+
+  getActivePartners() {
+    return this.http.get<any[]>(`${this.api['base']}/admin/dashboard/active-partners`);
+  }
+
+  getTopRestaurants() {
+    return this.http.get<any[]>(`${this.api['base']}/admin/dashboard/top-restaurants`);
+  }
+
+  getMyRestaurants() {
+    return this.http.get<any>(`${this.api['base']}/admin/restaurants/get-all`);
+  }
+
+  updateRestaurantStatus(id: string, status: number) {
+    return this.http.patch<Restaurant>(`${this.api['base']}/admin/restaurants/${id}/status`, {
+      status,
+    });
   }
 }

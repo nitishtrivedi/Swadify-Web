@@ -43,7 +43,9 @@ export class SuperAdminService {
   private http = inject(HttpClient);
 
   getStats() {
-    return this.api.get<SuperAdminStats>('/super-admin/stats');
+    return this.http.get<SuperAdminStats>(
+      `${this.api['base']}/super-admins/customer-management/stats`,
+    );
   }
 
   getAdmins(params?: Record<string, any>) {
@@ -74,7 +76,7 @@ export class SuperAdminService {
   }
 
   getCustomers(params?: Record<string, any>) {
-    return this.api.getPaged<User>('/super-admin/customers', params);
+    return this.api.getPaged<User>('/super-admins/customer-management/get-all-customers', params);
   }
 
   getActivityLog(params?: Record<string, any>) {

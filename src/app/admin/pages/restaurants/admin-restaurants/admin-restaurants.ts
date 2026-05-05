@@ -97,7 +97,7 @@ export class AdminRestaurants implements OnInit {
     this.loading.set(true);
     this.adminSvc.getMyRestaurants().subscribe({
       next: (r) => {
-        this.restaurants.set(r.data);
+        this.restaurants.set(r.items);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -165,11 +165,23 @@ export class AdminRestaurants implements OnInit {
     });
   }
 
+  // toggleOpen(r: Restaurant) {
+  //   this.adminSvc.toggleRestaurant(r.id, !r.isOpen).subscribe({
+  //     next: (res) => {
+  //       this.restaurants.update((list) => list.map((x) => (x.id === res.data.id ? res.data : x)));
+  //       this.toast.success(`${r.name} is now ${res.data.isOpen ? 'open' : 'closed'}`);
+  //     },
+  //     error: () => this.toast.error('Could not update status'),
+  //   });
+  // }
+
   toggleOpen(r: Restaurant) {
-    this.adminSvc.toggleRestaurant(r.id, !r.isOpen).subscribe({
+    const newStatus = r.status === 1 ? 2 : 1; // 1 = Open, 2 = Closed
+
+    this.adminSvc.updateRestaurantStatus(r.id, newStatus).subscribe({
       next: (res) => {
-        this.restaurants.update((list) => list.map((x) => (x.id === res.data.id ? res.data : x)));
-        this.toast.success(`${r.name} is now ${res.data.isOpen ? 'open' : 'closed'}`);
+        this.restaurants.update((list) => list.map((x) => (x.id === res.id ? res : x)));
+        this.toast.success(`${r.name} is now ${newStatus === 1 ? 'Open' : 'Closed'}`);
       },
       error: () => this.toast.error('Could not update status'),
     });

@@ -5,7 +5,7 @@
       <div>
         <h1 class="page-title">Restaurants</h1>
         <p class="page-sub">
-          {{ restaurants().length }} restaurant{{ restaurants().length !== 1 ? 's' : '' }} managed
+          <!-- {{ restaurants().length }} restaurant{{ restaurants().length !== 1 ? 's' : '' }} managed -->
         </p>
       </div>
       <button class="btn-primary" (click)="openAddModal()">
@@ -68,12 +68,15 @@
                 <div class="rest-card__cover-placeholder">🏪</div>
               }
               <!-- Open/Close toggle -->
-              <label class="open-toggle" [title]="r.isOpen ? 'Mark as Closed' : 'Mark as Open'">
-                <input type="checkbox" [checked]="r.isOpen" (change)="toggleOpen(r)" />
+              <label
+                class="open-toggle"
+                [title]="r.status === 1 ? 'Mark as Closed' : 'Mark as Open'"
+              >
+                <input type="checkbox" [checked]="r.status === 1" (change)="toggleOpen(r)" />
                 <span class="open-toggle__track">
                   <span class="open-toggle__thumb"></span>
                 </span>
-                <span class="open-toggle__label">{{ r.isOpen ? 'Open' : 'Closed' }}</span>
+                <span class="open-toggle__label">{{ r.status === 1 ? 'Open' : 'Closed' }}</span>
               </label>
             </div>
 

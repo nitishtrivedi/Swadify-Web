@@ -79,8 +79,9 @@ export class SuperAdminCustomers implements OnInit {
 
     this.svc.getCustomers(params).subscribe({
       next: (res) => {
+        console.log(res);
         this.customers.set(res.data);
-        this.totalCount.set(res.totalCount);
+        this.totalCount.set(res.data.length);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

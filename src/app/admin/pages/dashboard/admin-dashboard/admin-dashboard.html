@@ -104,10 +104,10 @@
               <stop offset="100%" stop-color="#D94F3D" stop-opacity="0" />
             </linearGradient>
           </defs>
-          <path [attr.d]="areaPath" fill="url(#areaGrad)" />
+          <path [attr.d]="areaPath()" fill="url(#areaGrad)" />
           <!-- Line -->
           <polyline
-            [attr.points]="chartPoints"
+            [attr.points]="chartPoints()"
             fill="none"
             stroke="#D94F3D"
             stroke-width="2.5"
@@ -115,7 +115,7 @@
             stroke-linejoin="round"
           />
           <!-- Dots -->
-          @for (pt of chartDots; track pt.x) {
+          @for (pt of chartDots(); track pt.x) {
             <circle
               [attr.cx]="pt.x"
               [attr.cy]="pt.y"
@@ -127,7 +127,7 @@
           }
           <!-- Saffron secondary line -->
           <polyline
-            [attr.points]="chartPoints2"
+            [attr.points]="chartPoints2()"
             fill="none"
             stroke="#FF9933"
             stroke-width="1.5"
@@ -161,7 +161,7 @@
       </div>
 
       <div class="qs-list">
-        @for (qs of quickStats; track qs.label) {
+        @for (qs of quickStats(); track qs.label) {
           <div class="qs-item">
             <div class="qs-item__icon">{{ qs.icon }}</div>
             <div class="qs-item__info">
@@ -185,7 +185,6 @@
       </div>
     </div>
   </div>
-
   <!-- Recent Orders table -->
   <div class="dash-card recent-orders">
     <div class="dash-card__header">
@@ -256,7 +255,7 @@
         <a routerLink="/admin/partners" class="view-all-link">Manage →</a>
       </div>
       <div class="dp-list">
-        @for (dp of activePartners; track dp.name) {
+        @for (dp of activePartners(); track dp.name) {
           <div class="dp-row">
             <div class="dp-row__avatar">{{ dp.name[0] }}</div>
             <div class="dp-row__info">
@@ -278,7 +277,7 @@
         <a routerLink="/admin/restaurants" class="view-all-link">See all →</a>
       </div>
       <div class="top-restaurants">
-        @for (r of topRestaurants; track r.name; let i = $index) {
+        @for (r of topRestaurants(); track r.name; let i = $index) {
           <div class="tr-row">
             <span class="tr-rank">{{ i + 1 }}</span>
             <div class="tr-icon">🏪</div>
