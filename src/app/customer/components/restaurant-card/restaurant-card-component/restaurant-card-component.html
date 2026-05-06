@@ -1,8 +1,8 @@
 <a class="r-card" [routerLink]="['/restaurants', restaurant.id]">
   <!-- Cover image / placeholder -->
   <div class="r-card__cover">
-    @if (restaurant.coverUrl) {
-      <img [src]="restaurant.coverUrl" [alt]="restaurant.name" loading="lazy" />
+    @if (restaurant.coverImageUrl) {
+      <img [src]="restaurant.coverImageUrl" [alt]="restaurant.name" loading="lazy" />
     } @else {
       <div class="r-card__cover-placeholder">
         <svg viewBox="0 0 120 80" fill="none" width="120">
@@ -22,8 +22,8 @@
     }
 
     <!-- Status badge -->
-    <span class="r-card__status" [class.open]="restaurant.isOpen">
-      {{ restaurant.isOpen ? 'Open' : 'Closed' }}
+    <span class="r-card__status" [class.open]="restaurant.status === 1">
+      {{ restaurant.status === 1 ? 'Open' : 'Closed' }}
     </span>
 
     <!-- Logo overlay -->
@@ -44,8 +44,8 @@
             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
           />
         </svg>
-        <span>{{ restaurant.rating | number: '1.1-1' }}</span>
-        <span class="r-card__reviews">({{ restaurant.reviewCount }})</span>
+        <span>{{ restaurant.averageRating | number: '1.1-1' }}</span>
+        <span class="r-card__reviews">({{ restaurant.totalRatings }})</span>
       </div>
     </div>
 
@@ -65,7 +65,7 @@
           <circle cx="12" cy="12" r="10" />
           <polyline points="12 6 12 12 16 14" />
         </svg>
-        {{ restaurant.deliveryTimeMin }}–{{ restaurant.deliveryTimeMax }} min
+        {{ restaurant.estimatedDeliveryTimeMinutes }} min
       </span>
       <span class="dot">·</span>
       <span>
@@ -76,7 +76,7 @@
         }
       </span>
       <span class="dot">·</span>
-      <span>₹{{ restaurant.minOrderAmount }} min</span>
+      <span>₹{{ restaurant.minimumOrderAmount }} min</span>
     </div>
   </div>
 </a>

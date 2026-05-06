@@ -120,7 +120,10 @@ export class AdminService {
   uploadRestaurantImage(id: string, type: 'logo' | 'cover', file: File) {
     const fd = new FormData();
     fd.append('image', file);
-    return this.api.post<{ url: string }>(`/restaurants/${id}/${type}`, fd);
+    return this.http.post<{ url: string }>(
+      `${this.api['base']}/admin/restaurants/${id}/${type}`,
+      fd,
+    );
   }
 
   // ── Menu ──────────────────────────────────────
@@ -249,5 +252,25 @@ export class AdminService {
     return this.http.patch<Restaurant>(`${this.api['base']}/admin/restaurants/${id}/status`, {
       status,
     });
+  }
+
+  getMyRestaurantById(id: number) {
+    return this.http.get<any>(`${this.api['base']}/admin/restaurants/get-by-id/${id}`);
+  }
+
+  createNewRestaurant(dto: any) {
+    return this.http.post<any>(`${this.api['base']}/admin/restaurants/create-new`, dto);
+  }
+
+  getRestaurantCategories() {
+    return this.http.get<any>(`${this.api['base']}/restaurant/categories`);
+  }
+
+  deleteMyRestaurant(id: number) {
+    return this.http.delete(`${this.api['base']}/admin/restaurants/delete-restaurant/${id}`);
+  }
+
+  updateMyRestaurant(id: number, dto: any) {
+    return this.http.put<any>(`${this.api['base']}/admin/restaurants/update-restaurant/${id}`, dto);
   }
 }

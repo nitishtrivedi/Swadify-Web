@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state/empty-state';
 import { Restaurant, MenuCategory, MenuItem } from '../../../../core/models';
 import { ToastService } from '../../../../shared/components/toast';
@@ -39,39 +38,45 @@ export class AdminRestaurants implements OnInit {
   editingItemId = signal<string | null>(null);
   editingCatForItem = signal<MenuCategory | null>(null);
   deleteTarget = signal<Restaurant | null>(null);
-  categoryName = signal('');
+
+  // Plain strings — used with [(ngModel)] directly
+  categoryName = '';
+
   selectedTags = signal<string[]>([]);
+  logoFile = signal<File | null>(null);
+  coverFile = signal<File | null>(null);
+  logoPreview = signal<string | null>(null);
+  coverPreview = signal<string | null>(null);
+
+  restaurantCategories = signal<{ id: number; name: string }[]>([]);
 
   availableTags = ['bestseller', 'spicy', 'new', 'recommended', 'must-try'];
 
   filteredRestaurants = computed(() => {
     const q = this.search().toLowerCase();
     return q
-      ? this.restaurants().filter(
-          (r) => r.name.toLowerCase().includes(q) || r.cuisineType.toLowerCase().includes(q),
-        )
+      ? this.restaurants().filter((r) => r.name.toLowerCase().includes(q))
       : this.restaurants();
   });
 
   restForm = this.fb.group({
     name: ['', Validators.required],
-    cuisineType: ['', Validators.required],
     description: [''],
-    phone: ['', Validators.required],
+    phoneNumber: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    openTime: ['09:00', Validators.required],
-    closeTime: ['22:00', Validators.required],
-    minOrderAmount: [99, Validators.required],
+    openingTime: ['09:00', Validators.required],
+    closingTime: ['22:00', Validators.required],
+    minimumOrderAmount: [99, Validators.required],
     deliveryFee: [0, Validators.required],
-    deliveryTimeMin: [20],
-    deliveryTimeMax: [45],
-    address: this.fb.group({
-      line1: ['', Validators.required],
-      line2: [''],
-      city: ['', Validators.required],
-      state: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    }),
+    estimatedDeliveryTimeMinutes: [30],
+    deliveryRadiusKm: [5.0],
+    isFeatured: [false],
+    addressLine1: ['', Validators.required],
+    addressLine2: [''],
+    city: ['', Validators.required],
+    state: ['', Validators.required],
+    pinCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+    categoryId: [null, Validators.required],
   });
 
   itemForm = this.fb.group({
@@ -85,12 +90,17 @@ export class AdminRestaurants implements OnInit {
   get rf() {
     return this.restForm.controls;
   }
+
   get itemF() {
     return this.itemForm.controls;
   }
 
   ngOnInit() {
     this.loadRestaurants();
+    this.adminSvc.getRestaurantCategories().subscribe((res) => {
+      console.log(res);
+      this.restaurantCategories.set(res.data);
+    });
   }
 
   loadRestaurants() {
@@ -117,22 +127,62 @@ export class AdminRestaurants implements OnInit {
     });
   }
 
+  onLogoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.logoFile.set(file);
+    this.logoPreview.set(URL.createObjectURL(file));
+  }
+
+  onCoverSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.coverFile.set(file);
+    this.coverPreview.set(URL.createObjectURL(file));
+  }
+
   openAddModal() {
     this.editingId.set(null);
+    this.logoFile.set(null);
+    this.coverFile.set(null);
+    this.logoPreview.set(null);
+    this.coverPreview.set(null);
     this.restForm.reset({
-      openTime: '09:00',
-      closeTime: '22:00',
-      minOrderAmount: 99,
+      openingTime: '09:00',
+      closingTime: '22:00',
+      minimumOrderAmount: 99,
       deliveryFee: 0,
-      deliveryTimeMin: 20,
-      deliveryTimeMax: 45,
+      estimatedDeliveryTimeMinutes: 30,
+      deliveryRadiusKm: 5.0,
+      isFeatured: false,
     });
     this.showRestaurantModal.set(true);
   }
 
   editRestaurant(r: Restaurant) {
     this.editingId.set(r.id);
-    this.restForm.patchValue({ ...r });
+    this.logoFile.set(null);
+    this.coverFile.set(null);
+    this.logoPreview.set(r.logoUrl ?? null);
+    this.coverPreview.set(r.coverImageUrl ?? null);
+    this.restForm.patchValue({
+      name: r.name,
+      description: r.description,
+      categoryId: r.categoryId as any,
+      phoneNumber: r.phoneNumber,
+      email: r.email,
+      openingTime: r.openingTime,
+      closingTime: r.closingTime,
+      minimumOrderAmount: r.minimumOrderAmount,
+      deliveryFee: r.deliveryFee,
+      estimatedDeliveryTimeMinutes: r.estimatedDeliveryTimeMinutes,
+      deliveryRadiusKm: r.deliveryRadiusKm,
+      addressLine1: r.addressLine1,
+      addressLine2: r.addressLine2,
+      city: r.city,
+      state: r.state,
+      pinCode: r.pinCode,
+    });
     this.showRestaurantModal.set(true);
   }
 
@@ -143,20 +193,31 @@ export class AdminRestaurants implements OnInit {
     }
     this.saving.set(true);
     const req = this.restForm.value as any;
+    const isEditing = !!this.editingId();
     const obs = this.editingId()
-      ? this.adminSvc.updateRestaurant(this.editingId()!, req)
-      : this.adminSvc.createRestaurant(req);
+      ? this.adminSvc.updateMyRestaurant(Number(this.editingId()!), req)
+      : this.adminSvc.createNewRestaurant(req);
 
     obs.subscribe({
-      next: (res) => {
-        if (this.editingId()) {
-          this.restaurants.update((list) => list.map((r) => (r.id === res.data.id ? res.data : r)));
-        } else {
-          this.restaurants.update((list) => [...list, res.data]);
+      next: (res: Restaurant) => {
+        const savedId = res.id;
+        const uploads: any[] = [];
+
+        if (this.logoFile())
+          uploads.push(this.adminSvc.uploadRestaurantImage(savedId, 'logo', this.logoFile()!));
+        if (this.coverFile())
+          uploads.push(this.adminSvc.uploadRestaurantImage(savedId, 'cover', this.coverFile()!));
+
+        if (uploads.length === 0) {
+          this.afterSave(res, isEditing);
+          return;
         }
-        this.saving.set(false);
-        this.closeModal();
-        this.toast.success(this.editingId() ? 'Restaurant updated!' : 'Restaurant added!');
+
+        Promise.all(uploads.map((o) => o.toPromise())).then(() => {
+          this.adminSvc
+            .getMyRestaurantById(Number(savedId))
+            .subscribe((r) => this.afterSave(r, isEditing));
+        });
       },
       error: () => {
         this.saving.set(false);
@@ -165,19 +226,19 @@ export class AdminRestaurants implements OnInit {
     });
   }
 
-  // toggleOpen(r: Restaurant) {
-  //   this.adminSvc.toggleRestaurant(r.id, !r.isOpen).subscribe({
-  //     next: (res) => {
-  //       this.restaurants.update((list) => list.map((x) => (x.id === res.data.id ? res.data : x)));
-  //       this.toast.success(`${r.name} is now ${res.data.isOpen ? 'open' : 'closed'}`);
-  //     },
-  //     error: () => this.toast.error('Could not update status'),
-  //   });
-  // }
+  private afterSave(restaurant: Restaurant, wasEditing: boolean) {
+    if (wasEditing) {
+      this.restaurants.update((list) => list.map((r) => (r.id === restaurant.id ? restaurant : r)));
+    } else {
+      this.restaurants.update((list) => [...list, restaurant]);
+    }
+    this.saving.set(false);
+    this.closeModal();
+    this.toast.success(wasEditing ? 'Restaurant updated!' : 'Restaurant added!');
+  }
 
   toggleOpen(r: Restaurant) {
-    const newStatus = r.status === 1 ? 2 : 1; // 1 = Open, 2 = Closed
-
+    const newStatus = r.status === 1 ? 2 : 1;
     this.adminSvc.updateRestaurantStatus(r.id, newStatus).subscribe({
       next: (res) => {
         this.restaurants.update((list) => list.map((x) => (x.id === res.id ? res : x)));
@@ -196,7 +257,7 @@ export class AdminRestaurants implements OnInit {
     const id = this.deleteTarget()?.id;
     if (!id) return;
     this.saving.set(true);
-    this.adminSvc.deleteRestaurant(id).subscribe({
+    this.adminSvc.deleteMyRestaurant(Number(id)).subscribe({
       next: () => {
         this.restaurants.update((list) => list.filter((r) => r.id !== id));
         this.saving.set(false);
@@ -212,23 +273,22 @@ export class AdminRestaurants implements OnInit {
 
   openAddCategory() {
     this.editingCatId.set(null);
-    this.categoryName.set('');
+    this.categoryName = '';
     this.showCategoryModal.set(true);
   }
 
   editCategory(cat: MenuCategory) {
     this.editingCatId.set(cat.id);
-    this.categoryName.set(cat.name);
+    this.categoryName = cat.name;
     this.showCategoryModal.set(true);
   }
 
   saveCategory() {
-    const name = this.categoryName();
-    if (!name) return;
+    if (!this.categoryName) return;
     this.saving.set(true);
     const obs = this.editingCatId()
-      ? this.adminSvc.updateCategory(this.editingCatId()!, name)
-      : this.adminSvc.createCategory(this.selectedRestaurant()!.id, name);
+      ? this.adminSvc.updateCategory(this.editingCatId()!, this.categoryName)
+      : this.adminSvc.createCategory(this.selectedRestaurant()!.id, this.categoryName);
 
     obs.subscribe({
       next: (res) => {

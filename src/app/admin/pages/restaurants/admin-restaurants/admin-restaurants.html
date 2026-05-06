@@ -4,9 +4,7 @@
     <div class="page-top">
       <div>
         <h1 class="page-title">Restaurants</h1>
-        <p class="page-sub">
-          <!-- {{ restaurants().length }} restaurant{{ restaurants().length !== 1 ? 's' : '' }} managed -->
-        </p>
+        <p class="page-sub"></p>
       </div>
       <button class="btn-primary" (click)="openAddModal()">
         <svg
@@ -39,7 +37,11 @@
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.35-4.35" />
       </svg>
-      <input [(ngModel)]="search" placeholder="Search restaurants…" />
+      <input
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        placeholder="Search restaurants…"
+      />
     </div>
 
     @if (loading()) {
@@ -60,14 +62,12 @@
       <div class="rest-grid">
         @for (r of filteredRestaurants(); track r.id) {
           <div class="rest-card">
-            <!-- Cover -->
             <div class="rest-card__cover">
-              @if (r.coverUrl) {
-                <img [src]="r.coverUrl" [alt]="r.name" />
+              @if (r.coverImageUrl) {
+                <img [src]="r.coverImageUrl" [alt]="r.name" />
               } @else {
                 <div class="rest-card__cover-placeholder">🏪</div>
               }
-              <!-- Open/Close toggle -->
               <label
                 class="open-toggle"
                 [title]="r.status === 1 ? 'Mark as Closed' : 'Mark as Open'"
@@ -80,21 +80,18 @@
               </label>
             </div>
 
-            <!-- Body -->
             <div class="rest-card__body">
               <div class="rest-card__row">
                 <h3>{{ r.name }}</h3>
-                <div class="rest-card__rating">⭐ {{ r.rating | number: '1.1-1' }}</div>
+                <div class="rest-card__rating">⭐ {{ r.averageRating | number: '1.1-1' }}</div>
               </div>
-              <p class="rest-card__cuisine">{{ r.cuisineType }}</p>
               <div class="rest-card__meta">
-                <span>🕐 {{ r.openTime }}–{{ r.closeTime }}</span>
-                <span>₹{{ r.minOrderAmount }} min</span>
-                <span>{{ r.deliveryTimeMin }}–{{ r.deliveryTimeMax }}min</span>
+                <span>🕐 {{ r.openingTime }}–{{ r.closingTime }}</span>
+                <span>₹{{ r.minimumOrderAmount }} min</span>
+                <span>~{{ r.estimatedDeliveryTimeMinutes }}min</span>
               </div>
             </div>
 
-            <!-- Actions -->
             <div class="rest-card__actions">
               <button class="action-btn" (click)="viewMenu(r)">
                 <svg
@@ -179,7 +176,6 @@
       <div class="skeleton" style="height: 300px; border-radius: 16px"></div>
     } @else {
       <div class="menu-admin-layout">
-        <!-- Category list -->
         @for (cat of menuCategories(); track cat.id) {
           <div class="menu-section-admin">
             <div class="menu-section-admin__header">
@@ -213,7 +209,7 @@
             } @else {
               <div class="menu-items-table">
                 <div class="mit-header">
-                  <span>Item</span><span>Price</span><span>Prep Time</span> <span>Available</span
+                  <span>Item</span><span>Price</span><span>Prep Time</span><span>Available</span
                   ><span>Actions</span>
                 </div>
                 @for (item of cat.items; track item.id) {
@@ -276,6 +272,87 @@
       </div>
 
       <form [formGroup]="restForm" (ngSubmit)="saveRestaurant()" class="modal-form">
+        <!-- Cover Image -->
+        <div class="form-section-title">Images</div>
+
+        <div class="image-upload-section">
+          <!-- Cover image -->
+          <div class="form-group">
+            <label>Cover Image</label>
+            <div class="image-upload-box image-upload-box--cover" (click)="coverInput.click()">
+              @if (coverPreview()) {
+                <img [src]="coverPreview()" alt="Cover" />
+                <div class="image-upload-box__overlay">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  <span>Change Cover</span>
+                </div>
+              } @else {
+                <span class="image-upload-box__icon">🖼️</span>
+                <span class="image-upload-box__hint"
+                  >Click to upload cover image<br />Recommended: 1200×400px</span
+                >
+                <span class="image-upload-box__label">Upload</span>
+              }
+            </div>
+            <input
+              #coverInput
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="onCoverSelected($event)"
+            />
+          </div>
+
+          <!-- Logo -->
+          <div class="form-group">
+            <label>Logo</label>
+            <div class="image-upload-box image-upload-box--logo" (click)="logoInput.click()">
+              @if (logoPreview()) {
+                <img [src]="logoPreview()" alt="Logo" />
+                <div class="image-upload-box__overlay">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  >
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  <span>Change Logo</span>
+                </div>
+              } @else {
+                <span class="image-upload-box__icon">🏪</span>
+                <span class="image-upload-box__hint">Square logo<br />Recommended: 400×400px</span>
+                <span class="image-upload-box__label">Upload</span>
+              }
+            </div>
+            <input
+              #logoInput
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="onLogoSelected($event)"
+            />
+          </div>
+        </div>
+
         <div class="form-grid-2">
           <div class="form-group">
             <label>Restaurant Name <span class="req">*</span></label>
@@ -285,33 +362,31 @@
             }
           </div>
           <div class="form-group">
-            <label>Cuisine Type <span class="req">*</span></label>
-            <input
+            <label>Description</label>
+            <textarea
               class="input"
-              formControlName="cuisineType"
-              placeholder="North Indian, Biryani"
-            />
-            @if (rf['cuisineType'].touched && rf['cuisineType'].invalid) {
-              <span class="error-msg">Required</span>
-            }
+              formControlName="description"
+              rows="2"
+              placeholder="Short description…"
+              style="resize: vertical"
+            ></textarea>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Description</label>
-          <textarea
-            class="input"
-            formControlName="description"
-            rows="2"
-            placeholder="Short description of the restaurant…"
-            style="resize: vertical"
-          ></textarea>
+          <label>Category <span class="req">*</span></label>
+          <select class="input" formControlName="categoryId">
+            <option value="" disabled>Select a category</option>
+            @for (cat of restaurantCategories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
         </div>
 
         <div class="form-grid-2">
           <div class="form-group">
             <label>Phone <span class="req">*</span></label>
-            <input class="input" formControlName="phone" placeholder="+91 98765 43210" />
+            <input class="input" formControlName="phoneNumber" placeholder="+91 98765 43210" />
           </div>
           <div class="form-group">
             <label>Email <span class="req">*</span></label>
@@ -327,15 +402,15 @@
         <div class="form-grid-4">
           <div class="form-group">
             <label>Opens At <span class="req">*</span></label>
-            <input class="input" formControlName="openTime" type="time" />
+            <input class="input" formControlName="openingTime" type="time" />
           </div>
           <div class="form-group">
             <label>Closes At <span class="req">*</span></label>
-            <input class="input" formControlName="closeTime" type="time" />
+            <input class="input" formControlName="closingTime" type="time" />
           </div>
           <div class="form-group">
             <label>Min Order (₹) <span class="req">*</span></label>
-            <input class="input" formControlName="minOrderAmount" type="number" min="0" />
+            <input class="input" formControlName="minimumOrderAmount" type="number" min="0" />
           </div>
           <div class="form-group">
             <label>Delivery Fee (₹) <span class="req">*</span></label>
@@ -345,37 +420,49 @@
 
         <div class="form-grid-2">
           <div class="form-group">
-            <label>Min Delivery Time (min)</label>
-            <input class="input" formControlName="deliveryTimeMin" type="number" min="0" />
+            <label>Delivery Time (min)</label>
+            <input
+              class="input"
+              formControlName="estimatedDeliveryTimeMinutes"
+              type="number"
+              min="0"
+            />
           </div>
           <div class="form-group">
-            <label>Max Delivery Time (min)</label>
-            <input class="input" formControlName="deliveryTimeMax" type="number" min="0" />
+            <label>Delivery Radius (km)</label>
+            <input class="input" formControlName="deliveryRadiusKm" type="number" min="0" />
           </div>
         </div>
 
         <div class="form-section-title">Address</div>
 
-        <div class="form-group" formGroupName="address">
-          <div class="form-grid-1">
-            <div class="form-group">
-              <label>Street Address <span class="req">*</span></label>
-              <input class="input" formControlName="line1" placeholder="Shop 4, MG Road" />
-            </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Street Address <span class="req">*</span></label>
+            <input class="input" formControlName="addressLine1" placeholder="Shop 4, MG Road" />
           </div>
-          <div class="form-grid-3" style="margin-top: 12px">
-            <div class="form-group">
-              <label>City <span class="req">*</span></label>
-              <input class="input" formControlName="city" placeholder="Pune" />
-            </div>
-            <div class="form-group">
-              <label>State <span class="req">*</span></label>
-              <input class="input" formControlName="state" placeholder="Maharashtra" />
-            </div>
-            <div class="form-group">
-              <label>Pincode <span class="req">*</span></label>
-              <input class="input" formControlName="pincode" placeholder="411001" maxlength="6" />
-            </div>
+          <div class="form-group">
+            <label>Street Address 2</label>
+            <input
+              class="input"
+              formControlName="addressLine2"
+              placeholder="Building name (optional)"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>City <span class="req">*</span></label>
+            <input class="input" formControlName="city" placeholder="Pune" />
+          </div>
+          <div class="form-group">
+            <label>State <span class="req">*</span></label>
+            <input class="input" formControlName="state" placeholder="Maharashtra" />
+          </div>
+          <div class="form-group">
+            <label>Pincode <span class="req">*</span></label>
+            <input class="input" formControlName="pinCode" placeholder="411001" maxlength="6" />
           </div>
         </div>
 
@@ -465,7 +552,6 @@
           </div>
         </div>
 
-        <!-- Veg toggle -->
         <div class="veg-radio-group">
           <button
             type="button"
@@ -487,7 +573,6 @@
           </button>
         </div>
 
-        <!-- Tags -->
         <div class="form-group">
           <label>Tags</label>
           <div class="tag-chips">

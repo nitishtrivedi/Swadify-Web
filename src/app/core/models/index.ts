@@ -51,20 +51,31 @@ export interface Restaurant {
   id: string;
   name: string;
   description?: string;
-  cuisineType: string;
+  categoryId: number;
+  phoneNumber: string;
+  email: string;
   logoUrl?: string;
-  coverUrl?: string;
-  rating: number;
-  reviewCount: number;
-  isOpen: boolean;
-  openTime: string;
-  closeTime: string;
-  deliveryTimeMin: number;
-  deliveryTimeMax: number;
-  minOrderAmount: number;
+  coverImageUrl?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  latitude: number;
+  longitude: number;
+  openingTime: string;
+  closingTime: string;
   deliveryFee: number;
-  address: Address;
-  status: number; // 0 = pending, 1 = approved, 2 = rejected
+  minimumOrderAmount: number;
+  estimatedDeliveryTimeMinutes: number;
+  deliveryRadiusKm: number;
+  isFeatured: boolean;
+  status: number;
+  isActive: boolean;
+  isVerified: boolean;
+  averageRating: number;
+  totalRatings: number;
+  cuisineType: string;
 }
 
 export interface Address {
