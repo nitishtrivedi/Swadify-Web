@@ -237,7 +237,7 @@
                     </label>
                     <div class="mit-actions">
                       <button class="icon-btn" (click)="editItem(item, cat)">Edit</button>
-                      <button class="icon-btn icon-btn--danger" (click)="deleteItem(item.id)">
+                      <button class="icon-btn icon-btn--danger" (click)="deleteItem(item)">
                         Del
                       </button>
                     </div>
@@ -612,11 +612,20 @@
     <div class="modal-box modal-box--sm" (click)="$event.stopPropagation()">
       <div class="delete-confirm">
         <span class="delete-confirm__icon">🗑️</span>
-        <h3>Delete "{{ deleteTarget()?.name }}"?</h3>
-        <p>This action cannot be undone. All menu items will be removed.</p>
+        @if (deleteMode() === 'restaurant') {
+          <h3>Delete "{{ deleteTarget()?.name }}"?</h3>
+          <p>This action cannot be undone. All menu items will be removed.</p>
+        } @else {
+          <h3>Delete "{{ deleteItemTarget()?.name }}"?</h3>
+          <p>This action cannot be undone.</p>
+        }
         <div class="modal-actions">
           <button class="btn-outline" (click)="showDeleteConfirm.set(false)">Cancel</button>
-          <button class="btn-danger" (click)="doDeleteRestaurant()" [disabled]="saving()">
+          <button
+            class="btn-danger"
+            (click)="deleteMode() === 'restaurant' ? doDeleteRestaurant() : doDeleteItem()"
+            [disabled]="saving()"
+          >
             @if (saving()) {
               <span class="spinner"></span>
             }

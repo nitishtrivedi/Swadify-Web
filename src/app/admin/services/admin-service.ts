@@ -130,27 +130,27 @@ export class AdminService {
   getMenu(restaurantId: string) {
     return this.api.get<MenuCategory[]>(`/restaurants/${restaurantId}/menu`);
   }
-  createCategory(restaurantId: string, name: string) {
-    return this.api.post<MenuCategory>(`/restaurants/${restaurantId}/categories`, { name });
-  }
-  updateCategory(id: string, name: string) {
-    return this.api.put<MenuCategory>(`/categories/${id}`, { name });
-  }
-  deleteCategory(id: string) {
-    return this.api.delete(`/categories/${id}`);
-  }
-  createMenuItem(req: CreateMenuItemRequest) {
-    return this.api.post<MenuItem>('/menu-items', req);
-  }
-  updateMenuItem(id: string, req: Partial<CreateMenuItemRequest>) {
-    return this.api.put<MenuItem>(`/menu-items/${id}`, req);
-  }
-  toggleMenuItem(id: string, isAvailable: boolean) {
-    return this.api.patch<MenuItem>(`/menu-items/${id}/toggle`, { isAvailable });
-  }
-  deleteMenuItem(id: string) {
-    return this.api.delete(`/menu-items/${id}`);
-  }
+  // createCategory(restaurantId: string, name: string) {
+  //   return this.api.post<MenuCategory>(`/restaurants/${restaurantId}/categories`, { name });
+  // }
+  // updateCategory(id: string, name: string) {
+  //   return this.api.put<MenuCategory>(`/categories/${id}`, { name });
+  // }
+  // deleteCategory(id: string) {
+  //   return this.api.delete(`/categories/${id}`);
+  // }
+  // createMenuItem(req: CreateMenuItemRequest) {
+  //   return this.api.post<MenuItem>('/menu-items', req);
+  // }
+  // updateMenuItem(id: string, req: Partial<CreateMenuItemRequest>) {
+  //   return this.api.put<MenuItem>(`/menu-items/${id}`, req);
+  // }
+  // toggleMenuItem(id: string, isAvailable: boolean) {
+  //   return this.api.patch<MenuItem>(`/menu-items/${id}/toggle`, { isAvailable });
+  // }
+  // deleteMenuItem(id: string) {
+  //   return this.api.delete(`/menu-items/${id}`);
+  // }
   uploadMenuImage(id: string, file: File) {
     const fd = new FormData();
     fd.append('image', file);
@@ -272,5 +272,54 @@ export class AdminService {
 
   updateMyRestaurant(id: number, dto: any) {
     return this.http.put<any>(`${this.api['base']}/admin/restaurants/update-restaurant/${id}`, dto);
+  }
+
+  // ── Menu Categories ───────────────────────────────────────
+  getMenuCategories(restaurantId: string) {
+    return this.http.get<any[]>(
+      `${this.api['base']}/admin/restaurants/${restaurantId}/menuCategories`,
+    );
+  }
+
+  createCategory(restaurantId: string, name: string) {
+    return this.http.post<any>(
+      `${this.api['base']}/admin/restaurants/${restaurantId}/menuCategories`,
+      { name },
+    );
+  }
+
+  updateCategory(id: string, name: string) {
+    return this.http.put<any>(`${this.api['base']}/admin/menuCategories/${id}`, { name });
+  }
+
+  deleteCategory(id: string) {
+    return this.http.delete(`${this.api['base']}/admin/menuCategories/${id}`, {
+      observe: 'response',
+    });
+  }
+
+  // ── Menu Items ────────────────────────────────────────────
+  createMenuItem(dto: any) {
+    return this.http.post<any>(`${this.api['base']}/admin/menuItems`, dto);
+  }
+
+  updateMenuItem(id: string, dto: any) {
+    return this.http.put<any>(`${this.api['base']}/admin/menuItems/${id}`, dto);
+  }
+
+  toggleMenuItem(id: string) {
+    return this.http.patch<any>(`${this.api['base']}/admin/menuItems/${id}/toggle`, {});
+  }
+
+  deleteMenuItem(id: string) {
+    return this.http.delete(`${this.api['base']}/admin/menuItems/${id}`, {
+      observe: 'response',
+    });
+  }
+
+  uploadMenuItemImage(id: string, file: File) {
+    const fd = new FormData();
+    fd.append('image', file);
+    return this.http.post<{ url: string }>(`${this.api['base']}/admin/menuItems/${id}/image`, fd);
   }
 }

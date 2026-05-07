@@ -50,6 +50,9 @@ export class AdminRestaurants implements OnInit {
 
   restaurantCategories = signal<{ id: number; name: string }[]>([]);
 
+  deleteItemTarget = signal<MenuItem | null>(null);
+  deleteMode = signal<'restaurant' | 'item'>('restaurant');
+
   availableTags = ['bestseller', 'spicy', 'new', 'recommended', 'must-try'];
 
   filteredRestaurants = computed(() => {
@@ -118,9 +121,9 @@ export class AdminRestaurants implements OnInit {
     this.selectedRestaurant.set(r);
     this.view.set('menu');
     this.loadingMenu.set(true);
-    this.adminSvc.getMenu(r.id).subscribe({
+    this.adminSvc.getMenuCategories(r.id).subscribe({
       next: (res) => {
-        this.menuCategories.set(res.data);
+        this.menuCategories.set(res.map((c) => this.mapCategory(c)));
         this.loadingMenu.set(false);
       },
       error: () => this.loadingMenu.set(false),
@@ -250,6 +253,7 @@ export class AdminRestaurants implements OnInit {
 
   confirmDelete(r: Restaurant) {
     this.deleteTarget.set(r);
+    this.deleteMode.set('restaurant');
     this.showDeleteConfirm.set(true);
   }
 
@@ -292,12 +296,13 @@ export class AdminRestaurants implements OnInit {
 
     obs.subscribe({
       next: (res) => {
+        const mapped = this.mapCategory({ ...res, items: [] });
         if (this.editingCatId()) {
           this.menuCategories.update((list) =>
-            list.map((c) => (c.id === res.data.id ? { ...c, name: res.data.name } : c)),
+            list.map((c) => (c.id === mapped.id ? { ...c, name: mapped.name } : c)),
           );
         } else {
-          this.menuCategories.update((list) => [...list, { ...res.data, items: [] }]);
+          this.menuCategories.update((list) => [...list, mapped]);
         }
         this.saving.set(false);
         this.showCategoryModal.set(false);
@@ -349,11 +354,21 @@ export class AdminRestaurants implements OnInit {
       return;
     }
     this.saving.set(true);
+    const v = this.itemForm.value as any;
+    const tags: string[] = this.selectedTags();
+
     const req = {
-      ...this.itemForm.value,
-      categoryId: this.editingCatForItem()!.id,
+      restaurantId: Number(this.selectedRestaurant()!.id),
+      categoryId: Number(this.editingCatForItem()!.id),
+      name: v.name,
+      description: v.description,
+      price: v.price,
+      isVegetarian: v.isVeg,
+      preparationTimeMinutes: v.preparationTimeMin,
+      // isBestseller: tags.includes('bestseller'),
       tags: this.selectedTags(),
-    } as any;
+      // isSpicy: tags.includes('spicy'),
+    };
 
     const obs = this.editingItemId()
       ? this.adminSvc.updateMenuItem(this.editingItemId()!, req)
@@ -361,12 +376,13 @@ export class AdminRestaurants implements OnInit {
 
     obs.subscribe({
       next: (res) => {
+        const mapped = this.mapItem(res);
         this.menuCategories.update((list) =>
           list.map((cat) => {
             if (cat.id !== this.editingCatForItem()!.id) return cat;
             const items = this.editingItemId()
-              ? cat.items.map((i) => (i.id === res.data.id ? res.data : i))
-              : [...cat.items, res.data];
+              ? cat.items.map((i) => (i.id === mapped.id ? mapped : i))
+              : [...cat.items, mapped];
             return { ...cat, items };
           }),
         );
@@ -382,12 +398,13 @@ export class AdminRestaurants implements OnInit {
   }
 
   toggleItem(item: MenuItem) {
-    this.adminSvc.toggleMenuItem(item.id, !item.isAvailable).subscribe({
+    this.adminSvc.toggleMenuItem(item.id).subscribe({
       next: (res) => {
+        const mapped = this.mapItem(res);
         this.menuCategories.update((list) =>
           list.map((cat) => ({
             ...cat,
-            items: cat.items.map((i) => (i.id === res.data.id ? res.data : i)),
+            items: cat.items.map((i) => (i.id === mapped.id ? mapped : i)),
           })),
         );
       },
@@ -395,20 +412,23 @@ export class AdminRestaurants implements OnInit {
     });
   }
 
-  deleteItem(id: string) {
-    if (!confirm('Delete this menu item?')) return;
-    this.adminSvc.deleteMenuItem(id).subscribe({
-      next: () => {
-        this.menuCategories.update((list) =>
-          list.map((cat) => ({
-            ...cat,
-            items: cat.items.filter((i) => i.id !== id),
-          })),
-        );
-        this.toast.success('Item deleted');
-      },
-      error: () => this.toast.error('Delete failed'),
-    });
+  deleteItem(item: MenuItem) {
+    // if (!confirm('Delete this menu item?')) return;
+    // this.adminSvc.deleteMenuItem(id).subscribe({
+    //   next: () => {
+    //     this.menuCategories.update((list) =>
+    //       list.map((cat) => ({
+    //         ...cat,
+    //         items: cat.items.filter((i) => i.id !== id),
+    //       })),
+    //     );
+    //     this.toast.success('Item deleted');
+    //   },
+    //   error: () => this.toast.error('Delete failed'),
+    // });
+    this.deleteItemTarget.set(item);
+    this.deleteMode.set('item');
+    this.showDeleteConfirm.set(true);
   }
 
   toggleTag(tag: string) {
@@ -420,5 +440,71 @@ export class AdminRestaurants implements OnInit {
   closeModal() {
     this.showRestaurantModal.set(false);
     this.editingId.set(null);
+  }
+
+  doDeleteItem() {
+    const id = this.deleteItemTarget()?.id;
+    console.log('Deleting item id:', id);
+    if (!id) {
+      console.warn('No item id found');
+      return;
+    }
+    this.saving.set(true);
+    this.adminSvc.deleteMenuItem(id).subscribe({
+      next: (res) => {
+        console.log('Delete success', res);
+        this.menuCategories.update((list) =>
+          list.map((cat) => ({
+            ...cat,
+            items: cat.items.filter((i) => {
+              console.log('comparing', i.id, '!==', id, '->', i.id !== id);
+              return i.id !== id;
+            }),
+          })),
+        );
+        this.saving.set(false);
+        this.showDeleteConfirm.set(false);
+        this.toast.success('Item deleted');
+      },
+      error: (err) => {
+        console.error('Delete error', err);
+        this.saving.set(false);
+        this.toast.error('Delete failed');
+      },
+    });
+  }
+
+  private mapItem(i: any, fallbackCategoryId?: string, fallbackRestaurantId?: string): MenuItem {
+    return {
+      id: i.id?.toString() ?? '',
+      categoryId: (i.categoryId ?? fallbackCategoryId)?.toString() ?? '',
+      restaurantId: (i.restaurantId ?? fallbackRestaurantId)?.toString() ?? '',
+      name: i.name,
+      description: i.description,
+      price: i.price,
+      imageUrl: i.imageUrl,
+      isVeg: i.isVegetarian,
+      isAvailable: i.isAvailable,
+      preparationTimeMin: i.preparationTimeMinutes,
+      tags:
+        typeof i.tags === 'string' && i.tags
+          ? i.tags
+              .split(',')
+              .map((t: string) => t.trim())
+              .filter(Boolean)
+          : (i.tags ?? []),
+    };
+  }
+
+  private mapCategory(c: any): MenuCategory {
+    return {
+      id: c.id?.toString() ?? '',
+      name: c.name,
+      restaurantId: c.restaurantId?.toString() ?? '',
+      sortOrder: c.displayOrder ?? 0,
+      items: (c.items ?? []).map((i: any) =>
+        this.mapItem(i, c.id?.toString(), c.restaurantId?.toString()),
+      ),
+    };
   }
 }
