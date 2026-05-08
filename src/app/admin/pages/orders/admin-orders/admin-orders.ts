@@ -2,7 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state/empty-state';
-import { DeliveryPartner, Order, OrderStatus } from '../../../../core/models';
+import {
+  DeliveryPartner,
+  Order,
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from '../../../../core/models';
 import { ToastService } from '../../../../shared/components/toast';
 import { AdminService } from '../../../services/admin-service';
 
@@ -54,14 +60,14 @@ export class AdminOrders implements OnInit {
   statusTabs = computed(() => [
     { value: 'all', label: 'All', count: this.orders().length },
     {
-      value: 'Placed',
+      value: 'Received',
       label: 'New',
-      count: this.orders().filter((o) => o.status === 'Placed').length,
+      count: this.orders().filter((o) => o.status === 'Received').length,
     },
     {
-      value: 'Confirmed',
-      label: 'Confirmed',
-      count: this.orders().filter((o) => o.status === 'Confirmed').length,
+      value: 'Accepted',
+      label: 'Accepted',
+      count: this.orders().filter((o) => o.status === 'Accepted').length,
     },
     {
       value: 'Preparing',
@@ -86,12 +92,17 @@ export class AdminOrders implements OnInit {
         Array<{ status: OrderStatus; label: string; icon: string; color: string }>
       >
     > = {
-      Placed: [{ status: 'Confirmed', label: 'Confirm Order', icon: '✅', color: '#FF9933' }],
-      Confirmed: [{ status: 'Preparing', label: 'Start Preparing', icon: '👨‍🍳', color: '#F57F17' }],
+      Received: [{ status: 'Accepted', label: 'Accept Order', icon: '✅', color: '#FF9933' }],
+      Accepted: [{ status: 'Preparing', label: 'Start Preparing', icon: '👨‍🍳', color: '#F57F17' }],
       Preparing: [
-        { status: 'PartnerAssigned', label: 'Mark Partner Ready', icon: '🏍️', color: '#5B8DEF' },
+        {
+          status: 'AssignedToDelivery',
+          label: 'Assign to Delivery Partner',
+          icon: '🏍️',
+          color: '#5B8DEF',
+        },
       ],
-      PartnerAssigned: [
+      AssignedToDelivery: [
         { status: 'OutForDelivery', label: 'Out for Delivery', icon: '🚀', color: '#1565C0' },
       ],
       OutForDelivery: [
@@ -103,12 +114,12 @@ export class AdminOrders implements OnInit {
 
   canCancel = computed(() => {
     const s = this.manageOrder()?.status;
-    return ['Placed', 'Confirmed', 'Preparing'].includes(s ?? '');
+    return ['Received', 'Accepted', 'Preparing'].includes(s ?? '');
   });
 
   canAssignPartner = computed(() => {
     const s = this.manageOrder()?.status;
-    return ['Confirmed', 'Preparing', 'PartnerAssigned'].includes(s ?? '');
+    return ['Accepted', 'Preparing', 'AssignedToDelivery'].includes(s ?? '');
   });
 
   ngOnInit() {
@@ -118,22 +129,128 @@ export class AdminOrders implements OnInit {
     });
   }
 
+  // loadOrders() {
+  //   this.loading.set(true);
+  //   const params: any = {
+  //     page: this.page(),
+  //     pageSize: this.pageSize,
+  //     sortBy: this.sortBy(),
+  //     ...(this.statusFilter() !== 'all' && { status: this.statusFilter() }),
+  //   };
+  //   this.adminSvc.getMyOrders().subscribe({
+  //     next: (res) => {
+  //       console.log(res);
+  //       // this.orders.set(res.data);
+  //       // this.totalCount.set(res.totalCount);
+  //       // this.loading.set(false);
+  //     },
+  //     error: () => this.loading.set(false),
+  //   });
+  // }
+
   loadOrders() {
     this.loading.set(true);
-    const params: any = {
-      page: this.page(),
-      pageSize: this.pageSize,
-      sortBy: this.sortBy(),
-      ...(this.statusFilter() !== 'all' && { status: this.statusFilter() }),
-    };
-    this.adminSvc.getOrders(params).subscribe({
+
+    this.adminSvc.getMyOrders().subscribe({
       next: (res) => {
-        this.orders.set(res.data);
-        this.totalCount.set(res.totalCount);
+        const mappedOrders: Order[] = res.map((o: any) => ({
+          id: o.id.toString(),
+
+          customerId: o.customerId?.toString() ?? '',
+          customerName:
+            o.firstName && o.lastName
+              ? `${o.firstName} ${o.lastName}`
+              : `Customer #${o.customerId}`,
+
+          restaurant: {
+            id: o.restaurantId?.toString(),
+            name: o.restaurant?.name ?? `Restaurant #${o.restaurantId}`,
+            logoUrl: o.restaurant?.logoUrl ?? '',
+          },
+
+          items:
+            o.orderItems?.map((i: any) => ({
+              quantity: i.quantity,
+
+              menuItem: {
+                id: i.menuItemId?.toString(),
+                categoryId: '',
+                restaurantId: o.restaurantId?.toString(),
+                name: i.itemName,
+                price: i.unitPrice,
+                isVeg: true,
+                isAvailable: true,
+                preparationTimeMin: 0,
+              },
+            })) ?? [],
+
+          status: this.mapOrderStatus(o.status),
+
+          paymentMethod: this.mapPaymentMethod(o.paymentMethod),
+
+          paymentStatus: this.mapPaymentStatus(o.paymentStatus),
+
+          subtotal: o.subTotal,
+
+          deliveryFee: o.deliveryFee,
+
+          discount: o.discountAmount,
+
+          total: o.totalAmount,
+
+          deliveryAddress: {
+            line1: o.deliveryAddressLine1,
+            line2: o.deliveryAddressLine2,
+            city: o.deliveryCity,
+            state: o.deliveryState,
+            pincode: o.deliveryPinCode,
+          },
+
+          deliveryPartnerId: o.deliveryPartnerId?.toString(),
+
+          deliveryPartnerName: '',
+
+          otp: o.uniqueDeliveryCode,
+
+          cancelReason: o.cancellationReason,
+
+          createdAt: o.createdAt,
+
+          updatedAt: o.updatedAt,
+        }));
+
+        this.orders.set(mappedOrders);
+
+        this.totalCount.set(mappedOrders.length);
+
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+
+      error: () => {
+        this.loading.set(false);
+        this.toast.error('Failed to load orders');
+      },
     });
+  }
+
+  mapPaymentMethod(method: number): PaymentMethod {
+    const map: Record<number, PaymentMethod> = {
+      1: 'COD',
+      2: 'Online',
+    };
+
+    return map[method] ?? 'COD';
+  }
+
+  mapPaymentStatus(status: number): PaymentStatus {
+    const map: Record<number, PaymentStatus> = {
+      1: 'Pending',
+      2: 'Paid',
+      3: 'Refunded',
+      4: 'Failed',
+    };
+
+    return map[status] ?? 'Pending';
   }
 
   openManage(order: Order) {
@@ -142,43 +259,113 @@ export class AdminOrders implements OnInit {
     this.selectedPartnerId.set(order.deliveryPartnerId ?? null);
   }
 
+  mapStatusToBackend(status: OrderStatus): number {
+    const map: Record<OrderStatus, number> = {
+      Received: 1,
+      Accepted: 2,
+      Preparing: 3,
+      ReadyForPickup: 4,
+      AssignedToDelivery: 5,
+      OutForDelivery: 6,
+      Delivered: 7,
+      Cancelled: 8,
+      Failed: 9,
+    };
+
+    return map[status];
+  }
+
   updateStatus(status: OrderStatus) {
     const order = this.manageOrder();
+
     if (!order) return;
+
     this.updatingStatus.set(true);
-    this.adminSvc.updateOrderStatus({ orderId: order.id, status }).subscribe({
+
+    const payload = {
+      status: this.mapStatusToBackend(status),
+    };
+
+    this.adminSvc.updateOrderStatus(Number(order.id), this.mapStatusToBackend(status)).subscribe({
       next: (res) => {
-        this.manageOrder.set(res.data);
-        this.orders.update((list) => list.map((o) => (o.id === res.data.id ? res.data : o)));
+        console.log(res);
+
+        const updatedOrder = {
+          ...order,
+          status,
+        };
+
+        this.manageOrder.set(updatedOrder);
+
+        this.orders.update((list) => list.map((o) => (o.id === order.id ? updatedOrder : o)));
+
         this.updatingStatus.set(false);
+
         this.toast.success(`Order marked as ${this.statusLabel(status)}`);
       },
+
       error: () => {
         this.updatingStatus.set(false);
+
         this.toast.error('Status update failed');
       },
     });
   }
 
   cancelOrder() {
+    // const order = this.manageOrder();
+    // if (!order || !this.cancelReason()) return;
+    // this.updatingStatus.set(true);
+    // this.adminSvc
+    //   .updateOrderStatus({
+    //     orderId: order.id,
+    //     status: 'Cancelled',
+    //     cancelReason: this.cancelReason(),
+    //   })
+    //   .subscribe({
+    //     next: (res) => {
+    //       this.manageOrder.set(res.data);
+    //       this.orders.update((list) => list.map((o) => (o.id === res.data.id ? res.data : o)));
+    //       this.updatingStatus.set(false);
+    //       this.toast.success('Order cancelled');
+    //     },
+    //     error: () => {
+    //       this.updatingStatus.set(false);
+    //       this.toast.error('Cancellation failed');
+    //     },
+    //   });
     const order = this.manageOrder();
+
     if (!order || !this.cancelReason()) return;
+
     this.updatingStatus.set(true);
+
     this.adminSvc
-      .updateOrderStatus({
-        orderId: order.id,
-        status: 'Cancelled',
-        cancelReason: this.cancelReason(),
-      })
+      .updateOrderStatus(
+        Number(order.id),
+        this.mapStatusToBackend('Cancelled'),
+        this.cancelReason(),
+      )
       .subscribe({
         next: (res) => {
-          this.manageOrder.set(res.data);
-          this.orders.update((list) => list.map((o) => (o.id === res.data.id ? res.data : o)));
+          const updatedOrder: Order = {
+            ...order,
+            status: 'Cancelled',
+            cancelReason: this.cancelReason(),
+          };
+
+          this.manageOrder.set(updatedOrder);
+
+          this.orders.update((list) => list.map((o) => (o.id === order.id ? updatedOrder : o)));
+
           this.updatingStatus.set(false);
-          this.toast.success('Order cancelled');
+
+          this.toast.success('Order cancelled successfully');
         },
+
         error: () => {
           this.updatingStatus.set(false);
+
           this.toast.error('Cancellation failed');
         },
       });
@@ -230,30 +417,49 @@ export class AdminOrders implements OnInit {
 
   statusLabel(status: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
-      Placed: 'New Order',
-      Confirmed: 'Confirmed',
+      Received: 'New Order',
+      Accepted: 'Accepted',
       Preparing: 'Preparing',
-      PartnerAssigned: 'Partner Assigned',
+      ReadyForPickup: 'Ready for Pickup',
+      AssignedToDelivery: 'Assigned to Delivery Partner',
       OutForDelivery: 'On the Way',
       Delivered: 'Delivered',
       Cancelled: 'Cancelled',
+      Failed: 'Failed',
     };
     return m[status] ?? status;
   }
 
   statusIcon(status: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
-      Placed: '📋',
-      Confirmed: '✅',
+      Received: '📋',
+      Accepted: '✅',
       Preparing: '👨‍🍳',
-      PartnerAssigned: '🏍️',
+      ReadyForPickup: '🏪',
+      AssignedToDelivery: '🏍️',
       OutForDelivery: '🚀',
       Delivered: '🎉',
       Cancelled: '❌',
+      Failed: '⚠️',
     };
     return m[status] ?? '📋';
   }
 
+  mapOrderStatus(status: number): OrderStatus {
+    const map: Record<number, OrderStatus> = {
+      1: 'Received',
+      2: 'Accepted',
+      3: 'Preparing',
+      4: 'ReadyForPickup',
+      5: 'AssignedToDelivery',
+      6: 'OutForDelivery',
+      7: 'Delivered',
+      8: 'Cancelled',
+      9: 'Failed',
+    };
+
+    return map[status] ?? 'Received';
+  }
   getItemNames(order: Order): string {
     if (!order?.items?.length) return '';
 

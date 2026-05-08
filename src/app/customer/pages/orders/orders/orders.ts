@@ -68,37 +68,103 @@ export class Orders implements OnInit {
   totalPages = computed(() => Math.ceil(this.filtered().length / this.pageSize));
   pageRange = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
+  // ngOnInit() {
+  //   this.api.get<Order[]>('/order/my').subscribe({
+  //     next: (res) => {
+  //       console.log(res);
+  //       this.allOrders.set(res.data);
+  //       this.loading.set(false);
+  //     },
+  //     error: () => this.loading.set(false),
+  //   });
+  // }
   ngOnInit() {
-    this.api.get<Order[]>('/orders/my').subscribe({
+    this.api.get<any>('/order/my').subscribe({
       next: (res) => {
-        this.allOrders.set(res.data);
+        console.log(res);
+
+        const mappedOrders: Order[] = res.data.map((o: any) => ({
+          id: o.id.toString(),
+
+          customerId: '',
+
+          restaurant: {
+            id: '',
+            name: o.restaurantName,
+            logoUrl: '',
+          },
+
+          items:
+            o.items?.map((i: any) => ({
+              quantity: i.quantity,
+
+              menuItem: {
+                id: i.menuItemId?.toString(),
+                categoryId: '',
+                restaurantId: '',
+                name: i.itemName,
+                price: i.unitPrice,
+                isVeg: true,
+                isAvailable: true,
+                preparationTimeMin: 0,
+              },
+            })) ?? [],
+
+          status: o.status,
+          paymentMethod: o.paymentMethod,
+          paymentStatus: o.paymentStatus,
+          subtotal: o.subTotal,
+          deliveryFee: o.deliveryFee,
+          discount: o.discountAmount,
+          total: o.totalAmount,
+          deliveryAddress: {
+            line1: o.deliveryAddress,
+            city: '',
+            state: '',
+            pincode: '',
+          },
+          deliveryPartnerId: undefined,
+          deliveryPartnerName: o.deliveryPartnerName,
+          otp: o.uniqueDeliveryCode,
+          cancelReason: o.cancellationReason,
+          createdAt: o.createdAt,
+          updatedAt: o.createdAt,
+        }));
+
+        this.allOrders.set(mappedOrders);
+
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+
+      error: () => {
+        this.loading.set(false);
+      },
     });
   }
 
   isActive(status: OrderStatus) {
-    return ['Placed', 'Confirmed', 'Preparing', 'PartnerAssigned', 'OutForDelivery'].includes(
+    return ['Received', 'Accepted', 'Preparing', 'AssignedToDelivery', 'OutForDelivery'].includes(
       status,
     );
   }
 
   statusLabel(status: OrderStatus): string {
     const map: Record<OrderStatus, string> = {
-      Placed: 'Order Placed',
-      Confirmed: 'Confirmed',
+      Received: 'Order Placed',
+      Accepted: 'Confirmed',
       Preparing: 'Preparing',
-      PartnerAssigned: 'Partner Assigned',
+      ReadyForPickup: 'Ready for Pickup',
+      AssignedToDelivery: 'Partner Assigned',
       OutForDelivery: 'Out for Delivery',
       Delivered: 'Delivered',
       Cancelled: 'Cancelled',
+      Failed: 'Failed',
     };
     return map[status] ?? status;
   }
 
   statusClass(status: OrderStatus): string {
-    if (this.isActive(status) && status !== 'Placed' && status !== 'Confirmed') return 'active';
+    if (this.isActive(status) && status !== 'Received' && status !== 'Accepted') return 'active';
     return status.toLowerCase();
   }
 

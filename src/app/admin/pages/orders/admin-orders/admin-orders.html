@@ -96,13 +96,13 @@
         </thead>
         <tbody>
           @for (order of displayedOrders(); track order.id) {
-            <tr [class.row-highlight]="order.status === 'Placed'">
+            <tr [class.row-highlight]="order.status === 'Received'">
               <td class="order-id-cell">#{{ order.id.slice(-6).toUpperCase() }}</td>
               <td class="customer-cell">
                 <div class="customer-cell__avatar">
                   {{ order.customerId.slice(0, 1).toUpperCase() }}
                 </div>
-                {{ order.deliveryAddress.line1.split(',')[0] || '—' }}
+                {{ order.customerName }}
               </td>
               <td>{{ order.restaurant.name }}</td>
               <td class="items-cell">

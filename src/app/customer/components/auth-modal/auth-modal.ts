@@ -89,6 +89,9 @@ export class AuthModal {
     //     this.toast.error(err?.error?.message ?? 'Registration failed');
     //   },
     // });
+
+    debugger;
+
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;

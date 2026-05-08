@@ -135,8 +135,11 @@
         </div>
 
         <div class="form-group">
-          <label>Phone <span class="optional">(optional)</span></label>
+          <label>Phone <span class="req">*</span></label>
           <input class="input" formControlName="phone" placeholder="+91 98765 43210" />
+          @if (rf['phone'].touched && rf['phone'].invalid) {
+            <span class="error-msg">Required</span>
+          }
         </div>
 
         <p class="terms">

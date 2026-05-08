@@ -125,13 +125,27 @@ export interface Cart {
 
 // ── Order ─────────────────────────────────────────────────
 export type OrderStatus =
-  | 'Placed'
-  | 'Confirmed'
+  | 'Received'
+  | 'Accepted'
   | 'Preparing'
-  | 'PartnerAssigned'
+  | 'ReadyForPickup'
+  | 'AssignedToDelivery'
   | 'OutForDelivery'
   | 'Delivered'
-  | 'Cancelled';
+  | 'Cancelled'
+  | 'Failed';
+
+export enum BackendOrderStatus {
+  Received = 1,
+  Accepted = 2,
+  Preparing = 3,
+  ReadyForPickup = 4,
+  AssignedToDelivery = 5,
+  OutForDelivery = 6,
+  Delivered = 7,
+  Cancelled = 8,
+  Failed = 9,
+}
 
 export type PaymentMethod = 'COD' | 'Online';
 export type PaymentStatus = 'Pending' | 'Paid' | 'Refunded' | 'Failed';
@@ -139,6 +153,7 @@ export type PaymentStatus = 'Pending' | 'Paid' | 'Refunded' | 'Failed';
 export interface Order {
   id: string;
   customerId: string;
+  customerName: string;
   restaurant: Pick<Restaurant, 'id' | 'name' | 'logoUrl'>;
   items: CartItem[];
   status: OrderStatus;

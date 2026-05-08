@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Restaurant, MenuCategory, MenuItem } from '../../../core/models';
@@ -8,13 +8,37 @@ import { CartService } from '../../../core/services/cart-service';
 import { ToastService } from '../../../shared/components/toast';
 import { RestaurantService } from '../../services/restaurant-service';
 
+// ── Restaurant Menu API Response ──────────────────────────
+export interface MenuItemApiDto {
+  id: number;
+  restaurantId: number;
+  restaurantName: string;
+  categoryName: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  price: number;
+  discountedPrice?: number;
+  effectivePrice: number;
+  isAvailable: boolean;
+  isVegetarian: boolean;
+  isVegan: boolean;
+  isGlutenFree: boolean;
+  isBestseller: boolean;
+  isSpicy: boolean;
+  preparationTimeMinutes: number;
+  averageRating: number;
+  totalRatings: number;
+  caloriesKcal?: number;
+}
+
 @Component({
   selector: 'app-restaurant-detail',
   imports: [CommonModule, FormsModule, DecimalPipe],
   templateUrl: './restaurant-detail.html',
   styleUrl: './restaurant-detail.scss',
 })
-export class RestaurantDetail {
+export class RestaurantDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private svc = inject(RestaurantService);
   readonly cart = inject(CartService);
@@ -56,14 +80,58 @@ export class RestaurantDetail {
       },
       error: () => this.loading.set(false),
     });
-    this.svc.getMenu(id).subscribe({
+    this.svc.getRestaurantMenu(Number(id)).subscribe({
       next: (res) => {
-        this.menu.set(res.data);
-        if (res.data.length) this.activeCategory.set(res.data[0].id);
+        //console.log('MENU: ', res);
+        const grouped = this.groupMenuByCategory(res.data);
+        this.menu.set(grouped);
+        if (grouped.length) this.activeCategory.set(grouped[0].id);
         this.loadingMenu.set(false);
       },
       error: () => this.loadingMenu.set(false),
     });
+  }
+
+  // Groups flat API items into MenuCategory[] by categoryName
+  private groupMenuByCategory(items: MenuItemApiDto[]): MenuCategory[] {
+    const categoryMap = new Map<string, MenuCategory>();
+
+    items.forEach((item) => {
+      const catKey = item.categoryName;
+
+      if (!categoryMap.has(catKey)) {
+        // Use categoryName as synthetic id since API doesn't return categoryId
+        categoryMap.set(catKey, {
+          id: catKey,
+          name: catKey,
+          restaurantId: item.restaurantId.toString(),
+          sortOrder: 0,
+          items: [],
+        });
+      }
+
+      const tags: string[] = [];
+      if (item.isBestseller) tags.push('bestseller');
+      if (item.isSpicy) tags.push('spicy');
+      if (item.isVegan) tags.push('vegan');
+      if (item.isGlutenFree) tags.push('gluten-free');
+
+      categoryMap.get(catKey)!.items.push({
+        id: item.id.toString(),
+        categoryId: catKey,
+        restaurantId: item.restaurantId.toString(),
+        name: item.name,
+        description: item.description,
+        price: item.effectivePrice,
+        imageUrl: item.imageUrl,
+        isVeg: item.isVegetarian,
+        isAvailable: item.isAvailable,
+        preparationTimeMin: item.preparationTimeMinutes,
+        tags,
+      });
+    });
+
+    return Array.from(categoryMap.values());
   }
 
   getQty(itemId: string): number {

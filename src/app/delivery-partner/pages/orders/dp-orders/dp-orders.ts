@@ -62,31 +62,35 @@ export class DpOrders implements OnInit {
   }
 
   isActive(status: OrderStatus) {
-    return ['PartnerAssigned', 'OutForDelivery'].includes(status);
+    return ['AssignedToDelivery', 'OutForDelivery'].includes(status);
   }
 
   statusLabel(status: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
-      Placed: 'Placed',
-      Confirmed: 'Confirmed',
+      Received: 'Received',
+      Accepted: 'Accepted',
       Preparing: 'Preparing',
-      PartnerAssigned: 'Assigned to You',
+      ReadyForPickup: 'Ready for Pickup',
+      AssignedToDelivery: 'Assigned to You',
       OutForDelivery: 'Out for Delivery',
       Delivered: 'Delivered ✓',
       Cancelled: 'Cancelled',
+      Failed: 'Failed',
     };
     return m[status] ?? status;
   }
 
   statusIcon(status: OrderStatus): string {
     const m: Record<OrderStatus, string> = {
-      Placed: '📋',
-      Confirmed: '✅',
+      Received: '📋',
+      Accepted: '✅',
       Preparing: '👨‍🍳',
-      PartnerAssigned: '🏍️',
+      ReadyForPickup: '🏪',
+      AssignedToDelivery: '🏍️',
       OutForDelivery: '🚀',
       Delivered: '🎉',
       Cancelled: '❌',
+      Failed: '⚠️',
     };
     return m[status] ?? '📦';
   }

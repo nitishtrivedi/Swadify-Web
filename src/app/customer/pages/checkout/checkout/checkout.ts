@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Order } from '../../../../core/models';
+import { BackendOrderStatus, Order } from '../../../../core/models';
 import { environment } from '../../../../../environments/environment';
 import { ToastService } from '../../../../shared/components/toast';
 import { AuthService } from '../../../../core/services/auth-service';
@@ -134,18 +134,29 @@ export class Checkout {
 
   private createOrder(paymentResponse: any) {
     this.placing.set(true);
+    const addr = this.addressForm.value;
     const payload = {
-      restaurantId: this.cart.cart()?.restaurantId,
-      items: this.cart.items().map((i) => ({ menuItemId: i.menuItem.id, quantity: i.quantity })),
-      deliveryAddress: { ...this.addressForm.value, type: this.addrType() },
-      paymentMethod: this.paymentMethod(),
-      promoCode: this.state.promoCode,
-      instructions: this.state.instructions,
+      restaurantId: Number(this.cart.cart()?.restaurantId),
+      paymentMethod: this.paymentMethod() === 'COD' ? 1 : 2, // match your PaymentMethod enum
+      items: this.cart.items().map((i) => ({
+        menuItemId: Number(i.menuItem.id),
+        quantity: i.quantity,
+      })),
+      deliveryAddressLine1: addr.line1,
+      deliveryAddressLine2: addr.line2 ?? '',
+      deliveryCity: addr.city,
+      deliveryState: addr.state,
+      deliveryPinCode: addr.pincode,
+      deliveryLatitude: 0,
+      deliveryLongitude: 0,
+      specialInstructions: this.state.instructions ?? '',
+      initialStatus: BackendOrderStatus.Received,
+      promoCode: this.state.promoCode ?? '',
       razorpayPaymentId: paymentResponse?.razorpay_payment_id,
       razorpayOrderId: paymentResponse?.razorpay_order_id,
       razorpaySignature: paymentResponse?.razorpay_signature,
     };
-    this.api.post<Order>('/orders', payload).subscribe({
+    this.api.post<Order>('/order', payload).subscribe({
       next: (res) => {
         this.placedOrderId.set(res.data.id);
         this.cart.clear();

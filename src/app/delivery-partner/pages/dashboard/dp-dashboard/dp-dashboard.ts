@@ -50,7 +50,7 @@ export class DpDashboard implements OnInit, OnDestroy {
     this.dpSvc.getAssignedOrders().subscribe({
       next: (res) => {
         const active = res.data.find((o) =>
-          ['PartnerAssigned', 'OutForDelivery'].includes(o.status),
+          ['AssignedToDelivery', 'OutForDelivery'].includes(o.status),
         );
         this.activeOrder.set(active ?? null);
       },

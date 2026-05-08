@@ -168,9 +168,9 @@ export class AdminService {
   getOrder(id: string) {
     return this.api.get<Order>(`/orders/${id}`);
   }
-  updateOrderStatus(req: UpdateOrderStatusRequest) {
-    return this.api.patch<Order>(`/orders/${req.orderId}/status`, req);
-  }
+  // updateOrderStatus(req: UpdateOrderStatusRequest) {
+  //   return this.api.patch<Order>(`/orders/${req.orderId}/status`, req);
+  // }
   assignPartner(req: AssignPartnerRequest) {
     return this.api.post<Order>(`/orders/${req.orderId}/assign-delivery`, req);
   }
@@ -321,5 +321,17 @@ export class AdminService {
     const fd = new FormData();
     fd.append('image', file);
     return this.http.post<{ url: string }>(`${this.api['base']}/admin/menuItems/${id}/image`, fd);
+  }
+
+  //Orders
+  getMyOrders() {
+    return this.http.get<any>(`${this.api['base']}/admin/orders/get-my-orders`);
+  }
+
+  updateOrderStatus(orderId: number, status: number, cancellationReason?: string) {
+    return this.http.patch<any>(`${this.api['base']}/admin/orders/update-order-status/${orderId}`, {
+      status,
+      cancellationReason,
+    });
   }
 }

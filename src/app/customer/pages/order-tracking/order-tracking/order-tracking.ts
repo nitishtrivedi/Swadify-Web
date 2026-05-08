@@ -28,14 +28,14 @@ export class OrderTracking implements OnInit, OnDestroy {
 
   readonly trackingSteps: TrackingStep[] = [
     {
-      status: 'Placed',
-      label: 'Order Placed',
+      status: 'Received',
+      label: 'Order Received',
       subLabel: 'We have received your order',
       icon: '📋',
     },
     {
-      status: 'Confirmed',
-      label: 'Order Confirmed',
+      status: 'Accepted',
+      label: 'Order Accepted',
       subLabel: 'Restaurant has accepted your order',
       icon: '✅',
     },
@@ -46,7 +46,7 @@ export class OrderTracking implements OnInit, OnDestroy {
       icon: '👨‍🍳',
     },
     {
-      status: 'PartnerAssigned',
+      status: 'AssignedToDelivery',
       label: 'Partner Assigned',
       subLabel: 'A delivery partner is heading to pick up',
       icon: '🏍️',
@@ -61,10 +61,10 @@ export class OrderTracking implements OnInit, OnDestroy {
   ];
 
   private readonly statusOrder: OrderStatus[] = [
-    'Placed',
-    'Confirmed',
+    'Received',
+    'Accepted',
     'Preparing',
-    'PartnerAssigned',
+    'AssignedToDelivery',
     'OutForDelivery',
     'Delivered',
   ];
@@ -91,7 +91,7 @@ export class OrderTracking implements OnInit, OnDestroy {
 
   isStepDone(status: OrderStatus): boolean {
     const o = this.order();
-    if (!o || o.status === 'Cancelled') return status === 'Placed';
+    if (!o || o.status === 'Cancelled') return status === 'Received';
     const ci = this.statusOrder.indexOf(o.status);
     const si = this.statusOrder.indexOf(status);
     return si <= ci;

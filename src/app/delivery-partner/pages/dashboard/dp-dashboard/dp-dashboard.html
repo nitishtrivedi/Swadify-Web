@@ -76,7 +76,7 @@
 
       <!-- Status actions -->
       <div class="active-order-card__actions">
-        @if (activeOrder()!.status === 'PartnerAssigned') {
+        @if (activeOrder()!.status === 'AssignedToDelivery') {
           <button
             class="dp-action-btn dp-action-btn--primary"
             (click)="markPickedUp()"
