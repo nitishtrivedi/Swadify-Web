@@ -57,10 +57,10 @@
         </a>
 
         <!-- Profile dropdown -->
-        <div class="navbar__profile" (click)="toggleDropdown()">
+        <div class="navbar__profile" (click)="toggleDropdown($event)">
           <div class="avatar">{{ userInitial() }}</div>
           @if (dropdownOpen()) {
-            <div class="dropdown" (click)="$event.stopPropagation()">
+            <div class="dropdown">
               <p class="dropdown__name">{{ userName() }}</p>
               <hr />
               <a routerLink="/profile" (click)="dropdownOpen.set(false)">My Profile</a>

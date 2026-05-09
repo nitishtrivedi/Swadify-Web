@@ -33,7 +33,8 @@ export class NavbarComponent {
     }
   }
 
-  toggleDropdown() {
+  toggleDropdown(event: MouseEvent) {
+    event.stopPropagation();
     this.dropdownOpen.update((v) => !v);
   }
   openLogin() {

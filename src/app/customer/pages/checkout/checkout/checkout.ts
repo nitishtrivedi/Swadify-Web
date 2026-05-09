@@ -93,79 +93,225 @@ export class Checkout {
     }
   }
 
+  // private initiateRazorpay() {
+  //   this.placing.set(true);
+  //   // Create Razorpay order via API
+  //   this.api
+  //     .post<{
+  //       razorpayOrderId: string;
+  //       amount: number;
+  //       currency: string;
+  //     }>('/payment/initiate', { amount: this.state.grandTotal, currency: 'INR' })
+  //     .subscribe({
+  //       next: (res) => {
+  //         const opts = {
+  //           key: environment.razorpayKey,
+  //           amount: res.data.amount * 100,
+  //           currency: res.data.currency,
+  //           name: 'Swadify',
+  //           description: 'Food Order Payment',
+  //           order_id: res.data.razorpayOrderId,
+  //           image: '/assets/logo.svg',
+  //           prefill: {
+  //             name: this.addressForm.value.name,
+  //             contact: this.addressForm.value.phone,
+  //             email: this.auth.user()?.email,
+  //           },
+  //           theme: { color: '#D94F3D' },
+  //           handler: (response: any) => this.createOrder(response),
+  //           modal: { ondismiss: () => this.placing.set(false) },
+  //         };
+  //         const rzp = new Razorpay(opts);
+  //         rzp.open();
+  //         this.placing.set(false);
+  //       },
+  //       error: () => {
+  //         this.placing.set(false);
+  //         this.toast.error('Payment initiation failed. Please try again.');
+  //       },
+  //     });
+  // }
+
   private initiateRazorpay() {
     this.placing.set(true);
-    // Create Razorpay order via API
+
     this.api
       .post<{
         razorpayOrderId: string;
         amount: number;
         currency: string;
-      }>('/payments/create-order', { amount: this.state.grandTotal, currency: 'INR' })
+      }>('/payment/initiate', {
+        amount: this.state.grandTotal,
+        currency: 'INR',
+      })
       .subscribe({
         next: (res) => {
           const opts = {
             key: environment.razorpayKey,
+
             amount: res.data.amount * 100,
+
             currency: res.data.currency,
+
             name: 'Swadify',
+
             description: 'Food Order Payment',
+
             order_id: res.data.razorpayOrderId,
+
             image: '/assets/logo.svg',
+
             prefill: {
               name: this.addressForm.value.name,
               contact: this.addressForm.value.phone,
               email: this.auth.user()?.email,
             },
-            theme: { color: '#D94F3D' },
-            handler: (response: any) => this.createOrder(response),
-            modal: { ondismiss: () => this.placing.set(false) },
+
+            theme: {
+              color: '#D94F3D',
+            },
+
+            handler: (response: any) => {
+              this.verifyPaymentAndCreateOrder(response);
+            },
+
+            modal: {
+              ondismiss: () => {
+                this.placing.set(false);
+              },
+            },
           };
+
           const rzp = new Razorpay(opts);
+
           rzp.open();
+
           this.placing.set(false);
         },
+
         error: () => {
           this.placing.set(false);
+
           this.toast.error('Payment initiation failed. Please try again.');
         },
       });
   }
 
+  private verifyPaymentAndCreateOrder(paymentResponse: any) {
+    this.api
+      .post('/payment/verify', {
+        razorpayOrderId: paymentResponse.razorpay_order_id,
+        razorpayPaymentId: paymentResponse.razorpay_payment_id,
+        razorpaySignature: paymentResponse.razorpay_signature,
+      })
+      .subscribe({
+        next: () => {
+          this.createOrder(paymentResponse);
+        },
+
+        error: () => {
+          this.placing.set(false);
+
+          this.toast.error('Payment verification failed');
+        },
+      });
+  }
+
+  // private createOrder(paymentResponse: any) {
+  //   this.placing.set(true);
+  //   const addr = this.addressForm.value;
+  //   const payload = {
+  //     restaurantId: Number(this.cart.cart()?.restaurantId),
+  //     paymentMethod: this.paymentMethod() === 'COD' ? 1 : 2, // match your PaymentMethod enum
+  //     items: this.cart.items().map((i) => ({
+  //       menuItemId: Number(i.menuItem.id),
+  //       quantity: i.quantity,
+  //     })),
+  //     deliveryAddressLine1: addr.line1,
+  //     deliveryAddressLine2: addr.line2 ?? '',
+  //     deliveryCity: addr.city,
+  //     deliveryState: addr.state,
+  //     deliveryPinCode: addr.pincode,
+  //     deliveryLatitude: 0,
+  //     deliveryLongitude: 0,
+  //     specialInstructions: this.state.instructions ?? '',
+  //     initialStatus: BackendOrderStatus.Received,
+  //     promoCode: this.state.promoCode ?? '',
+  //     razorpayPaymentId: paymentResponse?.razorpay_payment_id,
+  //     razorpayOrderId: paymentResponse?.razorpay_order_id,
+  //     razorpaySignature: paymentResponse?.razorpay_signature,
+  //   };
+  //   this.api.post<Order>('/order', payload).subscribe({
+  //     next: (res) => {
+  //       this.placedOrderId.set(res.data.id);
+  //       this.cart.clear();
+  //       this.currentStep.set(3);
+  //       this.placing.set(false);
+  //       window.scrollTo({ top: 0, behavior: 'smooth' });
+  //     },
+  //     error: () => {
+  //       this.placing.set(false);
+  //       this.toast.error('Order placement failed. Please try again.');
+  //     },
+  //   });
+  // }
   private createOrder(paymentResponse: any) {
     this.placing.set(true);
+
     const addr = this.addressForm.value;
+
     const payload = {
       restaurantId: Number(this.cart.cart()?.restaurantId),
-      paymentMethod: this.paymentMethod() === 'COD' ? 1 : 2, // match your PaymentMethod enum
+
+      paymentMethod: this.paymentMethod() === 'COD' ? 1 : 2,
+
       items: this.cart.items().map((i) => ({
         menuItemId: Number(i.menuItem.id),
         quantity: i.quantity,
       })),
+
       deliveryAddressLine1: addr.line1,
+
       deliveryAddressLine2: addr.line2 ?? '',
+
       deliveryCity: addr.city,
+
       deliveryState: addr.state,
+
       deliveryPinCode: addr.pincode,
+
       deliveryLatitude: 0,
+
       deliveryLongitude: 0,
+
       specialInstructions: this.state.instructions ?? '',
-      initialStatus: BackendOrderStatus.Received,
-      promoCode: this.state.promoCode ?? '',
+
       razorpayPaymentId: paymentResponse?.razorpay_payment_id,
+
       razorpayOrderId: paymentResponse?.razorpay_order_id,
+
       razorpaySignature: paymentResponse?.razorpay_signature,
     };
+
     this.api.post<Order>('/order', payload).subscribe({
       next: (res) => {
         this.placedOrderId.set(res.data.id);
+
         this.cart.clear();
+
         this.currentStep.set(3);
+
         this.placing.set(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
       },
+
       error: () => {
         this.placing.set(false);
+
         this.toast.error('Order placement failed. Please try again.');
       },
     });

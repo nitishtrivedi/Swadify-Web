@@ -58,7 +58,8 @@ export class Restaurants {
     };
     this.restaurantSvc.getAll(params).subscribe({
       next: (res) => {
-        this.restaurants.set(res.data);
+        console.log(res.data);
+        this.restaurants.set(res.data.filter((r: Restaurant) => r.isActive === true));
         this.totalCount.set(res.totalCount);
         this.loading.set(false);
       },

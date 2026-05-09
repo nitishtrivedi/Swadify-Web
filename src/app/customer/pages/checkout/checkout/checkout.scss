@@ -395,9 +395,13 @@
 
 /* ── Success state ─────────────────────────── */
 .order-success {
+  grid-column: 1 / -1; // add this
   @include m.flex(column, center, center, v.$space-xl);
   padding: v.$space-3xl v.$space-lg;
   text-align: center;
+  background: v.$white;
+  border-radius: v.$radius-xl;
+  border: 1px solid v.$border;
 }
 
 .success-graphic svg {
