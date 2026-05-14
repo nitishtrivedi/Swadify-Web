@@ -113,4 +113,34 @@ export class SuperAdminService {
       { isActive },
     );
   }
+
+  // ──────── USER MANAGEMENT (All Users) ────────────────────
+  getAllUsers() {
+    // return this.api.getPaged<User>('/super-admins/user-management/get-all-users', params);
+    return this.http.get<any>(`${this.api['base']}/super-admins/user-management/get-all`);
+  }
+
+  createUser(req: any) {
+    return this.http.post<any>(`${this.api['base']}/super-admins/user-management/create-user`, req);
+  }
+
+  updateUser(id: number, payload: any) {
+    return this.http.patch<any>(
+      `${this.api['base']}/super-admins/user-management/edit-user/${id}`,
+      payload,
+    );
+  }
+
+  deleteUser(id: number) {
+    return this.http.delete<void>(
+      `${this.api['base']}/super-admins/user-management/delete-user/${id}`,
+    );
+  }
+
+  toggleUserStatus(id: string) {
+    return this.http.patch<any>(
+      `${this.api['base']}/super-admins/user-management/toggle-status/${id}`,
+      {},
+    );
+  }
 }

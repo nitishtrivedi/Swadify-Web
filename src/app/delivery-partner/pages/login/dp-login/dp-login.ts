@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth-service';
+import { LoginRequest } from '../../../../core/models';
 
 @Component({
   selector: 'app-dp-login',
@@ -20,7 +21,7 @@ export class DpLogin {
   error = signal('');
 
   form = this.fb.group({
-    usernameOrEmail: ['', Validators.required],
+    identifier: ['', Validators.required],
     password: ['', Validators.required],
   });
 
@@ -35,7 +36,11 @@ export class DpLogin {
     }
     this.loading.set(true);
     this.error.set('');
-    this.auth.dpLogin(this.form.value as any).subscribe({
+    const request: LoginRequest = {
+      identifier: this.f['identifier'].value!,
+      password: this.f['password'].value!,
+    };
+    this.auth.adminLogin(request).subscribe({
       next: () => {
         this.loading.set(false);
         this.router.navigate(['/delivery']);

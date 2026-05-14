@@ -147,6 +147,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'users',
+            loadComponent: () =>
+              import('./super-admin/pages/users/super-admin-users/super-admin-users').then(
+                (m) => m.SuperAdminUsers,
+              ),
+          },
+          {
             path: 'admins',
             loadComponent: () =>
               import('./super-admin/pages/admins/super-admin-admins/super-admin-admins').then(

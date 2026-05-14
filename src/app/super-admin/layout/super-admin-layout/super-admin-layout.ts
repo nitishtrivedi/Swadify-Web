@@ -18,6 +18,7 @@ export class SuperAdminLayout {
 
   navItems = [
     { icon: '📊', label: 'Dashboard', route: '/super-admin/dashboard' },
+    { icon: '👥', label: 'Users', route: '/super-admin/users' },
     { icon: '👔', label: 'Admins', route: '/super-admin/admins' },
     { icon: '👥', label: 'Customers', route: '/super-admin/customers' },
     { icon: '📈', label: 'Analytics', route: '/super-admin/analytics' },

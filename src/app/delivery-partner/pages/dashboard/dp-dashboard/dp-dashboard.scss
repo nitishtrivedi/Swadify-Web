@@ -440,3 +440,13 @@
   animation: spin 0.7s linear infinite;
   display: inline-block;
 }
+.avail-order-customer {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: #666;
+  font-weight: 500;
+}
+.avail-order-card__restaurant-content {
+  display: flex;
+  flex-direction: column;
+}

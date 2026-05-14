@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Order } from '../../core/models';
 import { ApiService } from '../../core/services/api-service';
+import { HttpClient } from '@angular/common/http';
 
 export interface DpEarnings {
   today: number;
@@ -37,6 +38,7 @@ export interface DpProfile {
 })
 export class DpService {
   private api = inject(ApiService);
+  private http = inject(HttpClient);
 
   getAvailableOrders() {
     return this.api.get<Order[]>('/delivery/orders/available');
@@ -57,9 +59,22 @@ export class DpService {
     return this.api.get<DpEarnings>('/delivery/earnings', { period });
   }
   getProfile() {
-    return this.api.get<DpProfile>('/delivery/profile');
+    return this.api.get<any>('/delivery-partner/profile/');
   }
   updateProfile(req: Partial<DpProfile>) {
     return this.api.put<DpProfile>('/delivery/profile', req);
+  }
+  updateOnlineStatus(id: number) {
+    return this.api.patch<any>(`/delivery-partner/toggle/${id}`, {});
+  }
+
+  getMyProfile(id: number) {
+    return this.http.get<any>(`${this.api['base']}/delivery-partner/profile/${id}`);
+  }
+
+  getActiveDeliveries() {
+    return this.http.get<Order[]>(
+      `${this.api['base']}/delivery-partner/dashboard/active-deliveries`,
+    );
   }
 }

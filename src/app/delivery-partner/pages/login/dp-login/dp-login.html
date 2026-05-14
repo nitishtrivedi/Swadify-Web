@@ -92,11 +92,11 @@
         <label>Phone or Username</label>
         <input
           class="input"
-          formControlName="usernameOrEmail"
+          formControlName="identifier"
           placeholder="Your registered phone/username"
           autocomplete="username"
         />
-        @if (f['usernameOrEmail'].touched && f['usernameOrEmail'].invalid) {
+        @if (f['identifier'].touched && f['identifier'].invalid) {
           <span class="error-msg">This field is required</span>
         }
       </div>

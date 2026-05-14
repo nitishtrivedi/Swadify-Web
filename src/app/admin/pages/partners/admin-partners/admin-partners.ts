@@ -96,6 +96,7 @@ export class AdminPartners implements OnInit {
     this.loading.set(true);
     this.adminSvc.getPartners().subscribe({
       next: (res) => {
+        console.log('Partners loaded:', res.data);
         this.partners.set(res.data);
         this.loading.set(false);
       },

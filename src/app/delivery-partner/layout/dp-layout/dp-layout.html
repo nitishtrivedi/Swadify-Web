@@ -18,7 +18,7 @@
 
     <!-- Online toggle -->
     <label class="online-toggle">
-      <input type="checkbox" [(ngModel)]="isOnline" />
+      <input type="checkbox" [(ngModel)]="isOnline" (change)="updateOnlineStatus()" />
       <span class="online-toggle__track">
         <span class="online-toggle__thumb"></span>
       </span>

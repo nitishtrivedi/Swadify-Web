@@ -1,0 +1,370 @@
+<div class="page-wrap">
+  <div class="page-top">
+    <div>
+      <h1 class="page-title">Users</h1>
+      <p class="page-sub">
+        <span class="pill">{{ users().length }} total</span>
+        <span class="pill pill--blue">{{ userCounts().customers }} customers</span>
+        <span class="pill pill--orange">{{ userCounts().admins }} admins</span>
+      </p>
+    </div>
+    <button class="add-user-btn" (click)="openAddUserModal()">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Add User
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-inline">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <input
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event); onSearch()"
+        placeholder="Search by name, email or username…"
+      />
+      @if (search()) {
+        <button class="clear-btn" (click)="search.set(''); onSearch()">✕</button>
+      }
+    </div>
+
+    <div class="filter-chips">
+      @for (f of filterOptions; track f.value) {
+        <button
+          class="fchip"
+          [class.active]="roleFilter() === f.value"
+          (click)="roleFilter.set(f.value); page.set(1); loadUsers()"
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="loadUsers()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+
+  <!-- Summary row -->
+  <div class="summary-row">
+    @for (s of summaryStats(); track s.label) {
+      <div class="summary-tile" [style.--col]="s.color">
+        <p class="summary-tile__value">{{ s.value }}</p>
+        <p class="summary-tile__label">{{ s.label }}</p>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="users-skeleton">
+      @for (n of [1, 2, 3, 4, 5]; track n) {
+        <div class="skeleton" style="height: 64px; border-radius: 12px"></div>
+      }
+    </div>
+  } @else if (users().length === 0) {
+    <app-empty-state icon="👤" title="No users found" message="Users will appear here." />
+  } @else {
+    <!-- Table -->
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Verified</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of users(); track u.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-cell__avatar" [style.background]="avatarColor(u.firstName)">
+                    {{ u.firstName[0].toUpperCase() }}
+                  </div>
+                  <div>
+                    <p class="user-cell__name">{{ u.firstName }} {{ u.lastName }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="mono-cell">@{{ u.username }}</td>
+              <td class="email-cell">{{ u.email }}</td>
+              <td>
+                <span class="role-badge" [ngClass]="getRoleClass(u.role)">
+                  {{ getRoleLabel(u.role) }}
+                </span>
+              </td>
+              <td>
+                <span class="status-chip" [class.active]="u.isActive">
+                  @if (u.isActive) {
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      stroke="none"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                    Active
+                  } @else {
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      stroke="none"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                    Inactive
+                  }
+                </span>
+              </td>
+              <td>
+                <span class="verify-chip" [class.verified]="u.isEmailVerified">
+                  @if (u.isEmailVerified) {
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    >
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    Yes
+                  } @else {
+                    No
+                  }
+                </span>
+              </td>
+              <td class="light-cell">{{ u.createdAt | date: 'd MMM y' }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="view-btn" (click)="openDetail(u)" title="View details">👁️</button>
+                  <button class="edit-btn" (click)="openEditUserModal(u)" title="Edit">✏️</button>
+                  <button class="delete-btn" (click)="deleteUser(u)" title="Delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button [disabled]="page() === 1" (click)="setPage(page() - 1)">‹</button>
+        @for (p of pageRange(); track p) {
+          <button [class.active]="p === page()" (click)="setPage(p)">{{ p }}</button>
+        }
+        <button [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">›</button>
+      </div>
+    }
+  }
+</div>
+
+<!-- Detail panel -->
+@if (selectedUser() && !showModal()) {
+  <div class="drawer-backdrop" (click)="selectedUser.set(null)">
+    <div class="user-drawer" (click)="$event.stopPropagation()">
+      <div class="user-drawer__header">
+        <h3>User Profile</h3>
+        <button class="modal-close" (click)="selectedUser.set(null)">✕</button>
+      </div>
+
+      <div class="user-drawer__body">
+        <!-- Avatar + name -->
+        <div class="user-profile-hero">
+          <div
+            class="user-profile-hero__avatar"
+            [style.background]="avatarColor(selectedUser()!.firstName)"
+          >
+            {{ selectedUser()!.firstName[0].toUpperCase() }}
+          </div>
+          <div>
+            <h2>{{ selectedUser()!.firstName }} {{ selectedUser()!.lastName }}</h2>
+            <p class="user-profile-hero__username">@{{ selectedUser()!.username }}</p>
+          </div>
+        </div>
+
+        <!-- Info rows -->
+        <div class="detail-rows">
+          @for (row of detailRows(); track row.label) {
+            <div class="detail-row">
+              <span class="detail-row__label">{{ row.label }}</span>
+              <span class="detail-row__value">{{ row.value }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="drawer-actions">
+          <button class="btn-secondary" (click)="openEditUserModal(selectedUser()!)">
+            Edit User
+          </button>
+          <button
+            class="btn-secondary"
+            [class.btn-secondary--danger]="selectedUser()!.isActive"
+            (click)="toggleUserStatus(selectedUser()!)"
+          >
+            {{ selectedUser()!.isActive ? 'Deactivate' : 'Activate' }}
+          </button>
+          <button class="btn-danger" (click)="deleteUser(selectedUser()!)">Delete User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Add/Edit User Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="user-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditMode() ? 'Edit User' : 'Add New User' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="user-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input
+              type="text"
+              formControlName="firstName"
+              placeholder="Enter first name"
+              class="form-control"
+            />
+            @if (
+              userForm.get('firstName')?.hasError('required') && userForm.get('firstName')?.touched
+            ) {
+              <span class="error-text">First name is required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Last Name</label>
+            <input
+              type="text"
+              formControlName="lastName"
+              placeholder="Enter last name"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Username *</label>
+            <input
+              type="text"
+              formControlName="username"
+              placeholder="Enter username"
+              class="form-control"
+            />
+            @if (
+              userForm.get('username')?.hasError('required') && userForm.get('username')?.touched
+            ) {
+              <span class="error-text">Username is required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Email *</label>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Enter email"
+              class="form-control"
+            />
+            @if (userForm.get('email')?.hasError('required') && userForm.get('email')?.touched) {
+              <span class="error-text">Email is required</span>
+            }
+            @if (userForm.get('email')?.hasError('email') && userForm.get('email')?.touched) {
+              <span class="error-text">Please enter a valid email</span>
+            }
+          </div>
+
+          @if (!isEditMode()) {
+            <div class="form-group">
+              <label>Password *</label>
+              <input
+                type="password"
+                formControlName="password"
+                placeholder="Enter password"
+                class="form-control"
+              />
+              @if (
+                userForm.get('password')?.hasError('required') && userForm.get('password')?.touched
+              ) {
+                <span class="error-text">Password is required</span>
+              }
+              @if (
+                userForm.get('password')?.hasError('minlength') && userForm.get('password')?.touched
+              ) {
+                <span class="error-text">Password must be at least 6 characters</span>
+              }
+            </div>
+          }
+
+          <div class="form-group">
+            <label>Phone</label>
+            <input
+              type="tel"
+              formControlName="phone"
+              placeholder="Enter phone number"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Role *</label>
+            <select formControlName="role" class="form-control">
+              @for (role of availableRoles; track role.value) {
+                <option [value]="role.value.toString()">{{ role.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="userForm.invalid || submitting()">
+            {{ submitting() ? 'Saving...' : isEditMode() ? 'Update User' : 'Create User' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

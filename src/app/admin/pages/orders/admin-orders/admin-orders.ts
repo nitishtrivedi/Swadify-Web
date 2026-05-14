@@ -77,6 +77,11 @@ export class AdminOrders implements OnInit {
       count: this.orders().filter((o) => o.status === 'Preparing').length,
     },
     {
+      value: 'ReadyForPickup',
+      label: 'Ready for Pickup',
+      count: this.orders().filter((o) => o.status === 'ReadyForPickup').length,
+    },
+    {
       value: 'OutForDelivery',
       label: 'On the Way',
       count: this.orders().filter((o) => o.status === 'OutForDelivery').length,
@@ -97,6 +102,14 @@ export class AdminOrders implements OnInit {
       Received: [{ status: 'Accepted', label: 'Accept Order', icon: '✅', color: '#FF9933' }],
       Accepted: [{ status: 'Preparing', label: 'Start Preparing', icon: '👨‍🍳', color: '#F57F17' }],
       Preparing: [
+        {
+          status: 'ReadyForPickup',
+          label: 'Ready For Pickup',
+          icon: '🏍️',
+          color: '#5B8DEF',
+        },
+      ],
+      ReadyForPickup: [
         {
           status: 'AssignedToDelivery',
           label: 'Assign to Delivery Partner',
@@ -121,7 +134,7 @@ export class AdminOrders implements OnInit {
 
   canAssignPartner = computed(() => {
     const s = this.manageOrder()?.status;
-    return ['Accepted', 'Preparing', 'AssignedToDelivery'].includes(s ?? '');
+    return ['Accepted', 'Preparing', 'ReadyForPickup', 'AssignedToDelivery'].includes(s ?? '');
   });
 
   newOrderAlert = signal<{ orderId: string; amount: string } | null>(null);

@@ -34,7 +34,6 @@ export class SuperAdminDashboard implements OnInit {
   ngOnInit() {
     this.svc.getStats().subscribe({
       next: (res) => {
-        console.log(res);
         this.stats.set(res);
         this.buildCards(res);
         this.loading.set(false);

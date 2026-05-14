@@ -160,13 +160,29 @@
       @for (order of availableOrders(); track order.id) {
         <div class="avail-order-card">
           <div class="avail-order-card__header">
-            <div class="avail-order-card__restaurant">
+            <!-- <div class="avail-order-card__restaurant">
               <span class="rest-icon">🏪</span>
               <div>
                 <p class="avail-order-restaurant">{{ order.restaurant.name }}</p>
+
                 <p class="avail-order-meta">{{ order.items.length }} items · ₹{{ order.total }}</p>
               </div>
             </div>
+            <div class="avail-order-card__customer">
+              <p class="avail-order-customer">👤 {{ order.customerName }}</p>
+            </div> -->
+            <div class="avail-order-card__restaurant">
+              <span class="rest-icon">🏪</span>
+
+              <div class="avail-order-card__restaurant-content">
+                <p class="avail-order-restaurant">
+                  {{ order.restaurant.name }}
+                </p>
+
+                <p class="avail-order-meta">{{ order.items.length }} items · ₹{{ order.total }}</p>
+              </div>
+            </div>
+
             <div class="avail-order-card__distance">
               <p class="distance-val">~2.4 km</p>
               <p class="distance-label">away</p>
@@ -186,10 +202,12 @@
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
+
             {{ order.deliveryAddress.line1 }}, {{ order.deliveryAddress.city }}
           </div>
 
           <div class="avail-order-card__footer">
+            <p class="avail-order-customer">👤 {{ order.customerName }}</p>
             <span class="pay-tag" [class.cod]="order.paymentMethod === 'COD'">
               {{ order.paymentMethod === 'COD' ? '💵 COD' : '✅ Paid' }}
             </span>

@@ -59,9 +59,10 @@ export class DpDashboard implements OnInit, OnDestroy {
 
   loadAvailableOrders() {
     this.loadingOrders.set(true);
-    this.dpSvc.getAvailableOrders().subscribe({
+    this.dpSvc.getActiveDeliveries().subscribe({
       next: (res) => {
-        this.availableOrders.set(res.data);
+        console.log('Available orders:', res);
+        this.availableOrders.set(res);
         this.loadingOrders.set(false);
       },
       error: () => this.loadingOrders.set(false),
