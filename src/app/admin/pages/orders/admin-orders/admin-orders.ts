@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state/empty-state';
 import {
@@ -11,6 +11,8 @@ import {
 } from '../../../../core/models';
 import { ToastService } from '../../../../shared/components/toast';
 import { AdminService } from '../../../services/admin-service';
+import { SignalrService } from '../../../../core/services/signalr-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-admin-orders',
@@ -122,37 +124,51 @@ export class AdminOrders implements OnInit {
     return ['Accepted', 'Preparing', 'AssignedToDelivery'].includes(s ?? '');
   });
 
+  newOrderAlert = signal<{ orderId: string; amount: string } | null>(null);
+  private destroyRef = inject(DestroyRef);
+  private signalR = inject(SignalrService);
+
   ngOnInit() {
     this.loadOrders();
     this.adminSvc.getPartners().subscribe({
       next: (res) => this.partners.set(res.data),
     });
+
+    this.signalR.notification$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((notification) => {
+        if (notification.type === 'NewOrderAlert') {
+          // Show popup and reload orders
+          this.newOrderAlert.set({
+            orderId: notification.referenceId?.toString() ?? '',
+            amount: notification.message,
+          });
+          this.loadOrders();
+
+          // Auto dismiss after 8 seconds
+          setTimeout(() => this.newOrderAlert.set(null), 8000);
+        }
+      });
   }
 
-  // loadOrders() {
-  //   this.loading.set(true);
-  //   const params: any = {
-  //     page: this.page(),
-  //     pageSize: this.pageSize,
-  //     sortBy: this.sortBy(),
-  //     ...(this.statusFilter() !== 'all' && { status: this.statusFilter() }),
-  //   };
-  //   this.adminSvc.getMyOrders().subscribe({
-  //     next: (res) => {
-  //       console.log(res);
-  //       // this.orders.set(res.data);
-  //       // this.totalCount.set(res.totalCount);
-  //       // this.loading.set(false);
-  //     },
-  //     error: () => this.loading.set(false),
-  //   });
-  // }
+  dismissAlert() {
+    this.newOrderAlert.set(null);
+  }
+
+  viewNewOrder() {
+    const alert = this.newOrderAlert();
+    if (!alert) return;
+    const order = this.orders().find((o) => o.id === alert.orderId);
+    if (order) this.openManage(order);
+    this.newOrderAlert.set(null);
+  }
 
   loadOrders() {
     this.loading.set(true);
 
     this.adminSvc.getMyOrders().subscribe({
       next: (res) => {
+        console.log('Raw order sample:', res[0]);
         const mappedOrders: Order[] = res.map((o: any) => ({
           id: o.id.toString(),
 
@@ -299,6 +315,9 @@ export class AdminOrders implements OnInit {
 
         this.orders.update((list) => list.map((o) => (o.id === order.id ? updatedOrder : o)));
 
+        // Notify sidebar of status change for real-time updates
+        this.adminSvc.notifyOrderStatusChange(updatedOrder);
+
         this.updatingStatus.set(false);
 
         this.toast.success(`Order marked as ${this.statusLabel(status)}`);
@@ -358,6 +377,9 @@ export class AdminOrders implements OnInit {
 
           this.orders.update((list) => list.map((o) => (o.id === order.id ? updatedOrder : o)));
 
+          // Notify sidebar of status change for real-time updates
+          this.adminSvc.notifyOrderStatusChange(updatedOrder);
+
           this.updatingStatus.set(false);
 
           this.toast.success('Order cancelled successfully');
@@ -380,6 +402,10 @@ export class AdminOrders implements OnInit {
       next: (res) => {
         this.manageOrder.set(res.data);
         this.orders.update((list) => list.map((o) => (o.id === res.data.id ? res.data : o)));
+
+        // Notify sidebar of status change for real-time updates
+        this.adminSvc.notifyOrderStatusChange(res.data);
+
         this.updatingStatus.set(false);
         this.toast.success('Delivery partner assigned!');
       },

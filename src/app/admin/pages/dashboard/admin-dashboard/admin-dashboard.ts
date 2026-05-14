@@ -133,7 +133,6 @@ export class AdminDashboard implements OnInit {
 
     this.svc.getRecentOrders().subscribe({
       next: (res) => {
-        console.log(res);
         this.recentOrders.set(res);
         this.loadingOrders.set(false);
       },
@@ -168,6 +167,33 @@ export class AdminDashboard implements OnInit {
       .subscribe((data) => this.updateChart(data));
   }
 
+  // private updateChart(data: { date: string; revenue: number; orders: number }[]) {
+  //   if (!data.length) {
+  //     this.chartPoints.set('0,160 600,160');
+  //     this.chartPoints2.set('0,160 600,160');
+  //     this.areaPath.set('M0,160 L600,160 L600,200 L0,200 Z');
+  //     this.chartDots.set([]);
+  //     return;
+  //   }
+  //   const W = 600,
+  //     H = 200,
+  //     PAD = 20;
+  //   const maxRev = Math.max(...data.map((d) => d.revenue));
+  //   const maxOrd = Math.max(...data.map((d) => d.orders));
+
+  //   const toX = (i: number) => (i / (data.length - 1)) * W;
+  //   const toY = (v: number, max: number) => PAD + (1 - v / max) * (H - PAD * 2);
+
+  //   const pts = data.map((d, i) => `${toX(i)},${toY(d.revenue, maxRev)}`).join(' ');
+  //   const pts2 = data.map((d, i) => `${toX(i)},${toY(d.orders, maxOrd)}`).join(' ');
+  //   const lx = toX(data.length - 1);
+
+  //   this.chartPoints.set(pts);
+  //   this.chartPoints2.set(pts2);
+  //   this.areaPath.set(`M${pts.replace(/ /g, ' L')} L${lx},${H} L0,${H} Z`);
+  //   this.chartDots.set(data.map((d, i) => ({ x: toX(i), y: toY(d.revenue, maxRev) })));
+  // }
+
   private updateChart(data: { date: string; revenue: number; orders: number }[]) {
     if (!data.length) {
       this.chartPoints.set('0,160 600,160');
@@ -176,23 +202,52 @@ export class AdminDashboard implements OnInit {
       this.chartDots.set([]);
       return;
     }
-    const W = 600,
-      H = 200,
-      PAD = 20;
-    const maxRev = Math.max(...data.map((d) => d.revenue));
-    const maxOrd = Math.max(...data.map((d) => d.orders));
+
+    // ✅ Handle single point safely
+    if (data.length === 1) {
+      const y = 100;
+
+      this.chartPoints.set(`0,${y} 600,${y}`);
+
+      this.chartPoints2.set(`0,${y + 20} 600,${y + 20}`);
+
+      this.areaPath.set(`M0,${y} L600,${y} L600,200 L0,200 Z`);
+
+      this.chartDots.set([{ x: 300, y }]);
+
+      return;
+    }
+
+    const W = 600;
+    const H = 200;
+    const PAD = 20;
+
+    const maxRev = Math.max(...data.map((d) => d.revenue), 1);
+
+    const maxOrd = Math.max(...data.map((d) => d.orders), 1);
 
     const toX = (i: number) => (i / (data.length - 1)) * W;
+
     const toY = (v: number, max: number) => PAD + (1 - v / max) * (H - PAD * 2);
 
     const pts = data.map((d, i) => `${toX(i)},${toY(d.revenue, maxRev)}`).join(' ');
+
     const pts2 = data.map((d, i) => `${toX(i)},${toY(d.orders, maxOrd)}`).join(' ');
+
     const lx = toX(data.length - 1);
 
     this.chartPoints.set(pts);
+
     this.chartPoints2.set(pts2);
+
     this.areaPath.set(`M${pts.replace(/ /g, ' L')} L${lx},${H} L0,${H} Z`);
-    this.chartDots.set(data.map((d, i) => ({ x: toX(i), y: toY(d.revenue, maxRev) })));
+
+    this.chartDots.set(
+      data.map((d, i) => ({
+        x: toX(i),
+        y: toY(d.revenue, maxRev),
+      })),
+    );
   }
 
   private buildStatCards(d: DashStats) {

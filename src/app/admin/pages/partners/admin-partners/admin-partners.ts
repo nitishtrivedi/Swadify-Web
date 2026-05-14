@@ -32,7 +32,13 @@ export class AdminPartners implements OnInit {
   filteredPartners = computed(() => {
     let list = this.partners();
     const q = this.search().toLowerCase();
-    if (q) list = list.filter((p) => p.name.toLowerCase().includes(q) || p.phone.includes(q));
+    if (q)
+      list = list.filter(
+        (p) =>
+          p.firstName.toLowerCase().includes(q) ||
+          p.lastName.toLowerCase().includes(q) ||
+          p.phone.includes(q),
+      );
     if (this.availFilter() === 'online') list = list.filter((p) => p.isAvailable);
     if (this.availFilter() === 'offline') list = list.filter((p) => !p.isAvailable);
     return list;
@@ -105,7 +111,12 @@ export class AdminPartners implements OnInit {
 
   editPartner(p: DeliveryPartner) {
     this.editingId.set(p.id);
-    this.partnerForm.patchValue({ name: p.name, phone: p.phone, vehicleType: p.vehicleType });
+    this.partnerForm.patchValue({
+      //firstName: p.firstName,
+      //lastName: p.lastName,
+      phone: p.phone,
+      vehicleType: p.vehicleType,
+    });
     this.showModal.set(true);
   }
 
@@ -142,7 +153,9 @@ export class AdminPartners implements OnInit {
     this.adminSvc.togglePartnerAvailability(p.id, !p.isAvailable).subscribe({
       next: (res) => {
         this.partners.update((list) => list.map((x) => (x.id === res.data.id ? res.data : x)));
-        this.toast.info(`${p.name} is now ${res.data.isAvailable ? 'online' : 'offline'}`);
+        this.toast.info(
+          `${p.firstName} ${p.lastName} is now ${res.data.isAvailable ? 'online' : 'offline'}`,
+        );
       },
       error: () => this.toast.error('Could not update availability'),
     });

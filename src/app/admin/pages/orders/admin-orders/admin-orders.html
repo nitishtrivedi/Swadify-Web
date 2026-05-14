@@ -56,11 +56,15 @@
         </svg>
         <input
           [(ngModel)]="search"
-          (ngModelChange)="applyLocalFilter()"
+          (ngModelChange)="search.set($event); applyLocalFilter()"
           placeholder="Search by order ID, customer…"
         />
       </div>
-      <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="loadOrders()">
+      <select
+        class="filter-select"
+        [(ngModel)]="sortBy"
+        (ngModelChange)="sortBy.set($event); loadOrders()"
+      >
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>
         <option value="amount_high">Highest Amount</option>
@@ -99,9 +103,9 @@
             <tr [class.row-highlight]="order.status === 'Received'">
               <td class="order-id-cell">#{{ order.id.slice(-6).toUpperCase() }}</td>
               <td class="customer-cell">
-                <div class="customer-cell__avatar">
+                <!-- <div class="customer-cell__avatar">
                   {{ order.customerId.slice(0, 1).toUpperCase() }}
-                </div>
+                </div> -->
                 {{ order.customerName }}
               </td>
               <td>{{ order.restaurant.name }}</td>
@@ -164,6 +168,21 @@
         <button [disabled]="page() === totalPages()" (click)="setPage(page() + 1)">›</button>
       </div>
     }
+  }
+
+  <!-- ── NEW ORDER ALERT ─────────────────────────────────────── -->
+  @if (newOrderAlert()) {
+    <div class="new-order-alert animate-fade-up">
+      <div class="new-order-alert__icon">🔔</div>
+      <div class="new-order-alert__body">
+        <p class="new-order-alert__title">New Order Received!</p>
+        <p class="new-order-alert__msg">{{ newOrderAlert()!.amount }}</p>
+      </div>
+      <div class="new-order-alert__actions">
+        <button class="noa-view-btn" (click)="viewNewOrder()">View</button>
+        <button class="noa-close-btn" (click)="dismissAlert()">✕</button>
+      </div>
+    </div>
   }
 </div>
 
@@ -289,9 +308,9 @@
                       [value]="p.id"
                       (change)="selectedPartnerId.set(p.id)"
                     />
-                    <div class="partner-radio__avatar">{{ p.name[0] }}</div>
+                    <div class="partner-radio__avatar">{{ p.firstName[0] }}</div>
                     <div class="partner-radio__info">
-                      <p class="partner-radio__name">{{ p.name }}</p>
+                      <p class="partner-radio__name">{{ p.firstName }} {{ p.lastName }}</p>
                       <p class="partner-radio__meta">
                         {{ p.vehicleType }} · ⭐ {{ p.rating | number: '1.1-1' }}
                       </p>

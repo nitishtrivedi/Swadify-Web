@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, NgZone, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state/empty-state';
@@ -68,12 +68,13 @@ export class Orders implements OnInit {
     },
   ]);
 
-  totalPages = computed(() => Math.ceil(this.filtered().length / this.pageSize));
+  totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize));
   pageRange = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   private signalR = inject(SignalrService);
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);
+  private zone = inject(NgZone);
 
   // ngOnInit() {
   //   this.api.get<Order[]>('/order/my').subscribe({
@@ -151,12 +152,33 @@ export class Orders implements OnInit {
     this.signalR.notification$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((notification) => {
-        if (notification.referenceId) {
-          // Reload the full list so the updated order reflects
-          this.loadOrders();
+        this.zone.run(() => {
+          console.log('Notification received in orders page:', notification);
+          debugger;
+          const newStatus = this.mapNotificationTypeToStatus(notification.type);
+          console.log('New Status is', newStatus);
+          const orderId = notification.referenceId?.toString();
           this.toast.success(notification.message);
-        }
+          if (!newStatus || !orderId) return;
+
+          // Update the specific order's status in the list without reloading
+          this.allOrders.update((list) =>
+            list.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
+          );
+        });
       });
+  }
+
+  private mapNotificationTypeToStatus(type: string): OrderStatus | null {
+    const map: Record<string, OrderStatus> = {
+      OrderConfirmed: 'Accepted',
+      OrderPreparing: 'Preparing',
+      OrderReadyForPickup: 'ReadyForPickup',
+      OrderOutForDelivery: 'OutForDelivery',
+      OrderDelivered: 'Delivered',
+      OrderCancelled: 'Cancelled',
+    };
+    return map[type] ?? null;
   }
 
   loadOrders() {

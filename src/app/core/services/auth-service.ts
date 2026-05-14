@@ -27,10 +27,34 @@ export class AuthService {
   readonly user = this._user.asReadonly();
   readonly token = this._token.asReadonly();
   readonly isLoggedIn = computed(() => !!this._token());
-  readonly isCustomer = computed(() => this._user()?.role === UserRole.Customer);
-  readonly isAdmin = computed(() => this._user()?.role === UserRole.Admin);
-  readonly isSuperAdmin = computed(() => this._user()?.role === UserRole.SuperAdmin);
-  readonly isDP = computed(() => this._user()?.role === UserRole.DeliveryPartner);
+  // readonly isCustomer = computed(() => this._user()?.role === UserRole.Customer);
+  // readonly isAdmin = computed(() => this._user()?.role === UserRole.Admin);
+  // readonly isSuperAdmin = computed(() => this._user()?.role === UserRole.SuperAdmin);
+  // readonly isDP = computed(() => this._user()?.role === UserRole.DeliveryPartner);
+
+  readonly isCustomer = computed(() => {
+    const role = this._user()?.role;
+
+    return role === UserRole.Customer || role === 'Customer';
+  });
+
+  readonly isAdmin = computed(() => {
+    const role = this._user()?.role;
+
+    return role === UserRole.Admin || role === 'Admin';
+  });
+
+  readonly isSuperAdmin = computed(() => {
+    const role = this._user()?.role;
+
+    return role === UserRole.SuperAdmin || role === 'SuperAdmin';
+  });
+
+  readonly isDP = computed(() => {
+    const role = this._user()?.role;
+
+    return role === UserRole.DeliveryPartner || role === 'DeliveryPartner';
+  });
   readonly isVerified = computed(() => !!this._user()?.isEmailVerified);
 
   // ── Register ──────────────────────────────────────────────
@@ -44,12 +68,6 @@ export class AuthService {
 
   // ── Login ─────────────────────────────────────────────────
   login(req: LoginRequest) {
-    // return this.api.post<ApiResponse<{ tokens: AuthTokens; user: User }>>('/auth/login', req).pipe(
-    //   tap((res) => {
-    //     console.log('LOGIN RES:', res);
-    //     //this.setSession(res.data.tokens, res.data.user);
-    //   }),
-    // );
     return this.api.post<LoginResponse>('/auth/login', req).pipe(
       tap((res) => {
         this.setSession(
@@ -87,13 +105,30 @@ export class AuthService {
   }
 
   // ── Logout ────────────────────────────────────────────────
-  logout() {
+  logout(redirect = true) {
+    const currentUrl = this.router.url;
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
     this._token.set(null);
     this._user.set(null);
-    this.router.navigate(['/']);
+    //this.router.navigate(['/']);
+
+    if (!redirect) return;
+    // Admin area
+    if (currentUrl.startsWith('/admin')) {
+      this.router.navigate(['/admin/login']);
+    }
+
+    // Delivery partner area
+    else if (currentUrl.startsWith('/delivery')) {
+      this.router.navigate(['/delivery/login']);
+    }
+
+    // Customer area
+    else {
+      this.router.navigate(['/']);
+    }
   }
 
   // ── Update user in state ───────────────────────────────────
@@ -113,10 +148,31 @@ export class AuthService {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     this._token.set(tokens.accessToken);
     this._user.set(user);
+
+    // Check expiry after session is set
+    queueMicrotask(() => this.checkTokenExpiry());
   }
 
   private storedUser(): User | null {
     const raw = localStorage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
+  }
+
+  private checkTokenExpiry() {
+    const token = this.token();
+    if (!token) return;
+
+    try {
+      // Decode JWT payload (middle part)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expiresAt = payload.exp * 1000; // convert to ms
+
+      if (Date.now() >= expiresAt) {
+        this.logout(false);
+      }
+    } catch {
+      // Malformed token — clear it
+      this.logout(false);
+    }
   }
 }

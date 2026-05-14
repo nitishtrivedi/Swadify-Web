@@ -170,6 +170,7 @@ export interface Order {
   cancelReason?: string;
   createdAt: string;
   updatedAt: string;
+  orderNumber: string; // e.g. #000123
 }
 
 // ── Reviews ───────────────────────────────────────────────
@@ -188,9 +189,11 @@ export interface Review {
 // ── Delivery Partner ──────────────────────────────────────
 export interface DeliveryPartner {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   isAvailable: boolean;
+  isOnline: boolean;
   rating: number;
   totalDeliveries: number;
   vehicleType: string;

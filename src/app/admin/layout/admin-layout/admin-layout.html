@@ -32,7 +32,7 @@
     <!-- Nav items -->
     <nav class="sidebar__nav">
       <p class="sidebar__section-label">{{ collapsed() ? '' : 'Main' }}</p>
-      @for (item of navItems; track item.route) {
+      @for (item of navItems(); track item.route) {
         <a
           class="nav-item"
           [routerLink]="item.route"

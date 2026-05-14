@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { DeliveryPartner, MenuCategory, MenuItem, Order, Restaurant } from '../../core/models';
 import { ApiService } from '../../core/services/api-service';
 import { HttpClient } from '@angular/common/http';
+import { Subject } from 'rxjs';
 
 export interface CreateRestaurantRequest {
   name: string;
@@ -98,6 +99,14 @@ export class AdminService {
   private api = inject(ApiService);
   private http = inject(HttpClient);
 
+  // Event emitter for order status changes
+  orderStatusChanged$ = new Subject<Order>();
+
+  // Emit when order status changes
+  notifyOrderStatusChange(order: Order) {
+    this.orderStatusChanged$.next(order);
+  }
+
   // ── Restaurants ───────────────────────────────
   // getMyRestaurants() {
   //   return this.api.getPaged<Restaurant>('/admin/restaurants/get-all');
@@ -180,7 +189,7 @@ export class AdminService {
 
   // ── Delivery Partners ─────────────────────────
   getPartners() {
-    return this.api.get<DeliveryPartner[]>('/partners');
+    return this.api.get<DeliveryPartner[]>('/admin/delivery-partners/get-all');
   }
   createPartner(req: CreatePartnerRequest) {
     return this.api.post<DeliveryPartner>('/partners', req);
@@ -334,4 +343,6 @@ export class AdminService {
       cancellationReason,
     });
   }
+
+  //DeliveryPartners
 }

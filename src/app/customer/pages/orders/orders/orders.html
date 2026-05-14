@@ -63,7 +63,7 @@
     />
   } @else {
     <div class="orders-list">
-      @for (order of filtered(); track order.id) {
+      @for (order of filtered(); track order.id + '-' + order.status) {
         <div class="order-card animate-fade-up">
           <!-- Card header -->
           <div class="order-card__header">
